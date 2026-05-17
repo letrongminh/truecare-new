@@ -314,9 +314,74 @@ class Merchant(Base):
     max_bookings_per_day: Mapped[int] = mapped_column(Integer, nullable=False, default=5)
     storefront_photo_url: Mapped[str | None] = mapped_column(Text)
     bay_photo_url: Mapped[str | None] = mapped_column(Text)
+    application_status: Mapped[str] = mapped_column(String(40), nullable=False, default="pending_review")
+    photo_status: Mapped[str] = mapped_column(String(40), nullable=False, default="missing")
+    payment_recipient_status: Mapped[str] = mapped_column(String(40), nullable=False, default="missing")
+    ekyc_status: Mapped[str] = mapped_column(String(40), nullable=False, default="not_submitted")
+    go_live_blockers: Mapped[list[str]] = mapped_column(JSONType, nullable=False, default=list)
+    ops_rejection_reason: Mapped[str | None] = mapped_column(Text)
+    ops_reviewed_by: Mapped[UUID | None] = mapped_column(Uuid(as_uuid=True), ForeignKey("users.id"))
+    ops_reviewed_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
+    photo_confirmed_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
+    payment_recipient_verified_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
     stale: Mapped[bool] = mapped_column(Boolean, nullable=False, default=False)
     created_at: Mapped[datetime] = utc_now_column()
     deleted_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
+
+
+class MerchantEkycSubmission(Base):
+    __tablename__ = "merchant_ekyc_submissions"
+    __table_args__ = (
+        UniqueConstraint("merchant_id", "kind", name="merchant_ekyc_submissions_merchant_kind_uidx"),
+        Index("merchant_ekyc_submissions_merchant", "merchant_id", "kind"),
+    )
+
+    id: Mapped[UUID] = uuid_pk()
+    tenant_id: Mapped[UUID] = mapped_column(Uuid(as_uuid=True), ForeignKey("tenants.id"), nullable=False)
+    merchant_id: Mapped[UUID] = mapped_column(Uuid(as_uuid=True), ForeignKey("merchants.id"), nullable=False)
+    kind: Mapped[str] = mapped_column(String(40), nullable=False)
+    object_key: Mapped[str] = mapped_column(Text, nullable=False)
+    status: Mapped[str] = mapped_column(String(40), nullable=False, default="submitted")
+    submitted_at: Mapped[datetime] = utc_now_column()
+    reviewed_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
+
+
+class MerchantPaymentSetup(Base):
+    __tablename__ = "merchant_payment_setups"
+    __table_args__ = (
+        UniqueConstraint("merchant_id", name="merchant_payment_setups_merchant_uidx"),
+        Index("merchant_payment_setups_status", "tenant_id", "status"),
+    )
+
+    id: Mapped[UUID] = uuid_pk()
+    tenant_id: Mapped[UUID] = mapped_column(Uuid(as_uuid=True), ForeignKey("tenants.id"), nullable=False)
+    merchant_id: Mapped[UUID] = mapped_column(Uuid(as_uuid=True), ForeignKey("merchants.id"), nullable=False)
+    bank_name: Mapped[str] = mapped_column(String(120), nullable=False)
+    account_number: Mapped[str] = mapped_column(String(80), nullable=False)
+    account_holder_name: Mapped[str] = mapped_column(String(200), nullable=False)
+    qr_object_key: Mapped[str | None] = mapped_column(Text)
+    status: Mapped[str] = mapped_column(String(40), nullable=False, default="pending_review")
+    submitted_at: Mapped[datetime] = utc_now_column()
+    verified_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
+    verified_by: Mapped[UUID | None] = mapped_column(Uuid(as_uuid=True), ForeignKey("users.id"))
+
+
+class MerchantGoldenHour(Base):
+    __tablename__ = "merchant_golden_hours"
+    __table_args__ = (
+        UniqueConstraint("merchant_id", "day_of_week", name="merchant_golden_hours_merchant_day_uidx"),
+        Index("merchant_golden_hours_merchant", "merchant_id"),
+    )
+
+    id: Mapped[UUID] = uuid_pk()
+    tenant_id: Mapped[UUID] = mapped_column(Uuid(as_uuid=True), ForeignKey("tenants.id"), nullable=False)
+    merchant_id: Mapped[UUID] = mapped_column(Uuid(as_uuid=True), ForeignKey("merchants.id"), nullable=False)
+    day_of_week: Mapped[int] = mapped_column(Integer, nullable=False)
+    start_time: Mapped[str] = mapped_column(String(16), nullable=False)
+    end_time: Mapped[str] = mapped_column(String(16), nullable=False)
+    discount_percent: Mapped[int] = mapped_column(Integer, nullable=False)
+    created_at: Mapped[datetime] = utc_now_column()
+    updated_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
 
 
 class MerchantService(Base):

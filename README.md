@@ -9,9 +9,9 @@ Start here:
 - `knowledge/02-business/` contains the retained business proposal context.
 - `knowledge/INDEX.md` records every copied artifact, original source path, destination path, and purpose.
 - `INFRA.md` is the single minimal infrastructure plan for local porting with Supabase.
-- `apps/api` contains the FastAPI backend, implemented auth/marketplace/phase 2-3 routes, local RLS/audit/correctness gates, and remaining OpenAPI contract stubs.
-- `apps/mobile` contains the Expo Router shell.
-- `apps/ops-web` contains the Vite React Ops shell.
+- `apps/api` contains the FastAPI backend, implemented auth/marketplace/phase 2-3/merchant admission/local route-closure routes, and local RLS/audit/correctness gates.
+- `apps/mobile` contains the Expo Router shell with auth/profile and basic merchant onboarding data wiring.
+- `apps/ops-web` contains the Vite React Ops shell with admissions mutation wiring and read surfaces for commission, complaints, network health, growth/eKYC, and audit.
 - `packages/api-client` contains the generated TypeScript API client.
 - `docs/migration-map-v1.md` maps the 37 legacy schema tables into the Python port.
 - `Makefile` exposes readiness gates and local scaffold commands.
@@ -20,7 +20,10 @@ All retained source documents were copied, not moved.
 
 Useful commands:
 
+Python-backed checks install and run through the repo-local `.venv`; do not install Python packages globally for this port.
+
 ```bash
+make venv
 make infra-prereqs.check
 make secret-leak.check
 make route-test-matrix.check

@@ -76,6 +76,7 @@ export const operations = [
     "path": "/v1/me/bookings",
     "operationId": "get_v1_me_bookings",
     "tags": [
+      "route-closure",
       "me"
     ]
   },
@@ -151,6 +152,7 @@ export const operations = [
     "path": "/v1/merchants/{id}/calendar",
     "operationId": "get_v1_merchants_by_id_calendar",
     "tags": [
+      "route-closure",
       "merchant"
     ]
   },
@@ -177,6 +179,7 @@ export const operations = [
     "path": "/v1/merchants/{id}/ekyc/status",
     "operationId": "get_v1_merchants_by_id_ekyc_status",
     "tags": [
+      "merchant-admission",
       "merchant-ekyc"
     ]
   },
@@ -185,6 +188,7 @@ export const operations = [
     "path": "/v1/merchants/{id}/golden-hour",
     "operationId": "get_v1_merchants_by_id_golden_hour",
     "tags": [
+      "route-closure",
       "merchant"
     ]
   },
@@ -247,6 +251,7 @@ export const operations = [
     "path": "/v1/ops/data-room/{section}",
     "operationId": "get_v1_ops_data_room_by_section",
     "tags": [
+      "route-closure",
       "ops"
     ]
   },
@@ -255,6 +260,7 @@ export const operations = [
     "path": "/v1/ops/exports/{job_id}",
     "operationId": "get_v1_ops_exports_by_job_id",
     "tags": [
+      "route-closure",
       "ops"
     ]
   },
@@ -263,6 +269,7 @@ export const operations = [
     "path": "/v1/ops/merchants/pending",
     "operationId": "get_v1_ops_merchants_pending",
     "tags": [
+      "merchant-admission",
       "ops"
     ]
   },
@@ -481,6 +488,7 @@ export const operations = [
     "path": "/v1/bookings/{id}/arrived",
     "operationId": "post_v1_bookings_by_id_arrived",
     "tags": [
+      "route-closure",
       "bookings"
     ]
   },
@@ -637,6 +645,7 @@ export const operations = [
     "path": "/v1/merchants/applications",
     "operationId": "post_v1_merchants_applications",
     "tags": [
+      "merchant-admission",
       "merchant"
     ]
   },
@@ -645,6 +654,7 @@ export const operations = [
     "path": "/v1/merchants/{id}/calendar/maintenance",
     "operationId": "post_v1_merchants_by_id_calendar_maintenance",
     "tags": [
+      "route-closure",
       "merchant"
     ]
   },
@@ -653,6 +663,7 @@ export const operations = [
     "path": "/v1/merchants/{id}/confirm-photo",
     "operationId": "post_v1_merchants_by_id_confirm_photo",
     "tags": [
+      "merchant-admission",
       "merchant"
     ]
   },
@@ -661,6 +672,7 @@ export const operations = [
     "path": "/v1/merchants/{id}/ekyc/bank",
     "operationId": "post_v1_merchants_by_id_ekyc_bank",
     "tags": [
+      "merchant-admission",
       "merchant-ekyc"
     ]
   },
@@ -669,6 +681,7 @@ export const operations = [
     "path": "/v1/merchants/{id}/ekyc/cmnd",
     "operationId": "post_v1_merchants_by_id_ekyc_cmnd",
     "tags": [
+      "merchant-admission",
       "merchant-ekyc"
     ]
   },
@@ -677,6 +690,7 @@ export const operations = [
     "path": "/v1/merchants/{id}/ekyc/selfie",
     "operationId": "post_v1_merchants_by_id_ekyc_selfie",
     "tags": [
+      "merchant-admission",
       "merchant-ekyc"
     ]
   },
@@ -685,6 +699,7 @@ export const operations = [
     "path": "/v1/merchants/{id}/payment-setup",
     "operationId": "post_v1_merchants_by_id_payment_setup",
     "tags": [
+      "merchant-admission",
       "merchant"
     ]
   },
@@ -693,6 +708,7 @@ export const operations = [
     "path": "/v1/ops/bookings",
     "operationId": "post_v1_ops_bookings",
     "tags": [
+      "route-closure",
       "ops"
     ]
   },
@@ -701,6 +717,7 @@ export const operations = [
     "path": "/v1/ops/bookings/{id}/check-in",
     "operationId": "post_v1_ops_bookings_by_id_check_in",
     "tags": [
+      "route-closure",
       "ops"
     ]
   },
@@ -709,6 +726,7 @@ export const operations = [
     "path": "/v1/ops/evidence/upload",
     "operationId": "post_v1_ops_evidence_upload",
     "tags": [
+      "route-closure",
       "ops"
     ]
   },
@@ -717,6 +735,7 @@ export const operations = [
     "path": "/v1/ops/exports",
     "operationId": "post_v1_ops_exports",
     "tags": [
+      "route-closure",
       "ops"
     ]
   },
@@ -743,6 +762,7 @@ export const operations = [
     "path": "/v1/ops/merchants/{id}/approve",
     "operationId": "post_v1_ops_merchants_by_id_approve",
     "tags": [
+      "merchant-admission",
       "ops"
     ]
   },
@@ -751,6 +771,7 @@ export const operations = [
     "path": "/v1/ops/merchants/{id}/reject",
     "operationId": "post_v1_ops_merchants_by_id_reject",
     "tags": [
+      "merchant-admission",
       "ops"
     ]
   },
@@ -759,6 +780,7 @@ export const operations = [
     "path": "/v1/ops/merchants/{id}/suspend",
     "operationId": "post_v1_ops_merchants_by_id_suspend",
     "tags": [
+      "merchant-admission",
       "ops"
     ]
   },
@@ -767,6 +789,7 @@ export const operations = [
     "path": "/v1/ops/merchants/{id}/verify-payment-recipient",
     "operationId": "post_v1_ops_merchants_by_id_verify_payment_recipient",
     "tags": [
+      "merchant-admission",
       "ops"
     ]
   },
@@ -775,6 +798,7 @@ export const operations = [
     "path": "/v1/ops/payments/{id}/confirm",
     "operationId": "post_v1_ops_payments_by_id_confirm",
     "tags": [
+      "route-closure",
       "ops"
     ]
   },
@@ -792,6 +816,7 @@ export const operations = [
     "path": "/v1/ops/reward/voucher",
     "operationId": "post_v1_ops_reward_voucher",
     "tags": [
+      "route-closure",
       "ops"
     ]
   },
@@ -926,6 +951,7 @@ export const operations = [
     "path": "/v1/merchants/{id}/golden-hour",
     "operationId": "put_v1_merchants_by_id_golden_hour",
     "tags": [
+      "route-closure",
       "merchant"
     ]
   }

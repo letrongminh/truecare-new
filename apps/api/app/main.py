@@ -13,8 +13,12 @@ from app.routers.marketplace import IMPLEMENTED_MARKETPLACE_ROUTES
 from app.routers.marketplace import router as marketplace_router
 from app.routers.me import IMPLEMENTED_ME_ROUTES
 from app.routers.me import router as me_router
+from app.routers.merchant_admission import IMPLEMENTED_MERCHANT_ADMISSION_ROUTES
+from app.routers.merchant_admission import router as merchant_admission_router
 from app.routers.phase23 import IMPLEMENTED_PHASE23_ROUTES
 from app.routers.phase23 import router as phase23_router
+from app.routers.route_closure import IMPLEMENTED_ROUTE_CLOSURE_ROUTES
+from app.routers.route_closure import router as route_closure_router
 
 
 def _rate_limit_config() -> RateLimitConfig:
@@ -51,7 +55,18 @@ def create_app(rate_limit_config: RateLimitConfig | None = None) -> FastAPI:
     app.include_router(me_router)
     app.include_router(marketplace_router)
     app.include_router(phase23_router)
-    app.include_router(build_contract_router(exclude=IMPLEMENTED_AUTH_ROUTES | IMPLEMENTED_ME_ROUTES | IMPLEMENTED_MARKETPLACE_ROUTES | IMPLEMENTED_PHASE23_ROUTES))
+    app.include_router(merchant_admission_router)
+    app.include_router(route_closure_router)
+    app.include_router(
+        build_contract_router(
+            exclude=IMPLEMENTED_AUTH_ROUTES
+            | IMPLEMENTED_ME_ROUTES
+            | IMPLEMENTED_MARKETPLACE_ROUTES
+            | IMPLEMENTED_PHASE23_ROUTES
+            | IMPLEMENTED_MERCHANT_ADMISSION_ROUTES
+            | IMPLEMENTED_ROUTE_CLOSURE_ROUTES
+        )
+    )
     return app
 
 

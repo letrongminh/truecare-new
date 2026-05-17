@@ -30,6 +30,7 @@ class ErrorCode(StrEnum):
     promo_not_applicable = "PROMO_NOT_APPLICABLE"
     evidence_retry_exhausted = "EVIDENCE_RETRY_EXHAUSTED"
     audit_write_failed = "AUDIT_WRITE_FAILED"
+    merchant_go_live_blocked = "MERCHANT_GO_LIVE_BLOCKED"
     invalid_invite = "INVALID_INVITE"
     device_limit_exceeded = "DEVICE_LIMIT_EXCEEDED"
     resource_not_found = "RESOURCE_NOT_FOUND"
@@ -228,6 +229,14 @@ ERROR_REGISTRY: dict[ErrorCode, ErrorDefinition] = {
         detail_key="errors.audit_write_failed.detail",
         retryable=True,
         client_action="retry_later_or_contact_support",
+    ),
+    ErrorCode.merchant_go_live_blocked: ErrorDefinition(
+        status=409,
+        type="https://truecare.vn/problems/merchant-go-live-blocked",
+        title_key="errors.merchant_go_live_blocked.title",
+        detail_key="errors.merchant_go_live_blocked.detail",
+        retryable=False,
+        client_action="complete_go_live_checklist",
     ),
     ErrorCode.invalid_invite: ErrorDefinition(
         status=422,

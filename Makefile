@@ -25,9 +25,9 @@ $(VENV_MARKER): apps/api/requirements.txt
 infra-prereqs.check:
 	@scripts/infra/infra-prereqs-check.sh
 
-## supabase-readiness.check — verify Supabase DB extensions, roles, Realtime, and Storage assumptions
-supabase-readiness.check:
-	@scripts/infra/supabase-readiness-check.sh
+## supabase-readiness.check — verify Supabase DB extensions, roles, Realtime, and Storage assumptions through .venv
+supabase-readiness.check: venv
+	@$(VENV_PY) scripts/infra/supabase_readiness_check.py
 
 ## secret-leak.check — scan tracked files for high-risk secret material
 secret-leak.check:
