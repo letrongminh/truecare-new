@@ -1485,6 +1485,7 @@ Completed slices:
 - [x] Phase 2/3 backend completion slice: evidence presign/confirm/process, payments, rating, realtime token, promo, rewards, referrals, complaints, merchant custom service review/resubmit, price history, daily summary CSV, commission receivables, integration coverage, and regenerated OpenAPI client.
 - [x] Phase 4 mobile foundation slice: Tamagui provider/config, SecureStore-backed auth store, generated API client runtime wrapper, TanStack Query provider, offline mutation queue, all 20 mandatory Expo Router files, mobile route-file gate, and JavaScript workspace typecheck.
 - [x] Phase 5 Ops Web foundation slice: React Query provider, generated API client runtime wrapper, persisted bearer-token ops guard via `/v1/auth/me`, admissions/commission/complaints/network-health/growth-eKYC/audit route shells, shared loading/empty/error/offline/forbidden state surface, and ops route-file gate.
+- [x] Backend hardening and Phase 6 readiness slice: structured JSON access logging, configurable global/auth rate-limit foundation with tests, migration dry-run planner for the 37-table map, deterministic seed manifest/checker, and shadow-read comparison dry-run harness.
 
 Current verification:
 - [x] `make infra-prereqs.check`
@@ -1492,6 +1493,9 @@ Current verification:
 - [x] `make route-test-matrix.check`
 - [x] `make mobile.route-files.check`
 - [x] `make ops.route-files.check`
+- [x] `make migration.dry-run`
+- [x] `make seed.plan.check`
+- [x] `make shadow-read.check`
 - [x] `make db.up`
 - [x] `make db.migrate`
 - [x] `make api.test`
@@ -1510,17 +1514,17 @@ Deliverables:
 - [x] Route manifest and testID convention via `knowledge/00-porting/route-test-matrix-v1.md`.
 - [x] UI system decision and shell primitives for Expo and Ops web shells.
 - [x] Auth/RBAC/RLS spec and proof-of-concept implementation.
-- [ ] Rate-limit spec implementation.
+- [x] Rate-limit spec implementation.
 - [ ] Booking concurrency spike.
 - [ ] Offline/evidence queue spike.
 - [ ] Realtime private channel policy spike.
 - [x] Migration map for legacy 37-table schema.
-- [ ] Seed plan.
+- [x] Seed plan.
 - [x] Test infrastructure skeleton for API unit/integration gates.
 
 Exit gate:
 - [x] Runner choice, UI library, RLS stance, and route manifest are no longer blocked for the first scaffold.
-- [ ] Booking, evidence, realtime, seed, and production rate-limit spikes remain before Phase 0 is fully closed.
+- [ ] Booking, evidence, realtime, and shared-store production rate-limit spikes remain before Phase 0 is fully closed.
 
 ### Phase 1 - Backend Foundation
 
@@ -1532,12 +1536,12 @@ Build:
 - [x] SQLAlchemy async engine/session.
 - [x] Request ID middleware.
 - [x] RFC 9457 error envelope and registered typed errors.
-- [ ] Structured JSON logging.
+- [x] Structured JSON logging.
 - [x] Auth with refresh rotation.
 - [x] Refresh-token reuse detection.
 - [x] RBAC dependencies: `require_user`, `require_role`, `require_tenant`.
 - [x] RLS tenant context through `SET LOCAL`.
-- [ ] Production rate limiter.
+- [x] Configurable rate limiter for global, login, signup, and refresh limits.
 - [x] Idempotency service keyed by tenant, subject, and key with body-hash mismatch handling.
 - [x] Domain events table and repository.
 - [x] Worker skeleton with domain-event claim/drain no-op.
@@ -1548,8 +1552,8 @@ Exit gate:
 - [x] Auth/security integration suite passes.
 - [x] DB RLS proof test passes for the first RLS table.
 - [x] Generated client is regenerated from OpenAPI.
-- [ ] Rate-limit tests pass.
-- [ ] Structured logging checks pass.
+- [x] Rate-limit tests pass.
+- [x] Structured logging checks pass.
 - [ ] RLS coverage expands from proof table to production tenant tables.
 
 ### Phase 2 - Core Marketplace Loop
@@ -1642,9 +1646,9 @@ Exit gate:
 Duration: 1-2 weeks.
 
 Build:
-- [ ] Migration script with dry-run mode.
-- [ ] Seed scripts.
-- [ ] Shadow-read compare harness.
+- [x] Migration script with dry-run mode.
+- [x] Seed manifest/checker.
+- [x] Shadow-read compare dry-run harness.
 - [ ] Production deploy pipeline.
 - [ ] Backup/restore rehearsal.
 - [ ] Feature-flagged API origin switch.

@@ -26,6 +26,9 @@ make secret-leak.check
 make route-test-matrix.check
 make mobile.route-files.check
 make ops.route-files.check
+make migration.dry-run
+make seed.plan.check
+make shadow-read.check
 make db.up
 make db.migrate
 make api.test

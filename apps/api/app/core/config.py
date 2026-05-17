@@ -16,6 +16,14 @@ class Settings(BaseSettings):
     jwt_issuer: str = Field(default="truecare-new-api", alias="JWT_ISSUER")
     jwt_audience: str = Field(default="truecare-new", alias="JWT_AUDIENCE")
     default_tenant_name: str = "TrueCare Pilot"
+    rate_limit_enabled: bool = Field(default=True, alias="RATE_LIMIT_ENABLED")
+    rate_limit_global_per_minute: int = Field(default=100, alias="RATE_LIMIT_GLOBAL_PER_MINUTE")
+    rate_limit_login_limit: int = Field(default=5, alias="RATE_LIMIT_LOGIN_LIMIT")
+    rate_limit_login_window_seconds: int = Field(default=900, alias="RATE_LIMIT_LOGIN_WINDOW_SECONDS")
+    rate_limit_signup_limit: int = Field(default=3, alias="RATE_LIMIT_SIGNUP_LIMIT")
+    rate_limit_signup_window_seconds: int = Field(default=3600, alias="RATE_LIMIT_SIGNUP_WINDOW_SECONDS")
+    rate_limit_refresh_limit: int = Field(default=20, alias="RATE_LIMIT_REFRESH_LIMIT")
+    rate_limit_refresh_window_seconds: int = Field(default=3600, alias="RATE_LIMIT_REFRESH_WINDOW_SECONDS")
 
     model_config = SettingsConfigDict(env_file=".env", extra="ignore", populate_by_name=True)
 

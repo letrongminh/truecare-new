@@ -1,6 +1,7 @@
-from fastapi import APIRouter, Depends
+from fastapi import APIRouter, Depends, Request
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from app.core.rate_limit import enforce_login_rate_limit, enforce_refresh_rate_limit, enforce_signup_rate_limit
 from app.core.security import CurrentUser, require_user
 from app.db.session import get_session
 from app.schemas.auth import (
@@ -35,30 +36,33 @@ async def exists(request: AuthExistsRequest, session: AsyncSession = Depends(get
 
 
 @router.post("/signup", response_model=TokenPair, operation_id="post_v1_auth_signup")
-async def signup(request: SignupRequest, session: AsyncSession = Depends(get_session)) -> TokenPair:
+async def signup(request: Request, body: SignupRequest, session: AsyncSession = Depends(get_session)) -> TokenPair:
+    enforce_signup_rate_limit(request, body.identifier)
     async with session.begin():
         user, locale = await AuthService(session).signup(
-            identifier=request.identifier,
-            password=request.password,
-            display_name=request.display_name,
-            locale=request.locale,
+            identifier=body.identifier,
+            password=body.password,
+            display_name=body.display_name,
+            locale=body.locale,
         )
         token_pair = await AuthService(session).issue_token_pair(user, locale=locale)
     return TokenPair(**token_pair)
 
 
 @router.post("/login", response_model=TokenPair, operation_id="post_v1_auth_login")
-async def login(request: LoginRequest, session: AsyncSession = Depends(get_session)) -> TokenPair:
+async def login(request: Request, body: LoginRequest, session: AsyncSession = Depends(get_session)) -> TokenPair:
+    enforce_login_rate_limit(request, body.identifier)
     async with session.begin():
-        user, locale = await AuthService(session).login(identifier=request.identifier, password=request.password)
+        user, locale = await AuthService(session).login(identifier=body.identifier, password=body.password)
         token_pair = await AuthService(session).issue_token_pair(user, locale=locale)
     return TokenPair(**token_pair)
 
 
 @router.post("/refresh", response_model=TokenPair, operation_id="post_v1_auth_refresh")
-async def refresh(request: RefreshRequest, session: AsyncSession = Depends(get_session)) -> TokenPair:
+async def refresh(request: Request, body: RefreshRequest, session: AsyncSession = Depends(get_session)) -> TokenPair:
+    enforce_refresh_rate_limit(request, body.refresh_token)
     async with session.begin():
-        token_pair = await AuthService(session).refresh(request.refresh_token)
+        token_pair = await AuthService(session).refresh(body.refresh_token)
     return TokenPair(**token_pair)
 
 

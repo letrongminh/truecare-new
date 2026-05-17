@@ -1,0 +1,99 @@
+{
+  "version": 1,
+  "description": "Deterministic baseline seeds required before TrueCare P0 migration/cutover.",
+  "groups": [
+    {
+      "name": "tenant",
+      "table": "tenants",
+      "required": true,
+      "naturalKey": ["name"],
+      "rows": [
+        {
+          "name": "TrueCare Pilot"
+        }
+      ]
+    },
+    {
+      "name": "service_templates",
+      "table": "service_templates",
+      "required": true,
+      "naturalKey": ["name"],
+      "rows": [
+        {
+          "name": "Rua ngoai that",
+          "base_price": 80000,
+          "duration_min": 20,
+          "duration_max": 35,
+          "evidence_required": "before_after_exterior"
+        },
+        {
+          "name": "Rua noi that",
+          "base_price": 120000,
+          "duration_min": 30,
+          "duration_max": 45,
+          "evidence_required": "interior_after"
+        },
+        {
+          "name": "Rua tron goi",
+          "base_price": 180000,
+          "duration_min": 45,
+          "duration_max": 70,
+          "evidence_required": "before_after_interior"
+        }
+      ]
+    },
+    {
+      "name": "worker_jobs",
+      "table": "worker_jobs",
+      "required": true,
+      "naturalKey": ["name"],
+      "rows": [
+        {
+          "name": "expire_stale_holds",
+          "schedule_kind": "interval",
+          "max_lag_seconds": 120
+        },
+        {
+          "name": "release_stale_vouchers",
+          "schedule_kind": "interval",
+          "max_lag_seconds": 120
+        },
+        {
+          "name": "process_evidence_uploads",
+          "schedule_kind": "interval",
+          "max_lag_seconds": 300
+        },
+        {
+          "name": "complaint_sla_escalation",
+          "schedule_kind": "interval",
+          "max_lag_seconds": 600
+        },
+        {
+          "name": "daily_summary_materialization",
+          "schedule_kind": "interval",
+          "max_lag_seconds": 1800
+        }
+      ]
+    },
+    {
+      "name": "feature_flags",
+      "table": "feature_flags",
+      "required": false,
+      "naturalKey": ["key"],
+      "rows": [
+        {
+          "key": "api_origin_switch",
+          "default": "new-api"
+        },
+        {
+          "key": "force_update_enabled",
+          "default": false
+        },
+        {
+          "key": "realtime_poll_fallback",
+          "default": true
+        }
+      ]
+    }
+  ]
+}

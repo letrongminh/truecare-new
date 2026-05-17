@@ -26,6 +26,7 @@ class ErrorCode(StrEnum):
     invalid_booking_state = "INVALID_BOOKING_STATE"
     invalid_check_in_code = "INVALID_CHECK_IN_CODE"
     hold_expired = "HOLD_EXPIRED"
+    rate_limited = "RATE_LIMITED"
 
 
 class ErrorDefinition(BaseModel):
@@ -189,6 +190,14 @@ ERROR_REGISTRY: dict[ErrorCode, ErrorDefinition] = {
         detail_key="errors.hold_expired.detail",
         retryable=False,
         client_action="create_new_booking_hold",
+    ),
+    ErrorCode.rate_limited: ErrorDefinition(
+        status=429,
+        type="https://truecare.vn/problems/rate-limited",
+        title_key="errors.rate_limited.title",
+        detail_key="errors.rate_limited.detail",
+        retryable=True,
+        client_action="wait_and_retry",
     ),
 }
 

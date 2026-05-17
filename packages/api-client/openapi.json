@@ -718,7 +718,8 @@
           "INVALID_BOOKING_HOLD",
           "INVALID_BOOKING_STATE",
           "INVALID_CHECK_IN_CODE",
-          "HOLD_EXPIRED"
+          "HOLD_EXPIRED",
+          "RATE_LIMITED"
         ],
         "title": "ErrorCode",
         "type": "string"

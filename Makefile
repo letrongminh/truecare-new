@@ -45,6 +45,18 @@ mobile.route-files.check:
 ops.route-files.check:
 	@$(PYTHON) scripts/checks/ops_route_files_check.py
 
+## migration.dry-run — verify the legacy-to-new migration dry-run plan
+migration.dry-run:
+	@$(PYTHON) scripts/migration/migration_dry_run.py
+
+## seed.plan.check — verify deterministic baseline seed manifest
+seed.plan.check:
+	@$(PYTHON) scripts/migration/seed_baseline.py
+
+## shadow-read.check — verify shadow-read comparison query coverage
+shadow-read.check:
+	@$(PYTHON) scripts/migration/shadow_read_compare.py
+
 ## api.test — run FastAPI foundation tests through the local venv
 api.test: venv
 	@cd apps/api && ../../$(VENV_PY) -m pytest -m "not integration"
