@@ -2,7 +2,7 @@
 set -euo pipefail
 
 missing=()
-for bin in docker node pnpm uv psql supabase jq curl git ssh; do
+for bin in node pnpm uv psql supabase jq curl git; do
   if ! command -v "$bin" >/dev/null 2>&1; then
     missing+=("$bin")
   fi
@@ -19,11 +19,6 @@ if (( node_major < 22 )) || (( node_major % 2 != 0 )); then
   exit 1
 fi
 
-docker info >/dev/null 2>&1 || {
-  echo 'docker daemon is not reachable' >&2
-  exit 1
-}
-
 remote="$(git remote get-url origin 2>/dev/null || true)"
 case "$remote" in
   https://github.com/letrongminh/truecare-new.git|git@github.com:letrongminh/truecare-new.git) ;;
@@ -33,13 +28,15 @@ case "$remote" in
     ;;
 esac
 
-if [[ -n "${EC2_SSH_KEY_PATH:-}" && ! -f "$EC2_SSH_KEY_PATH" ]]; then
-  printf 'EC2_SSH_KEY_PATH does not exist: %s\n' "$EC2_SSH_KEY_PATH" >&2
-  exit 1
-fi
+warnings=()
+for optional in docker aws ssh gh eas; do
+  if ! command -v "$optional" >/dev/null 2>&1; then
+    warnings+=("$optional")
+  fi
+done
 
-if [[ "${CHECK_MODE:-local}" != "ci" ]]; then
-  supabase projects list >/dev/null
+if ((${#warnings[@]} > 0)); then
+  printf 'optional tools not installed yet: %s\n' "${warnings[*]}" >&2
 fi
 
 echo ok
