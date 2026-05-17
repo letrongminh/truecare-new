@@ -136,6 +136,7 @@ class ProcessedDomainEvent(Base):
 
     consumer_name: Mapped[str] = mapped_column(String(120), primary_key=True)
     event_id: Mapped[UUID] = mapped_column(Uuid(as_uuid=True), primary_key=True)
+    tenant_id: Mapped[UUID | None] = mapped_column(Uuid(as_uuid=True), ForeignKey("tenants.id"))
     processed_at: Mapped[datetime] = utc_now_column()
     result_hash: Mapped[str | None] = mapped_column(String(128))
     error_context: Mapped[dict[str, Any] | None] = mapped_column(JSONType)
@@ -290,6 +291,10 @@ class Evidence(Base):
     perceptual_hash: Mapped[str | None] = mapped_column(String(128))
     watermarked_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
     exif_stripped: Mapped[bool] = mapped_column(Boolean, nullable=False, default=False)
+    retry_attempts: Mapped[int] = mapped_column(Integer, nullable=False, default=0)
+    retry_exhausted_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
+    ops_review_required: Mapped[bool] = mapped_column(Boolean, nullable=False, default=False)
+    last_retry_error: Mapped[str | None] = mapped_column(Text)
     created_at: Mapped[datetime] = utc_now_column()
     uploaded_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
 
@@ -457,6 +462,7 @@ class WorkerJob(Base):
     __tablename__ = "worker_jobs"
 
     name: Mapped[str] = mapped_column(String(120), primary_key=True)
+    tenant_id: Mapped[UUID | None] = mapped_column(Uuid(as_uuid=True), ForeignKey("tenants.id"))
     schedule_kind: Mapped[str] = mapped_column(String(40), nullable=False)
     enabled: Mapped[bool] = mapped_column(Boolean, nullable=False, default=True)
     next_run_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
@@ -470,6 +476,7 @@ class WorkerRun(Base):
     __tablename__ = "worker_runs"
 
     id: Mapped[UUID] = uuid_pk()
+    tenant_id: Mapped[UUID | None] = mapped_column(Uuid(as_uuid=True), ForeignKey("tenants.id"))
     job_name: Mapped[str] = mapped_column(String(120), ForeignKey("worker_jobs.name"), nullable=False)
     owner_id: Mapped[str] = mapped_column(String(120), nullable=False)
     attempt: Mapped[int] = mapped_column(Integer, nullable=False, default=1)
@@ -480,6 +487,25 @@ class WorkerRun(Base):
     high_watermark: Mapped[str | None] = mapped_column(String(200))
     rows_processed: Mapped[int] = mapped_column(Integer, nullable=False, default=0)
     error_context: Mapped[dict[str, Any] | None] = mapped_column(JSONType)
+
+
+class AuditLog(Base):
+    __tablename__ = "audit_log"
+    __table_args__ = (
+        Index("audit_log_tenant_recorded", "tenant_id", "recorded_at"),
+        Index("audit_log_actor", "actor_user_id", "recorded_at"),
+        Index("audit_log_target", "target_kind", "target_id"),
+    )
+
+    id: Mapped[UUID] = uuid_pk()
+    tenant_id: Mapped[UUID] = mapped_column(Uuid(as_uuid=True), ForeignKey("tenants.id"), nullable=False)
+    actor_user_id: Mapped[UUID | None] = mapped_column(Uuid(as_uuid=True), ForeignKey("users.id"))
+    action: Mapped[str] = mapped_column(String(120), nullable=False)
+    target_kind: Mapped[str] = mapped_column(String(80), nullable=False)
+    target_id: Mapped[UUID | None] = mapped_column(Uuid(as_uuid=True))
+    payload: Mapped[dict[str, Any]] = mapped_column(JSONType, nullable=False, default=dict)
+    recorded_at: Mapped[datetime] = utc_now_column()
+    request_id: Mapped[str | None] = mapped_column(String(80))
 
 
 class RlsProbeRecord(Base):

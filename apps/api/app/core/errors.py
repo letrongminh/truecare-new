@@ -27,6 +27,9 @@ class ErrorCode(StrEnum):
     invalid_check_in_code = "INVALID_CHECK_IN_CODE"
     hold_expired = "HOLD_EXPIRED"
     rate_limited = "RATE_LIMITED"
+    promo_not_applicable = "PROMO_NOT_APPLICABLE"
+    evidence_retry_exhausted = "EVIDENCE_RETRY_EXHAUSTED"
+    audit_write_failed = "AUDIT_WRITE_FAILED"
 
 
 class ErrorDefinition(BaseModel):
@@ -198,6 +201,30 @@ ERROR_REGISTRY: dict[ErrorCode, ErrorDefinition] = {
         detail_key="errors.rate_limited.detail",
         retryable=True,
         client_action="wait_and_retry",
+    ),
+    ErrorCode.promo_not_applicable: ErrorDefinition(
+        status=422,
+        type="https://truecare.vn/problems/promo-not-applicable",
+        title_key="errors.promo_not_applicable.title",
+        detail_key="errors.promo_not_applicable.detail",
+        retryable=False,
+        client_action="choose_another_promo",
+    ),
+    ErrorCode.evidence_retry_exhausted: ErrorDefinition(
+        status=409,
+        type="https://truecare.vn/problems/evidence-retry-exhausted",
+        title_key="errors.evidence_retry_exhausted.title",
+        detail_key="errors.evidence_retry_exhausted.detail",
+        retryable=False,
+        client_action="request_ops_review",
+    ),
+    ErrorCode.audit_write_failed: ErrorDefinition(
+        status=500,
+        type="https://truecare.vn/problems/audit-write-failed",
+        title_key="errors.audit_write_failed.title",
+        detail_key="errors.audit_write_failed.detail",
+        retryable=True,
+        client_action="retry_later_or_contact_support",
     ),
 }
 

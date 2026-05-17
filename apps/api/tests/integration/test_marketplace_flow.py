@@ -1,12 +1,15 @@
 from __future__ import annotations
 
+import asyncio
 from datetime import timedelta
 from uuid import UUID, uuid4
 
+import httpx
 import pytest
 from fastapi.testclient import TestClient
-from sqlalchemy import delete, select
+from sqlalchemy import delete, func, select
 
+from app.core.rate_limit import RateLimitConfig
 from app.db.models import Booking, Complaint, Evidence, Merchant, MerchantService, Payment, PromoCodeUsage, Rating, RewardStamp, SlotCapacity, ServiceTemplate
 from app.db.session import get_sessionmaker
 from app.main import create_app
@@ -32,7 +35,7 @@ async def _signup(client: TestClient) -> tuple[str, UUID, UUID]:
     return access_token, UUID(me.json()["tenant_id"]), UUID(me.json()["user_id"])
 
 
-async def _seed_marketplace(tenant_id: UUID, user_id: UUID) -> tuple[UUID, UUID]:
+async def _seed_marketplace(tenant_id: UUID, user_id: UUID, *, slot_count: int = 2) -> tuple[UUID, UUID]:
     merchant_id = uuid4()
     service_id = uuid4()
     now_slot = round_to_current_slot()
@@ -92,17 +95,10 @@ async def _seed_marketplace(tenant_id: UUID, user_id: UUID) -> tuple[UUID, UUID]
                         tenant_id=tenant_id,
                         merchant_id=merchant_id,
                         bay_number=1,
-                        time_slot=now_slot,
+                        time_slot=now_slot + timedelta(minutes=30 * index),
                         status="available",
-                    ),
-                    SlotCapacity(
-                        id=uuid4(),
-                        tenant_id=tenant_id,
-                        merchant_id=merchant_id,
-                        bay_number=1,
-                        time_slot=now_slot + timedelta(minutes=30),
-                        status="available",
-                    ),
+                    )
+                    for index in range(slot_count)
                 ]
             )
     return merchant_id, service_id
@@ -211,3 +207,45 @@ async def test_slot_full_is_reported_after_available_slots_are_claimed() -> None
     )
     assert full.status_code == 409
     assert full.json()["code"] == "SLOT_FULL"
+
+
+@pytest.mark.anyio
+@pytest.mark.parametrize("request_count", [10, 50, 100])
+async def test_concurrent_booking_holds_allow_only_one_winner_per_slot(request_count: int) -> None:
+    app = create_app(rate_limit_config=RateLimitConfig(enabled=False))
+    client = TestClient(app)
+    access_token, tenant_id, user_id = await _signup(client)
+    merchant_id, service_id = await _seed_marketplace(tenant_id, user_id, slot_count=1)
+    headers = {"Authorization": f"Bearer {access_token}"}
+    base_body = {
+        "merchant_id": str(merchant_id),
+        "merchant_service_id": str(service_id),
+        "bay_number": 1,
+    }
+    transport = httpx.ASGITransport(app=app)
+    semaphore = asyncio.Semaphore(25)
+
+    async def post_hold(index: int) -> httpx.Response:
+        async with semaphore:
+            async with httpx.AsyncClient(transport=transport, base_url="http://testserver") as async_client:
+                return await async_client.post(
+                    "/v1/bookings/holds",
+                    json={**base_body, "idempotency_key": f"storm-{request_count}-{index}-{uuid4().hex}"},
+                    headers=headers,
+                )
+
+    responses = await asyncio.gather(*(post_hold(index) for index in range(request_count)))
+    successes = [response for response in responses if response.status_code == 201]
+    conflicts = [response for response in responses if response.status_code == 409 and response.json()["code"] == "SLOT_FULL"]
+
+    assert len(successes) == 1
+    assert len(conflicts) == request_count - 1
+    async with get_sessionmaker()() as session:
+        held_bookings = await session.scalar(
+            select(func.count()).select_from(Booking).where(Booking.tenant_id == tenant_id, Booking.merchant_id == merchant_id, Booking.status == "held")
+        )
+        held_slots = await session.scalar(
+            select(func.count()).select_from(SlotCapacity).where(SlotCapacity.tenant_id == tenant_id, SlotCapacity.merchant_id == merchant_id, SlotCapacity.status == "held")
+        )
+    assert held_bookings == 1
+    assert held_slots == 1

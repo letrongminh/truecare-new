@@ -37,6 +37,9 @@ class EvidenceDto(BaseModel):
     perceptual_hash: str | None = None
     watermarked_at: datetime | None = None
     exif_stripped: bool = False
+    retry_attempts: int = 0
+    retry_exhausted_at: datetime | None = None
+    ops_review_required: bool = False
 
 
 class EvidenceListResponse(BaseModel):
@@ -122,7 +125,10 @@ class CreatePromoCodeRequest(BaseModel):
     discount_value: int = Field(gt=0)
     max_discount_amount: int | None = Field(default=None, ge=0)
     min_order_amount: int | None = Field(default=None, ge=0)
+    merchant_id: UUID | None = None
+    service_template_id: UUID | None = None
     usage_limit_total: int = Field(default=100, ge=1)
+    usage_limit_per_user: int = Field(default=1, ge=1)
 
 
 class RewardProgressResponse(BaseModel):
@@ -266,6 +272,20 @@ class CommissionReceivableDto(BaseModel):
 
 class CommissionReceivablesResponse(BaseModel):
     receivables: list[CommissionReceivableDto]
+
+
+class AuditLogDto(BaseModel):
+    id: UUID
+    actor_user_id: UUID | None = None
+    action: str
+    target_kind: str
+    target_id: UUID | None = None
+    payload: dict[str, object] = Field(default_factory=dict)
+    recorded_at: datetime
+
+
+class AuditLogResponse(BaseModel):
+    audit_log: list[AuditLogDto]
 
 
 class RealtimeTokenResponse(BaseModel):

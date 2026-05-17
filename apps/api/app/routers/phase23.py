@@ -9,6 +9,8 @@ from app.core.security import CurrentUser, require_user
 from app.db.session import get_session
 from app.schemas.marketplace import BookingDto, MerchantServiceDto
 from app.schemas.phase23 import (
+    AuditLogDto,
+    AuditLogResponse,
     CommissionReceivablesResponse,
     ComplaintDto,
     ComplaintListResponse,
@@ -83,6 +85,7 @@ IMPLEMENTED_PHASE23_ROUTES = {
     ("GET", "/v1/ops/commission-receivables"),
     ("GET", "/v1/ops/complaints"),
     ("PATCH", "/v1/ops/complaints/{id}"),
+    ("GET", "/v1/ops/audit-log"),
     ("POST", "/v1/realtime/token"),
 }
 
@@ -291,7 +294,18 @@ async def daily_summary_csv(id: UUID, current: CurrentUser = Depends(require_use
 @router.post("/v1/ops/promo-codes", response_model=PromoValidateResponse, operation_id="post_v1_ops_promo_codes", tags=["ops"])
 async def ops_create_promo(request: CreatePromoCodeRequest, current: CurrentUser = Depends(require_user), session: AsyncSession = Depends(get_session)) -> PromoValidateResponse:
     async with session.begin():
-        promo = await Phase23Service(session).create_promo(current=current, code=request.code, discount_type=request.discount_type, discount_value=request.discount_value, max_discount_amount=request.max_discount_amount, min_order_amount=request.min_order_amount, usage_limit_total=request.usage_limit_total)
+        promo = await Phase23Service(session).create_promo(
+            current=current,
+            code=request.code,
+            discount_type=request.discount_type,
+            discount_value=request.discount_value,
+            max_discount_amount=request.max_discount_amount,
+            min_order_amount=request.min_order_amount,
+            merchant_id=request.merchant_id,
+            service_template_id=request.service_template_id,
+            usage_limit_total=request.usage_limit_total,
+            usage_limit_per_user=request.usage_limit_per_user,
+        )
     return PromoValidateResponse(valid=True, code=promo.code)
 
 
@@ -325,6 +339,26 @@ async def ops_complaints(current: CurrentUser = Depends(require_user), session: 
 async def ops_update_complaint(id: UUID, request: OpsComplaintUpdateRequest, current: CurrentUser = Depends(require_user), session: AsyncSession = Depends(get_session)) -> ComplaintDto:
     async with session.begin():
         return await Phase23Service(session).update_ops_complaint(current=current, complaint_id=id, status=request.status, resolution=request.resolution, refund_approved=request.refund_approved, voucher_action=request.voucher_action)
+
+
+@router.get("/v1/ops/audit-log", response_model=AuditLogResponse, operation_id="get_v1_ops_audit_log", tags=["ops"])
+async def ops_audit_log(limit: int = Query(default=100, ge=1, le=500), current: CurrentUser = Depends(require_user), session: AsyncSession = Depends(get_session)) -> AuditLogResponse:
+    async with session.begin():
+        rows = await Phase23Service(session).list_audit_log(current=current, limit=limit)
+    return AuditLogResponse(
+        audit_log=[
+            AuditLogDto(
+                id=row.id,
+                actor_user_id=row.actor_user_id,
+                action=row.action,
+                target_kind=row.target_kind,
+                target_id=row.target_id,
+                payload=row.payload,
+                recorded_at=row.recorded_at,
+            )
+            for row in rows
+        ]
+    )
 
 
 @router.post("/v1/realtime/token", response_model=RealtimeTokenResponse, operation_id="post_v1_realtime_token", tags=["realtime"])

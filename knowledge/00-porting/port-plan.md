@@ -1486,6 +1486,7 @@ Completed slices:
 - [x] Phase 4 mobile foundation slice: Tamagui provider/config, SecureStore-backed auth store, generated API client runtime wrapper, TanStack Query provider, offline mutation queue, all 20 mandatory Expo Router files, mobile route-file gate, and JavaScript workspace typecheck.
 - [x] Phase 5 Ops Web foundation slice: React Query provider, generated API client runtime wrapper, persisted bearer-token ops guard via `/v1/auth/me`, admissions/commission/complaints/network-health/growth-eKYC/audit route shells, shared loading/empty/error/offline/forbidden state surface, and ops route-file gate.
 - [x] Backend hardening and Phase 6 readiness slice: structured JSON access logging, configurable global/auth rate-limit foundation with tests, migration dry-run planner for the 37-table map, deterministic seed manifest/checker, and shadow-read comparison dry-run harness.
+- [x] Backend correctness closure + local cutover gates: production-table RLS migration and app-role coverage tests, booking hold storm tests for 10/50/100 requests, evidence confirm idempotency and retry exhaustion state, promo validation matrix with discount math, transactional audit rows plus `/v1/ops/audit-log`, daily summary CSV header/totals checks, and regenerated OpenAPI client.
 
 Current verification:
 - [x] `make infra-prereqs.check`
@@ -1515,7 +1516,7 @@ Deliverables:
 - [x] UI system decision and shell primitives for Expo and Ops web shells.
 - [x] Auth/RBAC/RLS spec and proof-of-concept implementation.
 - [x] Rate-limit spec implementation.
-- [ ] Booking concurrency spike.
+- [x] Booking concurrency spike.
 - [ ] Offline/evidence queue spike.
 - [ ] Realtime private channel policy spike.
 - [x] Migration map for legacy 37-table schema.
@@ -1524,7 +1525,7 @@ Deliverables:
 
 Exit gate:
 - [x] Runner choice, UI library, RLS stance, and route manifest are no longer blocked for the first scaffold.
-- [ ] Booking, evidence, realtime, and shared-store production rate-limit spikes remain before Phase 0 is fully closed.
+- [ ] Evidence offline queue, realtime private channel, and shared-store production rate-limit spikes remain before Phase 0 is fully closed.
 
 ### Phase 1 - Backend Foundation
 
@@ -1554,7 +1555,7 @@ Exit gate:
 - [x] Generated client is regenerated from OpenAPI.
 - [x] Rate-limit tests pass.
 - [x] Structured logging checks pass.
-- [ ] RLS coverage expands from proof table to production tenant tables.
+- [x] RLS coverage expands from proof table to production tenant tables.
 
 ### Phase 2 - Core Marketplace Loop
 
@@ -1574,9 +1575,9 @@ Build:
 Exit gate:
 - [x] Full core loop passes API integration.
 - [ ] Maestro smoke passes.
-- [ ] Concurrent hold tests pass.
+- [x] Concurrent hold tests pass.
 - [x] Payment idempotency replay is implemented for initiate.
-- [ ] Evidence retry tests pass.
+- [x] Evidence retry tests pass.
 
 ### Phase 3 - Retention, Promo, Complaints, Ops Support
 
@@ -1596,7 +1597,8 @@ Exit gate:
 - [ ] Reward C10/C11/C12 mobile flows pass.
 - [x] Referral backend smoke passes.
 - [x] Complaint ops backend workflow passes.
-- [ ] Promo 8-case and stacking test matrix passes.
+- [x] Promo 8-case validation matrix and discount math pass.
+- [ ] Promo stacking rules pass after Golden Hour/reward/voucher stacking surface is implemented.
 
 ### Phase 4 - Expo Mobile Parity
 
@@ -1638,8 +1640,8 @@ Build:
 Exit gate:
 - [x] Mandatory Ops web route files exist, expose matrix `testIDPrefix` values, and compile.
 - [ ] Playwright ops journeys pass.
-- [ ] Exports return correct CSV headers and totals.
-- [ ] Ops actions write audit log.
+- [x] Exports return correct CSV headers and totals.
+- [x] Implemented ops actions write audit log.
 
 ### Phase 6 - Migration, Soak, Cutover
 
@@ -1702,7 +1704,7 @@ Backend safety:
 - [ ] Auth refresh rotation implemented.
 - [ ] Token theft detection implemented.
 - [ ] Role middleware covers every route.
-- [ ] DB RLS enabled and tested for production tenant tables.
+- [x] DB RLS enabled and tested for production tenant tables.
 - [ ] Idempotency implemented for booking/payment/evidence/promo/reward mutations.
 - [ ] Domain events are idempotent and retryable.
 - [ ] `domain_events` / `processed_domain_events` contract covers async side effects and per-consumer idempotency.
@@ -1727,7 +1729,8 @@ Mobile reliability:
 - [ ] Push notification token registration and receive behavior tested.
 
 Ops and support:
-- [ ] Audit log for every ops state change.
+- [x] Audit log for every implemented ops state change.
+- [ ] Audit log coverage for future/manual fallback ops actions.
 - [ ] Manual fallback actions implemented.
 - [ ] Complaint SLA visible.
 - [ ] Commission CSV verified.
@@ -1747,7 +1750,8 @@ Additional production gates:
 - [ ] Reward, merchant admission, and commission state machines covered by integration tests.
 - [ ] `no_show` and `rated` booking states implemented and migrated.
 - [ ] Search endpoint uses PostGIS + pg_trgm for P0.
-- [ ] Promo 8 validation cases and 5 stacking rules implemented.
+- [x] Promo 8 validation cases implemented.
+- [ ] Promo 5 stacking rules implemented.
 - [ ] Service mode tag enforcement and stale merchant detection implemented.
 - [ ] Force update and feature flags endpoints implemented.
 - [ ] Account deletion cancel window and data export bundle verified.

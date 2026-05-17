@@ -9,7 +9,7 @@ Start here:
 - `knowledge/02-business/` contains the retained business proposal context.
 - `knowledge/INDEX.md` records every copied artifact, original source path, destination path, and purpose.
 - `INFRA.md` is the single minimal infrastructure plan for local porting with Supabase.
-- `apps/api` contains the FastAPI foundation scaffold and OpenAPI contract stubs.
+- `apps/api` contains the FastAPI backend, implemented auth/marketplace/phase 2-3 routes, local RLS/audit/correctness gates, and remaining OpenAPI contract stubs.
 - `apps/mobile` contains the Expo Router shell.
 - `apps/ops-web` contains the Vite React Ops shell.
 - `packages/api-client` contains the generated TypeScript API client.

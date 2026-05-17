@@ -220,6 +220,7 @@ export const operations = [
     "path": "/v1/ops/audit-log",
     "operationId": "get_v1_ops_audit_log",
     "tags": [
+      "phase2-phase3",
       "ops"
     ]
   },

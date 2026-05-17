@@ -14,6 +14,7 @@ from app.core.config import get_settings
 from app.core.errors import ApiError, ErrorCode
 from app.core.security import CurrentUser
 from app.db.models import (
+    AuditLog,
     Booking,
     Complaint,
     Evidence,
@@ -22,6 +23,7 @@ from app.db.models import (
     Payment,
     PriceChangeLog,
     PromoCode,
+    PromoCodeUsage,
     Rating,
     Referral,
     RewardStamp,
@@ -51,6 +53,7 @@ from app.services.auth_service import signing_key
 from app.services.domain_events import DomainEventRepository
 
 REWARD_THRESHOLD = 5
+EVIDENCE_RETRY_EXHAUSTION_THRESHOLD = 3
 
 
 class Phase23Service:
@@ -96,7 +99,9 @@ class Phase23Service:
             raise ApiError(ErrorCode.booking_not_found, detail="Evidence was not found.")
         await self._booking_for_actor(current, evidence.booking_id)
         if object_key != evidence.object_key:
-            raise ApiError(ErrorCode.invalid_booking_state, detail="Evidence object key does not match presign.")
+            raise ApiError(ErrorCode.idempotency_mismatch, detail="Evidence object key does not match presign.")
+        if evidence.status == "processed":
+            return self._evidence_dto(evidence)
         now = datetime.now(UTC)
         evidence.status = "processed"
         evidence.quality = "valid"
@@ -114,6 +119,38 @@ class Phase23Service:
             event_type="evidence.processed",
             payload={"evidence_id": str(evidence.id), "booking_id": str(evidence.booking_id)},
         )
+        await self.session.flush()
+        return self._evidence_dto(evidence)
+
+    async def record_evidence_retry_failure(self, *, current: CurrentUser, evidence_id: UUID, object_key: str, error_message: str) -> EvidenceDto:
+        await self._context(current)
+        evidence = await self.session.get(Evidence, evidence_id)
+        if evidence is None or evidence.tenant_id != current.tenant_id:
+            raise ApiError(ErrorCode.booking_not_found, detail="Evidence was not found.")
+        await self._booking_for_actor(current, evidence.booking_id)
+        if object_key != evidence.object_key:
+            raise ApiError(ErrorCode.idempotency_mismatch, detail="Evidence object key does not match retry key.")
+        if evidence.status == "processed":
+            return self._evidence_dto(evidence)
+
+        evidence.retry_attempts += 1
+        evidence.last_retry_error = error_message
+        if evidence.retry_attempts >= EVIDENCE_RETRY_EXHAUSTION_THRESHOLD and not evidence.ops_review_required:
+            evidence.status = "weak_evidence"
+            evidence.quality = "weak_evidence"
+            evidence.ops_review_required = True
+            evidence.retry_exhausted_at = datetime.now(UTC)
+            await DomainEventRepository(self.session).emit(
+                tenant_id=current.tenant_id,
+                aggregate_type="evidence",
+                aggregate_id=evidence.id,
+                event_type="evidence.retry_exhausted",
+                payload={
+                    "evidence_id": str(evidence.id),
+                    "booking_id": str(evidence.booking_id),
+                    "retry_attempts": evidence.retry_attempts,
+                },
+            )
         await self.session.flush()
         return self._evidence_dto(evidence)
 
@@ -263,8 +300,10 @@ class Phase23Service:
         await self._context(current)
         code = request.code.strip().upper()
         promo = await self.session.scalar(select(PromoCode).where(PromoCode.tenant_id == current.tenant_id, PromoCode.code == code))
-        if promo is None or not promo.is_active:
+        if promo is None:
             return PromoValidateResponse(valid=False, code=code, reason="not_found")
+        if not promo.is_active:
+            return PromoValidateResponse(valid=False, code=code, reason="inactive")
         now = datetime.now(UTC)
         if promo.starts_at and promo.starts_at > now:
             return PromoValidateResponse(valid=False, code=code, reason="not_started")
@@ -272,10 +311,20 @@ class Phase23Service:
             return PromoValidateResponse(valid=False, code=code, reason="expired")
         if promo.used_count >= promo.usage_limit_total:
             return PromoValidateResponse(valid=False, code=code, reason="exhausted")
+        per_user_uses = (
+            await self.session.scalar(
+                select(func.count()).select_from(PromoCodeUsage).where(PromoCodeUsage.tenant_id == current.tenant_id, PromoCodeUsage.promo_code_id == promo.id, PromoCodeUsage.user_id == current.user_id)
+            )
+            or 0
+        )
+        if per_user_uses >= promo.usage_limit_per_user:
+            return PromoValidateResponse(valid=False, code=code, reason="per_user_limit")
         if promo.min_order_amount and request.order_amount < promo.min_order_amount:
             return PromoValidateResponse(valid=False, code=code, reason="min_order_not_met")
-        if promo.merchant_id and request.merchant_id and promo.merchant_id != request.merchant_id:
+        if promo.merchant_id and promo.merchant_id != request.merchant_id:
             return PromoValidateResponse(valid=False, code=code, reason="merchant_mismatch")
+        if promo.service_template_id and promo.service_template_id != request.service_template_id:
+            return PromoValidateResponse(valid=False, code=code, reason="service_template_mismatch")
         discount = request.order_amount * promo.discount_value // 100 if promo.discount_type == "percent" else min(promo.discount_value, request.order_amount)
         if promo.max_discount_amount is not None:
             discount = min(discount, promo.max_discount_amount)
@@ -286,7 +335,20 @@ class Phase23Service:
         rows = (await self.session.scalars(select(PromoCode).where(PromoCode.tenant_id == current.tenant_id, PromoCode.is_active.is_(True)).order_by(PromoCode.created_at.desc()))).all()
         return [self._promo_dto(row) for row in rows]
 
-    async def create_promo(self, *, current: CurrentUser, code: str, discount_type: str, discount_value: int, max_discount_amount: int | None, min_order_amount: int | None, usage_limit_total: int) -> PromoCodeDto:
+    async def create_promo(
+        self,
+        *,
+        current: CurrentUser,
+        code: str,
+        discount_type: str,
+        discount_value: int,
+        max_discount_amount: int | None,
+        min_order_amount: int | None,
+        merchant_id: UUID | None,
+        service_template_id: UUID | None,
+        usage_limit_total: int,
+        usage_limit_per_user: int,
+    ) -> PromoCodeDto:
         await self._require_ops(current)
         promo = PromoCode(
             id=uuid4(),
@@ -296,10 +358,20 @@ class Phase23Service:
             discount_value=discount_value,
             max_discount_amount=max_discount_amount,
             min_order_amount=min_order_amount,
+            merchant_id=merchant_id,
+            service_template_id=service_template_id,
             usage_limit_total=usage_limit_total,
+            usage_limit_per_user=usage_limit_per_user,
             created_by_ops=current.user_id,
         )
         self.session.add(promo)
+        self._audit(
+            current=current,
+            action="promo_code.create",
+            target_kind="promo_code",
+            target_id=promo.id,
+            payload={"code": promo.code, "discount_type": discount_type, "discount_value": discount_value},
+        )
         await self.session.flush()
         return self._promo_dto(promo)
 
@@ -405,6 +477,13 @@ class Phase23Service:
             if value is not None:
                 setattr(complaint, key, value)
         complaint.updated_at = datetime.now(UTC)
+        self._audit(
+            current=current,
+            action="complaint.update",
+            target_kind="complaint",
+            target_id=complaint.id,
+            payload={key: value for key, value in values.items() if value is not None},
+        )
         await self.session.flush()
         return self._complaint_dto(complaint)
 
@@ -477,6 +556,13 @@ class Phase23Service:
         service.ops_reviewed_by = current.user_id
         service.ops_reviewed_at = datetime.now(UTC)
         service.ops_rejection_reason = None if approved else reason
+        self._audit(
+            current=current,
+            action="merchant_service.approve" if approved else "merchant_service.reject",
+            target_kind="merchant_service",
+            target_id=service.id,
+            payload={"reason": reason} if reason else {},
+        )
         await self.session.flush()
         return self._merchant_service_dto(service)
 
@@ -556,6 +642,16 @@ class Phase23Service:
             current_row.commission_receivable += payment.commission_amount
         return list(grouped.values())
 
+    async def list_audit_log(self, *, current: CurrentUser, limit: int = 100) -> list[AuditLog]:
+        await self._require_ops(current)
+        return list(
+            (
+                await self.session.scalars(
+                    select(AuditLog).where(AuditLog.tenant_id == current.tenant_id).order_by(AuditLog.recorded_at.desc()).limit(min(max(limit, 1), 500))
+                )
+            ).all()
+        )
+
     def realtime_token(self, *, current: CurrentUser) -> str:
         now = datetime.now(UTC)
         payload = {
@@ -615,6 +711,19 @@ class Phase23Service:
         if not set(current.roles).intersection({"ops", "admin", "finance_ops", "quality_ops"}):
             raise ApiError(ErrorCode.forbidden, detail="Ops role required.")
 
+    def _audit(self, *, current: CurrentUser, action: str, target_kind: str, target_id: UUID | None, payload: dict[str, object] | None = None) -> None:
+        self.session.add(
+            AuditLog(
+                id=uuid4(),
+                tenant_id=current.tenant_id,
+                actor_user_id=current.user_id,
+                action=action,
+                target_kind=target_kind,
+                target_id=target_id,
+                payload=payload or {},
+            )
+        )
+
     async def _merchant_service_for_actor(self, current: CurrentUser, service_id: UUID) -> MerchantService:
         service = await self.session.get(MerchantService, service_id)
         if service is None or service.tenant_id != current.tenant_id:
@@ -668,7 +777,22 @@ class Phase23Service:
 
     @staticmethod
     def _evidence_dto(row: Evidence) -> EvidenceDto:
-        return EvidenceDto(id=row.id, booking_id=row.booking_id, type=row.type, photo_url=row.photo_url, status=row.status, quality=row.quality, latitude=row.latitude, longitude=row.longitude, perceptual_hash=row.perceptual_hash, watermarked_at=row.watermarked_at, exif_stripped=row.exif_stripped)
+        return EvidenceDto(
+            id=row.id,
+            booking_id=row.booking_id,
+            type=row.type,
+            photo_url=row.photo_url,
+            status=row.status,
+            quality=row.quality,
+            latitude=row.latitude,
+            longitude=row.longitude,
+            perceptual_hash=row.perceptual_hash,
+            watermarked_at=row.watermarked_at,
+            exif_stripped=row.exif_stripped,
+            retry_attempts=row.retry_attempts,
+            retry_exhausted_at=row.retry_exhausted_at,
+            ops_review_required=row.ops_review_required,
+        )
 
     @staticmethod
     def _payment_dto(row: Payment) -> PaymentDto:

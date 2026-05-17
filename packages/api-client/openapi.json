@@ -1,6 +1,81 @@
 {
   "components": {
     "schemas": {
+      "AuditLogDto": {
+        "properties": {
+          "action": {
+            "title": "Action",
+            "type": "string"
+          },
+          "actor_user_id": {
+            "anyOf": [
+              {
+                "format": "uuid",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Actor User Id"
+          },
+          "id": {
+            "format": "uuid",
+            "title": "Id",
+            "type": "string"
+          },
+          "payload": {
+            "additionalProperties": true,
+            "title": "Payload",
+            "type": "object"
+          },
+          "recorded_at": {
+            "format": "date-time",
+            "title": "Recorded At",
+            "type": "string"
+          },
+          "target_id": {
+            "anyOf": [
+              {
+                "format": "uuid",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Target Id"
+          },
+          "target_kind": {
+            "title": "Target Kind",
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "action",
+          "target_kind",
+          "recorded_at"
+        ],
+        "title": "AuditLogDto",
+        "type": "object"
+      },
+      "AuditLogResponse": {
+        "properties": {
+          "audit_log": {
+            "items": {
+              "$ref": "#/components/schemas/AuditLogDto"
+            },
+            "title": "Audit Log",
+            "type": "array"
+          }
+        },
+        "required": [
+          "audit_log"
+        ],
+        "title": "AuditLogResponse",
+        "type": "object"
+      },
       "AuthExistsRequest": {
         "properties": {
           "identifier": {
@@ -511,6 +586,18 @@
             ],
             "title": "Max Discount Amount"
           },
+          "merchant_id": {
+            "anyOf": [
+              {
+                "format": "uuid",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Merchant Id"
+          },
           "min_order_amount": {
             "anyOf": [
               {
@@ -522,6 +609,24 @@
               }
             ],
             "title": "Min Order Amount"
+          },
+          "service_template_id": {
+            "anyOf": [
+              {
+                "format": "uuid",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Service Template Id"
+          },
+          "usage_limit_per_user": {
+            "default": 1,
+            "minimum": 1.0,
+            "title": "Usage Limit Per User",
+            "type": "integer"
           },
           "usage_limit_total": {
             "default": 100,
@@ -719,7 +824,10 @@
           "INVALID_BOOKING_STATE",
           "INVALID_CHECK_IN_CODE",
           "HOLD_EXPIRED",
-          "RATE_LIMITED"
+          "RATE_LIMITED",
+          "PROMO_NOT_APPLICABLE",
+          "EVIDENCE_RETRY_EXHAUSTED",
+          "AUDIT_WRITE_FAILED"
         ],
         "title": "ErrorCode",
         "type": "string"
@@ -821,6 +929,11 @@
             ],
             "title": "Longitude"
           },
+          "ops_review_required": {
+            "default": false,
+            "title": "Ops Review Required",
+            "type": "boolean"
+          },
           "perceptual_hash": {
             "anyOf": [
               {
@@ -839,6 +952,23 @@
           "quality": {
             "title": "Quality",
             "type": "string"
+          },
+          "retry_attempts": {
+            "default": 0,
+            "title": "Retry Attempts",
+            "type": "integer"
+          },
+          "retry_exhausted_at": {
+            "anyOf": [
+              {
+                "format": "date-time",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Retry Exhausted At"
           },
           "status": {
             "title": "Status",
@@ -4974,28 +5104,50 @@
     "/v1/ops/audit-log": {
       "get": {
         "operationId": "get_v1_ops_audit_log",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "limit",
+            "required": false,
+            "schema": {
+              "default": 100,
+              "maximum": 500,
+              "minimum": 1,
+              "title": "Limit",
+              "type": "integer"
+            }
+          }
+        ],
         "responses": {
           "200": {
             "content": {
               "application/json": {
-                "schema": {}
+                "schema": {
+                  "$ref": "#/components/schemas/AuditLogResponse"
+                }
               }
             },
             "description": "Successful Response"
           },
-          "501": {
+          "422": {
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/ProblemDetails"
+                  "$ref": "#/components/schemas/HTTPValidationError"
                 }
               }
             },
-            "description": "Contract stub not implemented yet"
+            "description": "Validation Error"
           }
         },
-        "summary": "List audit log",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "summary": "Ops Audit Log",
         "tags": [
+          "phase2-phase3",
           "ops"
         ]
       }
