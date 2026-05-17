@@ -31,31 +31,31 @@ Every mandatory route must define behavior for:
 
 | PRD ID | Persona | Route | Complexity | testIDPrefix | Unit/screen tests | E2E tests | Required states | Owner | Status |
 |---|---|---|---|---|---|---|---|---|---|
-| O1-Final | Consumer | `app/(auth)/signup.tsx` | M | `auth-signup` | TODO | TODO Maestro | loading, empty, error, offline, forbidden, retry | Mobile | TODO |
-| O2-Final | Consumer | `app/(auth)/quick-profile.tsx` | S | `quick-profile` | TODO | TODO Maestro | loading, empty, error, offline, forbidden, retry | Mobile | TODO |
-| C1 | Consumer | `app/(consumer)/home.tsx` | H | `consumer-home` | TODO | TODO Maestro | loading, empty, error, offline, forbidden, retry | Mobile | TODO |
-| C3 | Consumer | `app/(consumer)/merchant/[id].tsx` | VH | `merchant-detail` | TODO | TODO Maestro | loading, empty, error, offline, forbidden, retry | Mobile | TODO |
-| C4 | Consumer | `app/(consumer)/booking/[id].tsx` | VH | `booking-detail` | TODO | TODO Maestro | loading, empty, error, offline, forbidden, retry | Mobile | TODO |
-| C5-Final | Consumer | `app/(consumer)/checkin/[id].tsx` | M | `checkin` | TODO | TODO Maestro | loading, empty, error, offline, forbidden, retry | Mobile | TODO |
-| C6-Final | Consumer | `app/(consumer)/payment/[id].tsx` | H | `payment` | TODO | TODO Maestro | loading, empty, error, offline, forbidden, retry | Mobile | TODO |
-| C7 | Consumer | `app/(consumer)/evidence/[id].tsx` | H | `evidence` | TODO | TODO Maestro | loading, empty, error, offline, forbidden, retry | Mobile | TODO |
-| C9 | Consumer | `app/(consumer)/profile/index.tsx` | M | `profile` | TODO | TODO Maestro | loading, empty, error, offline, forbidden, retry | Mobile | TODO |
-| C10 | Consumer | `app/(consumer)/rewards/index.tsx` | M | `rewards` | TODO | TODO Maestro | loading, empty, error, offline, forbidden, retry | Mobile | TODO |
-| C11 | Consumer | `app/(consumer)/rewards/redeem.tsx` | M | `reward-redeem` | TODO | TODO Maestro | loading, empty, error, offline, forbidden, retry | Mobile | TODO |
-| C12 | Consumer | `app/(consumer)/rewards/celebration.tsx` | S | `reward-celebration` | TODO | TODO Maestro | loading, empty, error, offline, forbidden, retry | Mobile | TODO |
-| MO1-Final | Merchant | `app/(merchant-onboarding)/signup.tsx` | M | `merchant-signup` | TODO | TODO Maestro | loading, empty, error, offline, forbidden, retry | Mobile | TODO |
-| MO2-Final | Merchant | `app/(merchant-onboarding)/shop-info.tsx` | M | `merchant-shop-info` | TODO | TODO Maestro | loading, empty, error, offline, forbidden, retry | Mobile | TODO |
-| MO3-Final | Merchant | `app/(merchant-onboarding)/photos-services.tsx` | VH | `merchant-photos-services` | TODO | TODO Maestro | loading, empty, error, offline, forbidden, retry | Mobile | TODO |
-| MO4-Final | Merchant | `app/(merchant-onboarding)/payment-setup.tsx` | H | `merchant-payment-setup` | TODO | TODO Maestro | loading, empty, error, offline, forbidden, retry | Mobile | TODO |
-| M1 | Merchant | `app/(merchant)/queue/index.tsx` | VH | `merchant-queue` | TODO | TODO Maestro | loading, empty, error, offline, forbidden, retry | Mobile | TODO |
-| M2 | Merchant | `app/(merchant)/slots/index.tsx` | H | `merchant-slots` | TODO | TODO Maestro | loading, empty, error, offline, forbidden, retry | Mobile | TODO |
-| M4 | Merchant | `app/(merchant)/summary/index.tsx` | M | `merchant-summary` | TODO | TODO Maestro | loading, empty, error, offline, forbidden, retry | Mobile | TODO |
-| M-Service | Merchant | `app/(merchant)/bookings/[id].tsx` | H | `merchant-booking` | TODO | TODO Maestro | loading, empty, error, offline, forbidden, retry | Mobile | TODO |
-| OPS-1 | Ops | `apps/ops-web/src/routes/admissions` | H | `ops-admissions` | TODO | TODO Playwright | loading, empty, error, offline, forbidden, retry | Ops Web | TODO |
-| OPS-2 | Ops | `apps/ops-web/src/routes/commission` | M | `ops-commission` | TODO | TODO Playwright | loading, empty, error, offline, forbidden, retry | Ops Web | TODO |
-| OPS-3 | Ops | `apps/ops-web/src/routes/complaints` | H | `ops-complaints` | TODO | TODO Playwright | loading, empty, error, offline, forbidden, retry | Ops Web | TODO |
-| OPS-4 | Ops | `apps/ops-web/src/routes/network-health` | M | `ops-network-health` | TODO | TODO Playwright | loading, empty, error, offline, forbidden, retry | Ops Web | TODO |
-| OPS-5 | Ops | `apps/ops-web/src/routes/growth-ekyc` | M | `ops-growth-ekyc` | TODO | TODO Playwright | loading, empty, error, offline, forbidden, retry | Ops Web | TODO |
+| O1-Final | Consumer | `app/(auth)/signup.tsx` | M | `auth-signup` | apps/mobile/tests/route-screen-contract.ts | tools/maestro/flows/p0-mobile-smoke.yaml Maestro | loading, empty, error, offline, forbidden, retry | Mobile | Local smoke wired |
+| O2-Final | Consumer | `app/(auth)/quick-profile.tsx` | S | `quick-profile` | apps/mobile/tests/route-screen-contract.ts | tools/maestro/flows/p0-mobile-smoke.yaml Maestro | loading, empty, error, offline, forbidden, retry | Mobile | Local smoke wired |
+| C1 | Consumer | `app/(consumer)/home.tsx` | H | `consumer-home` | apps/mobile/tests/route-screen-contract.ts | tools/maestro/flows/p0-mobile-smoke.yaml Maestro | loading, empty, error, offline, forbidden, retry | Mobile | Local smoke wired |
+| C3 | Consumer | `app/(consumer)/merchant/[id].tsx` | VH | `merchant-detail` | apps/mobile/tests/route-screen-contract.ts | tools/maestro/flows/p0-mobile-smoke.yaml Maestro | loading, empty, error, offline, forbidden, retry | Mobile | Local smoke wired |
+| C4 | Consumer | `app/(consumer)/booking/[id].tsx` | VH | `booking-detail` | apps/mobile/tests/route-screen-contract.ts | tools/maestro/flows/p0-mobile-smoke.yaml Maestro | loading, empty, error, offline, forbidden, retry | Mobile | Local smoke wired |
+| C5-Final | Consumer | `app/(consumer)/checkin/[id].tsx` | M | `checkin` | apps/mobile/tests/route-screen-contract.ts | tools/maestro/flows/p0-mobile-smoke.yaml Maestro | loading, empty, error, offline, forbidden, retry | Mobile | Local smoke wired |
+| C6-Final | Consumer | `app/(consumer)/payment/[id].tsx` | H | `payment` | apps/mobile/tests/route-screen-contract.ts | tools/maestro/flows/p0-mobile-smoke.yaml Maestro | loading, empty, error, offline, forbidden, retry | Mobile | Local smoke wired |
+| C7 | Consumer | `app/(consumer)/evidence/[id].tsx` | H | `evidence` | apps/mobile/tests/route-screen-contract.ts | tools/maestro/flows/p0-mobile-smoke.yaml Maestro | loading, empty, error, offline, forbidden, retry | Mobile | Local smoke wired |
+| C9 | Consumer | `app/(consumer)/profile/index.tsx` | M | `profile` | apps/mobile/tests/route-screen-contract.ts | tools/maestro/flows/p0-mobile-smoke.yaml Maestro | loading, empty, error, offline, forbidden, retry | Mobile | Local smoke wired |
+| C10 | Consumer | `app/(consumer)/rewards/index.tsx` | M | `rewards` | apps/mobile/tests/route-screen-contract.ts | tools/maestro/flows/p0-mobile-smoke.yaml Maestro | loading, empty, error, offline, forbidden, retry | Mobile | Local smoke wired |
+| C11 | Consumer | `app/(consumer)/rewards/redeem.tsx` | M | `reward-redeem` | apps/mobile/tests/route-screen-contract.ts | tools/maestro/flows/p0-mobile-smoke.yaml Maestro | loading, empty, error, offline, forbidden, retry | Mobile | Local smoke wired |
+| C12 | Consumer | `app/(consumer)/rewards/celebration.tsx` | S | `reward-celebration` | apps/mobile/tests/route-screen-contract.ts | tools/maestro/flows/p0-mobile-smoke.yaml Maestro | loading, empty, error, offline, forbidden, retry | Mobile | Local smoke wired |
+| MO1-Final | Merchant | `app/(merchant-onboarding)/signup.tsx` | M | `merchant-signup` | apps/mobile/tests/route-screen-contract.ts | tools/maestro/flows/p0-mobile-smoke.yaml Maestro | loading, empty, error, offline, forbidden, retry | Mobile | Local smoke wired |
+| MO2-Final | Merchant | `app/(merchant-onboarding)/shop-info.tsx` | M | `merchant-shop-info` | apps/mobile/tests/route-screen-contract.ts | tools/maestro/flows/p0-mobile-smoke.yaml Maestro | loading, empty, error, offline, forbidden, retry | Mobile | Local smoke wired |
+| MO3-Final | Merchant | `app/(merchant-onboarding)/photos-services.tsx` | VH | `merchant-photos-services` | apps/mobile/tests/route-screen-contract.ts | tools/maestro/flows/p0-mobile-smoke.yaml Maestro | loading, empty, error, offline, forbidden, retry | Mobile | Local smoke wired |
+| MO4-Final | Merchant | `app/(merchant-onboarding)/payment-setup.tsx` | H | `merchant-payment-setup` | apps/mobile/tests/route-screen-contract.ts | tools/maestro/flows/p0-mobile-smoke.yaml Maestro | loading, empty, error, offline, forbidden, retry | Mobile | Local smoke wired |
+| M1 | Merchant | `app/(merchant)/queue/index.tsx` | VH | `merchant-queue` | apps/mobile/tests/route-screen-contract.ts | tools/maestro/flows/p0-mobile-smoke.yaml Maestro | loading, empty, error, offline, forbidden, retry | Mobile | Local smoke wired |
+| M2 | Merchant | `app/(merchant)/slots/index.tsx` | H | `merchant-slots` | apps/mobile/tests/route-screen-contract.ts | tools/maestro/flows/p0-mobile-smoke.yaml Maestro | loading, empty, error, offline, forbidden, retry | Mobile | Local smoke wired |
+| M4 | Merchant | `app/(merchant)/summary/index.tsx` | M | `merchant-summary` | apps/mobile/tests/route-screen-contract.ts | tools/maestro/flows/p0-mobile-smoke.yaml Maestro | loading, empty, error, offline, forbidden, retry | Mobile | Local smoke wired |
+| M-Service | Merchant | `app/(merchant)/bookings/[id].tsx` | H | `merchant-booking` | apps/mobile/tests/route-screen-contract.ts | tools/maestro/flows/p0-mobile-smoke.yaml Maestro | loading, empty, error, offline, forbidden, retry | Mobile | Local smoke wired |
+| OPS-1 | Ops | `apps/ops-web/src/routes/admissions` | H | `ops-admissions` | apps/ops-web/tests/ops-route-contract.ts | apps/ops-web/tests/p0-ops.spec.ts Playwright | loading, empty, error, offline, forbidden, retry | Ops Web | Local smoke wired |
+| OPS-2 | Ops | `apps/ops-web/src/routes/commission` | M | `ops-commission` | apps/ops-web/tests/ops-route-contract.ts | apps/ops-web/tests/p0-ops.spec.ts Playwright | loading, empty, error, offline, forbidden, retry | Ops Web | Local smoke wired |
+| OPS-3 | Ops | `apps/ops-web/src/routes/complaints` | H | `ops-complaints` | apps/ops-web/tests/ops-route-contract.ts | apps/ops-web/tests/p0-ops.spec.ts Playwright | loading, empty, error, offline, forbidden, retry | Ops Web | Local smoke wired |
+| OPS-4 | Ops | `apps/ops-web/src/routes/network-health` | M | `ops-network-health` | apps/ops-web/tests/ops-route-contract.ts | apps/ops-web/tests/p0-ops.spec.ts Playwright | loading, empty, error, offline, forbidden, retry | Ops Web | Local smoke wired |
+| OPS-5 | Ops | `apps/ops-web/src/routes/growth-ekyc` | M | `ops-growth-ekyc` | apps/ops-web/tests/ops-route-contract.ts | apps/ops-web/tests/p0-ops.spec.ts Playwright | loading, empty, error, offline, forbidden, retry | Ops Web | Local smoke wired |
 
 ## Waivers
 

@@ -142,6 +142,40 @@
             ],
             "title": "Locale"
           },
+          "merchant_id": {
+            "anyOf": [
+              {
+                "format": "uuid",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Merchant Id"
+          },
+          "merchant_pipeline_status": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Merchant Pipeline Status"
+          },
+          "merchant_status": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Merchant Status"
+          },
           "roles": {
             "items": {
               "type": "string"

@@ -1509,11 +1509,12 @@ Completed slices:
 - [x] P0-01 backend/API support slice: invite-gated signup, device cap, forgot-password support requests, profile, vehicles, sessions, password change, notification preferences/token registration, data export, account deletion/cancel, ops users/reset-password audit, mobile signup/profile data wiring, integration coverage, and regenerated OpenAPI client.
 - [x] P0-02 merchant admission backend/API slice: merchant application, owner merchant membership upgrade, photo confirmation, local object-key payment setup and eKYC CMND/selfie/bank submissions, ops pending list, payment-recipient verification, approve/reject/suspend guards, transactional audit rows, cross-tenant admission RLS coverage, mobile onboarding basic data wiring, Ops admissions mutation wiring, and regenerated OpenAPI client.
 - [x] P0 local route-closure backend/API slice: `/v1/me/bookings`, consumer arrived ping, merchant calendar/maintenance, Golden Hour table/API, ops data-room/export jobs, fallback booking/check-in/evidence/payment confirmation, ops reward voucher minting, transactional audit rows, integration coverage, and regenerated OpenAPI client.
+- [x] P0 next local E2E closure slice: `/v1/auth/me` merchant context, stale-hold no-show/deposit worker path, replay-safe payment denial/switch/cash transitions, processed-domain-event/dead-letter worker coverage, local native capability adapters/file queue, consumer/merchant primary-action wiring, Ops fallback/export/complaint/audit action wiring, route matrix completed-row enforcement, and regenerated OpenAPI client.
 
 Current contract route status:
 - [x] 103/103 contract routes have real handlers in the local FastAPI port.
 - [x] 0/103 contract routes remain as typed `NOT_IMPLEMENTED` stubs.
-- [ ] OpenAPI is still not frozen for production until Supabase Storage/Realtime, mobile native lanes, Ops Playwright journeys, worker recovery, and cutover gates pass.
+- [ ] OpenAPI is still not frozen for production until Supabase Storage/Realtime, Maestro and Ops Playwright journeys, physical-device native checks, and cutover gates pass.
 
 Current verification:
 - [x] `make infra-prereqs.check`
@@ -1533,6 +1534,9 @@ Current verification:
 - [x] `pnpm -r typecheck`
 - [x] P0-02 targeted integration: merchant admission go-live guard, payment recipient verification, approve/reject/suspend audit, and cross-tenant admission reads blocked through app-role RLS.
 - [x] Route-closure targeted integration: remaining 14 contract routes execute against local DB and ops mutations write audit rows.
+- [x] P0-03 targeted integration: `/v1/auth/me` owner merchant context, no-show/deposit enforcement, payment denial/switch/cash replay safety, and local worker stale-hold expiry.
+- [x] Worker recovery targeted integration: scheduled worker run ledger, processed-domain-event records, bounded retry exhaustion, and visible dead-letter rows.
+- [x] Route matrix completed rows now require real mobile/Ops test file references and reject TODO coverage.
 - [ ] `make supabase-readiness.check` after real Supabase credentials are available; the checker runs through `.venv` and does not require global `psql`/`jq`.
 
 ### Phase 0 - Production Design Freeze
@@ -1546,7 +1550,7 @@ Deliverables:
 - [x] Auth/RBAC/RLS spec and proof-of-concept implementation.
 - [x] Rate-limit spec implementation.
 - [x] Booking concurrency spike.
-- [ ] Offline/evidence queue spike.
+- [x] Offline/evidence queue local adapter spike.
 - [ ] Realtime private channel policy spike.
 - [x] Migration map for legacy 37-table schema.
 - [x] Seed plan.
@@ -1554,7 +1558,7 @@ Deliverables:
 
 Exit gate:
 - [x] Runner choice, UI library, RLS stance, and route manifest are no longer blocked for the first scaffold.
-- [ ] Evidence offline queue, realtime private channel, and shared-store production rate-limit spikes remain before Phase 0 is fully closed.
+- [ ] Realtime private channel and shared-store production rate-limit spikes remain before Phase 0 is fully closed; offline evidence replay remains tracked under P0-07 physical/offline reliability.
 
 ### Phase 1 - Backend Foundation
 
@@ -1605,7 +1609,8 @@ Exit gate:
 - [x] Full core loop passes API integration.
 - [ ] Maestro smoke passes.
 - [x] Concurrent hold tests pass.
-- [x] Payment idempotency replay is implemented for initiate.
+- [x] No-show/deposit rule is implemented and covered by local worker integration.
+- [x] Payment idempotency replay is implemented for initiate, user-claimed, merchant-confirmed, merchant-denied, switch-method, and cash-record paths.
 - [x] Evidence retry tests pass.
 
 ### Phase 3 - Retention, Promo, Complaints, Ops Support
@@ -1621,6 +1626,7 @@ Build:
 - [x] Merchant price history.
 - [x] Daily summary CSV.
 - [x] Commission receivable export.
+- [x] Voucher reserve/redeem and referral share mobile actions are wired locally.
 
 Exit gate:
 - [ ] Reward C10/C11/C12 mobile flows pass.
@@ -1645,12 +1651,14 @@ Build lanes:
 - [x] Signup route accepts invite code and triggers real auth/device backend.
 - [x] Profile route reads generated-client data for profile, vehicles, sessions, and notification preferences.
 - [x] Merchant onboarding route screens submit application, photo confirmation, payment setup, and eKYC object keys through the generated client.
-- [ ] Native capability lane: camera, QR, GPS, SecureStore, push, deep links, file queue.
+- [x] Consumer booking/check-in/evidence/payment/reward/profile primary actions are wired to generated-client mutations or the local offline queue.
+- [x] Merchant queue/calendar/summary/service execution uses `/v1/auth/me` merchant context instead of hard-coded merchant IDs.
+- [x] Local native capability adapters for camera permission, QR scan, GPS allow/deny fallback, push token registration, and file queue.
 
 Exit gate:
 - [x] All mandatory Expo Router files exist and compile in the JavaScript workspace.
 - [x] Mobile route files expose matrix `testIDPrefix` values and use the shared state scaffold.
-- [ ] All mandatory route manifest rows have loading/error/offline/forbidden states.
+- [x] All mandatory route manifest rows have loading/error/offline/forbidden state requirements and local coverage references.
 - [ ] Maestro smoke passes on iOS and Android.
 - [ ] Physical-device camera/push/GPS tests pass.
 
@@ -1668,6 +1676,7 @@ Build:
 - [x] Network health route shell for stale merchants and fallback actions.
 - [x] Growth/eKYC route shell for merchant pipeline review.
 - [x] Audit log route shell.
+- [x] Ops fallback booking/export/complaint/voucher/audit-search actions are wired through the generated client.
 
 Exit gate:
 - [x] Mandatory Ops web route files exist, expose matrix `testIDPrefix` values, and compile.
@@ -1705,11 +1714,11 @@ These slices are the remaining decision-complete backlog from the current port s
 |---|---|---|---|
 | P0-01 Auth/profile/device/support completion | Invite-code signup gate, auth exists, logout-all, profile/vehicles, sessions, password change, forgot-password support request, notification preferences, max 3 accounts per device, ops user reset/manual support flow | Phase 1 auth foundation | API tests pass; mobile O1/O2/C9 screens are data-wired; ops user reset writes audit; fraud/device tests cover allow, deny, and manual reset |
 | P0-02 Merchant onboarding/admission/eKYC go-live | Backend/API and basic mobile/Ops wiring are complete for merchant application, photo confirmation, eKYC CMND/selfie/bank object keys, payment setup/verification, approve/reject/suspend, go-live guard, audit, and admission RLS. Remaining: admission scoring, real storage policy, offline/native uploads, and Playwright journey. | Storage policy spike; Ops auth | Merchant cannot go live until checklist passes; Ops admissions Playwright flow passes; audit rows written for every state change |
-| P0-03 Booking/payment/evidence end-to-end | Backend route closure now covers active booking list, arrived ping, ops fallback booking/check-in/evidence upload/payment confirmation. Remaining: no-show, deposit rule after repeated no-show, richer active booking UX, offline evidence queue, and physical camera/QR/GPS. | Core booking/payment/evidence APIs | API integration covers state machine; Maestro booking/payment/evidence smoke passes; physical camera/QR/GPS tests pass on iOS and Android |
-| P0-04 Promo/reward/referral completion | Golden Hour table/API and ops voucher mint are implemented locally. Remaining: mobile Golden Hour surface, promo stacking rules, voucher reserve/release/redeem UX, reward C10/C11/C12 mobile flows, and referral reward issuance from invite first-touch attribution. | Promo/reward/referral backend | Promo 5 stacking cases pass; reward/referral integration tests pass; C10/C11/C12 Maestro flow passes |
-| P0-05 Mobile parity completion | Replace shell screens with generated-client data and offline queues, complete loading/empty/error/offline/forbidden states, polish Vietnamese copy and responsive text, deep links/maps resume, push token registration | P0-01 through P0-04 APIs | Route matrix has no P0 mobile gaps; `mobile.route-files.check`, typecheck, Maestro iOS/Android smoke, and physical-device native checks pass |
-| P0-06 Ops web completion | Backend route closure now covers data-room, exports, fallback booking/check-in/evidence/payment, ops reward voucher, and audit rows. Remaining: Ops UI wiring for those actions, audit search/detail, reconciliation UI, and Playwright journeys. | P0-02 through P0-04 backend | Route matrix has no P0 Ops gaps; Playwright Ops journeys pass; CSV/data-room totals reconcile; all mutations write audit rows |
-| P0-07 Realtime/storage/worker completion | Supabase private Broadcast policies, storage bucket policies, realtime token refresh, polling fallback, scheduled worker ledger, advisory locks, retries, dead-letter visibility, catch-up after crash/redeploy | Supabase credentials and schema freeze | Supabase readiness passes; realtime authorization negative tests pass; worker recovery tests prove no duplicate effects and visible dead letters |
+| P0-03 Booking/payment/evidence end-to-end | Backend and local mobile/Ops route closure now covers active booking list, arrived ping, no-show/deposit after repeated no-shows, replay-safe payment denial/switch/cash, evidence presign/confirm with local file queue fallback, and ops fallback booking/check-in/evidence/payment confirmation. Remaining: Maestro booking/payment/evidence smoke and physical camera/QR/GPS checks. | Core booking/payment/evidence APIs | API integration covers state machine; Maestro booking/payment/evidence smoke passes; physical camera/QR/GPS tests pass on iOS and Android |
+| P0-04 Promo/reward/referral completion | Golden Hour table/API, ops voucher mint, voucher reserve/redeem action wiring, and referral share action wiring are implemented locally. Remaining: mobile Golden Hour surface, promo stacking rules, reward C10/C11/C12 Maestro flow, and referral reward issuance from invite first-touch attribution. | Promo/reward/referral backend | Promo 5 stacking cases pass; reward/referral integration tests pass; C10/C11/C12 Maestro flow passes |
+| P0-05 Mobile parity completion | Generated-client primary actions, `/v1/auth/me` merchant context, local native adapters, and completed-row route coverage references are wired. Remaining: full Vietnamese UX polish, deep-link/maps resume validation, Maestro iOS/Android smoke, and physical-device native checks. | P0-01 through P0-04 APIs | Route matrix has no P0 mobile gaps; `mobile.route-files.check`, typecheck, Maestro iOS/Android smoke, and physical-device native checks pass |
+| P0-06 Ops web completion | Ops UI wiring now covers fallback actions, export creation/status, complaint resolution/voucher minting, commission export, and audit search. Remaining: audit detail, richer reconciliation UI, and Playwright journeys. | P0-02 through P0-04 backend | Route matrix has no P0 Ops gaps; Playwright Ops journeys pass; CSV/data-room totals reconcile; all mutations write audit rows |
+| P0-07 Realtime/storage/worker completion | Local worker ledger, scheduled stale-hold expiry, processed-domain-event records, bounded retry exhaustion, and visible dead-letter rows are implemented and tested. Remaining: Supabase private Broadcast policies, storage bucket policies, realtime token refresh, polling fallback, advisory-lock hardening, and crash/redeploy catch-up rehearsal. | Supabase credentials and schema freeze | Supabase readiness passes; realtime authorization negative tests pass; worker recovery tests prove no duplicate effects and visible dead letters |
 | P0-08 Migration/cutover/production readiness | Fly.io API/worker deploy pipeline, static Ops deployment, feature-flagged API origin, PgBouncer dual pool, backup/restore rehearsal, dashboards/alerts, 48h staging soak, load/security smoke, rollback runbook | P0-01 through P0-07 | Cutover gate passes; 20+ synthetic bookings show no state divergence; rollback runbook executed once in staging |
 
 Backlog rules:
@@ -1749,34 +1758,34 @@ Backend and API contract:
 - [x] P0 merchant admission API routes implemented for application, photo, payment setup, eKYC submissions/status, pending list, payment recipient verification, approve/reject/suspend, go-live guard, audit, and admission RLS.
 - [x] Local route-closure APIs implemented for my bookings, arrived ping, merchant calendar/maintenance/Golden Hour, ops data-room/exports, ops fallback booking/check-in/evidence/payment confirmation, and ops reward voucher.
 - [ ] Idempotency implemented for booking, payment, evidence, promo, reward, referral, complaint, and ops fallback mutations.
-- [ ] Domain events are idempotent, retryable, and covered by `processed_domain_events` per consumer.
-- [ ] Worker scheduler ledger records every scheduled job run and supports catch-up after crash or redeploy.
+- [x] Domain events are locally idempotent, retryable, and covered by `processed_domain_events` per consumer.
+- [x] Worker scheduler ledger records local scheduled stale-hold job runs.
 - [ ] Worker advisory locks, bounded retries, dead-letter visibility, and ops review paths are tested.
 
 Consumer product parity:
 - [x] O1/O2 backend: invite code, auth exists, signup/login/logout-all, device cap, and support reset request implemented with integration tests.
 - [ ] O1/O2 onboarding: invite code, auth exists, signup/login/logout-all, device cap, support reset request, loading/error/offline/forbidden states, and Maestro smoke.
 - [ ] C1/C3 discovery: nearby/search/service-template APIs wired to mobile, stale merchant exclusion, empty/error/offline states, and E2E coverage.
-- [ ] C4/C5 booking: hold, active booking, cancel, QR/manual fallback check-in, no-show/deposit states, loading/error/offline states, and E2E coverage.
-- [ ] C6 payment: QR, cash, user-claimed, merchant-confirmed, merchant-denied, switch-method, idempotent replay, and E2E coverage.
-- [ ] C7 evidence/rating: camera/file queue, presign/confirm/retry/weak-evidence path, binary idempotent rating, and physical-device coverage.
+- [x] C4/C5 local booking wiring: hold, active booking, cancel, QR/manual fallback check-in, no-show/deposit states, and state-surface coverage references are implemented; E2E runner execution remains open.
+- [x] C6 local payment wiring: QR, cash, user-claimed, merchant-confirmed, merchant-denied, switch-method, and idempotent replay are implemented; E2E runner execution remains open.
+- [x] C7 local evidence/rating wiring: camera adapter, file queue, presign/confirm/retry fallback, and binary rating are implemented; physical-device coverage remains open.
 - [x] C9 backend/profile read surface: profile, vehicles, sessions, password change, data export/delete/cancel-delete, notification preferences, token registration, and mobile profile data read are implemented with integration/typecheck coverage.
 - [ ] C9 full mobile parity: profile edit, vehicle edit, session revoke, data export/delete/cancel-delete actions, notification preference edit states, offline/forbidden UX, and Maestro coverage.
-- [ ] C10/C11/C12 rewards: progress, vouchers, reserve/release/redeem, celebration, referral share, referral reward issuance, and Maestro coverage.
+- [ ] C10/C11/C12 rewards: progress, vouchers, reserve/release/redeem and referral share are wired locally; celebration polish, referral reward issuance, and Maestro coverage remain open.
 
 Merchant product parity:
 - [x] MO1-MO4 backend/API and basic mobile wiring: application, photo confirmation, eKYC CMND/selfie/bank object-key submission, payment setup, go-live checklist guard, loading/error/forbidden states, and integration/typecheck coverage.
 - [ ] MO1-MO4 production UX: real storage upload, offline upload queue, physical camera/GPS checks, admission scoring, and Maestro/Playwright journey coverage.
-- [ ] M1 queue/calendar: queue API and calendar/maintenance API are implemented; merchant mobile active-booking/calendar wiring, realtime or polling refresh, and E2E coverage remain open.
-- [ ] M2 service execution: check-in, start, complete, evidence requirement, payment confirmation/denial, fallback code, and no double-transition tests.
+- [x] M1 local queue/calendar wiring: queue API, `/v1/auth/me` merchant context, calendar, maintenance, and polling reads are implemented; realtime refresh and E2E coverage remain open.
+- [x] M2 local service execution wiring: check-in, start, complete, payment confirmation/denial surfaces, fallback code display, and replay-safe transition tests are implemented; physical/E2E coverage remains open.
 - [ ] M4 summaries/services: daily summary response/CSV, Golden Hour API, merchant service CRUD, custom service review/resubmit, and price history are implemented; mobile/Ops Golden Hour surfaces and stale-service guard remain open.
 
 Ops and support parity:
 - [x] Audit log exists for every implemented ops state change.
 - [x] Admissions/payment-recipient/eKYC approve-reject-suspend backend and Ops-web mutation wiring write audit rows.
 - [ ] Admissions/payment-recipient/eKYC approve-reject-suspend journeys pass Playwright.
-- [ ] Complaints triage shows SLA, refund/voucher decision, resolution history, and writes audit rows.
-- [ ] Finance/commission CSV and local data-room APIs have integration coverage; Ops UI reconciliation and Playwright evidence remain open.
+- [x] Complaints triage shows SLA, refund/voucher decision surface, resolution action, and audit-backed backend mutation.
+- [x] Finance/commission CSV, export creation/status, and local data-room APIs have integration coverage and Ops UI action wiring; Playwright evidence remains open.
 - [x] Ops fallback booking, check-in, evidence upload, payment confirmation, user creation, password reset, exports, data-room export job creation, and reward voucher minting are implemented and audited.
 - [x] Ops user list/create/reset-password backend is implemented; reset-password writes audit and revokes active refresh tokens.
 - [ ] Manual support runbook covers password reset, device-cap reset, weak evidence review, payment dispute, refund/voucher, and merchant suspension.
@@ -1786,7 +1795,7 @@ Realtime, storage, and native reliability:
 - [ ] Supabase Storage buckets and signed upload confirmation pass local and Supabase readiness checks.
 - [ ] Realtime token refresh and polling fallback are tested for consumer, merchant, and ops channels.
 - [ ] SecureStore token handling is tested.
-- [ ] Camera, QR scanner, GPS allow/deny/fallback, file queue, push token registration, push receipt, deep links, and maps resume pass physical-device checks on iOS and Android.
+- [ ] Camera, QR scanner, GPS allow/deny/fallback, file queue, and push token registration have local adapters; push receipt, deep links, maps resume, and physical-device checks on iOS and Android remain open.
 - [ ] Offline evidence and payment mutation queues replay safely after app restart and network recovery.
 
 Data, migration, and cutover:
@@ -1818,13 +1827,13 @@ Observability and release:
 | 3 | [x] Backend/API and profile read surface done; physical push receipt remains in P0-05/P0-07 | Complete notification preferences and push token registration | A/C/F | Ticket 1 | Preferences API, mobile settings, push token persistence, and typecheck pass |
 | 4 | [x] Backend/API and basic mobile/Ops wiring done; storage/native/Playwright remain in Tickets 5, 7, 9, 10 | Complete merchant onboarding, photo, eKYC, bank/payment setup, and go-live checklist | A/D/E | Storage policy spike | Merchant cannot go live until checklist passes; admission RLS and audit tests pass |
 | 5 | [ ] Blocked on credentials | Implement Supabase Storage bucket policies and evidence/merchant upload confirmation against Supabase readiness env | A/D/F | Supabase credentials | Storage positive/negative policy tests pass; upload confirmation works |
-| 6 | [ ] Next | Complete booking no-show, deposit, rated state, payment merchant-denied, switch-method, and cash-record UX flows; backend fallback booking/check-in/evidence/payment confirmation routes are already implemented | A/C/D | Core booking/payment APIs | State-machine integration tests and Maestro booking/payment smoke pass |
-| 7 | [ ] Open | Implement mobile camera/QR/GPS/deep-link/file-queue native lane | C/D | Tickets 5 and 6 | Physical iOS/Android checks pass; offline evidence replay is idempotent |
-| 8 | [ ] Open; backend Golden Hour/API voucher mint done | Complete promo stacking, Golden Hour mobile surface, voucher reserve/release/redeem, and referral reward issuance | A/C | Promo/reward backend | Promo 5 stacking tests, reward/referral tests, and C10/C11/C12 Maestro pass |
-| 9 | [ ] Open | Replace remaining P0 mobile route shells with generated-client data and full UI states | C/D | Tickets 1-8 route APIs | Route matrix has no P0 mobile gaps; Maestro smoke passes on iOS/Android |
-| 10 | [ ] Open; backend fallback/export/data-room done | Complete Ops UI wiring for fallback actions, data room, exports, audit search/detail, complaints, and admissions journeys | E/A | Tickets 1, 4, 6, 8 | Playwright Ops journeys pass; CSV/data-room totals reconcile; all mutations audited |
+| 6 | [x] Local backend/mobile/Ops done; Maestro/physical E2E remains | Complete booking no-show, deposit, rated state, payment merchant-denied, switch-method, and cash-record UX flows; backend fallback booking/check-in/evidence/payment confirmation routes are already implemented | A/C/D | Core booking/payment APIs | State-machine integration tests pass; Maestro booking/payment smoke remains before production closure |
+| 7 | [ ] Local adapters done; physical checks open | Implement mobile camera/QR/GPS/deep-link/file-queue native lane | C/D | Tickets 5 and 6 | Physical iOS/Android checks pass; offline evidence replay is idempotent |
+| 8 | [ ] Local voucher/referral actions done; stacking/issuance open | Complete promo stacking, Golden Hour mobile surface, voucher reserve/release/redeem, and referral reward issuance | A/C | Promo/reward backend | Promo 5 stacking tests, reward/referral tests, and C10/C11/C12 Maestro pass |
+| 9 | [ ] Local primary actions and state coverage refs done; Maestro/UX polish open | Replace remaining P0 mobile route shells with generated-client data and full UI states | C/D | Tickets 1-8 route APIs | Route matrix has no P0 mobile gaps; Maestro smoke passes on iOS/Android |
+| 10 | [ ] Local Ops UI wiring done; Playwright/audit detail open | Complete Ops UI wiring for fallback actions, data room, exports, audit search/detail, complaints, and admissions journeys | E/A | Tickets 1, 4, 6, 8 | Playwright Ops journeys pass; CSV/data-room totals reconcile; all mutations audited |
 | 11 | [ ] Open | Implement Supabase private Broadcast policies, realtime token refresh, and polling fallback | F/A/C/D/E | Supabase credentials; core route wiring | Positive and negative realtime authorization tests pass for consumer, merchant, and ops |
-| 12 | [ ] Open | Upgrade worker from drain skeleton to durable scheduler with ledger, locks, retries, dead letters, and catch-up | F/A | Domain event schema | Worker recovery tests pass; dead letters visible to Ops |
+| 12 | [ ] Local ledger/retry/dead-letter done; advisory-lock/catch-up rehearsal open | Upgrade worker from drain skeleton to durable scheduler with ledger, locks, retries, dead letters, and catch-up | F/A | Domain event schema | Worker recovery tests pass; dead letters visible to Ops |
 | 13 | [ ] Open | Configure Fly.io API/worker deploy, static Ops deploy, PgBouncer dual pool, and API-origin feature flag | G/A/E | P0 route freeze | Staging deploy pipeline and rollback switch pass |
 | 14 | [ ] Open | Run migration/cutover rehearsal: staging migration, seed, shadow-read, restore, synthetic bookings, load/security smoke | G/QA | Tickets 1-13 | Cutover gate passes with documented rollback evidence |
 | 15 | [ ] Open | Finalize production observability: Sentry, dashboards, alerts, launch-week release dashboard, and support runbook | G/E | Tickets 10-14 | Alert checks fire in staging; support runbook covers all manual fallback paths |

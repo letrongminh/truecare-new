@@ -1,8 +1,10 @@
 from fastapi import APIRouter, Depends, Request
+from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.core.rate_limit import enforce_login_rate_limit, enforce_refresh_rate_limit, enforce_signup_rate_limit
 from app.core.security import CurrentUser, require_user
+from app.db.models import Merchant
 from app.db.session import get_session
 from app.schemas.auth import (
     AuthExistsRequest,
@@ -87,12 +89,25 @@ async def logout_all(current: CurrentUser = Depends(require_user), session: Asyn
 
 
 @router.get("/me", response_model=AuthMeResponse, operation_id="get_v1_auth_me")
-async def me(current: CurrentUser = Depends(require_user)) -> AuthMeResponse:
+async def me(current: CurrentUser = Depends(require_user), session: AsyncSession = Depends(get_session)) -> AuthMeResponse:
+    merchant = await session.scalar(
+        select(Merchant)
+        .where(
+            Merchant.tenant_id == current.tenant_id,
+            Merchant.user_id == current.user_id,
+            Merchant.deleted_at.is_(None),
+        )
+        .order_by(Merchant.created_at.desc())
+        .limit(1)
+    )
     return AuthMeResponse(
         user_id=current.user_id,
         tenant_id=current.tenant_id,
         roles=list(current.roles),
         locale=current.locale,
+        merchant_id=merchant.id if merchant else None,
+        merchant_status=merchant.status if merchant else None,
+        merchant_pipeline_status=merchant.pipeline_status if merchant else None,
     )
 
 

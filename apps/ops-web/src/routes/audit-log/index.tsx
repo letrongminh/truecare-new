@@ -1,3 +1,4 @@
+import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { OpsTable, OpsStateSurface, deriveOpsState } from "../../components/OpsStateSurface";
 import { apiRequest } from "../../lib/api";
@@ -18,12 +19,19 @@ type AuditLogResponse = {
 };
 
 export function AuditLogRoute({ token, canUseApi }: OpsRouteProps) {
+  const [filter, setFilter] = useState("");
   const query = useQuery({
     queryKey: ["ops-audit-log", token],
     enabled: canUseApi,
     queryFn: () => apiRequest<AuditLogResponse>("get_v1_ops_audit_log", { token })
   });
-  const rows = query.data?.audit_log || query.data?.items || [];
+  const rows = (query.data?.audit_log || query.data?.items || []).filter((row) => {
+    const needle = filter.trim().toLowerCase();
+    if (!needle) {
+      return true;
+    }
+    return [row.action, row.target_kind, row.target_id, row.actor_user_id].filter(Boolean).join(" ").toLowerCase().includes(needle);
+  });
   const state = deriveOpsState({
     enabled: canUseApi,
     loading: query.isLoading,
@@ -39,6 +47,12 @@ export function AuditLogRoute({ token, canUseApi }: OpsRouteProps) {
       state={state}
       onRetry={() => query.refetch()}
     >
+      <input
+        data-testid="ops-audit-log-search"
+        placeholder="Search action, target, actor"
+        value={filter}
+        onChange={(event) => setFilter(event.target.value)}
+      />
       <OpsTable headers={["Recorded", "Actor", "Action", "Target"]}>
         {rows.map((row) => (
           <tr key={row.id}>

@@ -180,9 +180,15 @@ async def test_phase2_phase3_backend_flow() -> None:
     payment_id = payment.json()["id"]
     claimed = client.post(f"/v1/payments/{payment_id}/user-claimed", headers=headers)
     assert claimed.status_code == 200, claimed.text
+    claimed_replay = client.post(f"/v1/payments/{payment_id}/user-claimed", headers=headers)
+    assert claimed_replay.status_code == 200, claimed_replay.text
+    assert claimed_replay.json()["status"] == "user_claimed"
     verified = client.post(f"/v1/payments/{payment_id}/merchant-confirmed", headers=headers)
     assert verified.status_code == 200, verified.text
     assert verified.json()["status"] == "verified"
+    verified_replay = client.post(f"/v1/payments/{payment_id}/merchant-confirmed", headers=headers)
+    assert verified_replay.status_code == 200, verified_replay.text
+    assert verified_replay.json()["status"] == "verified"
 
     rating = client.post(f"/v1/bookings/{booking['id']}/rate", json={"rating": "positive", "comment": "Tot"}, headers=headers)
     assert rating.status_code == 200, rating.text
@@ -252,6 +258,59 @@ async def test_phase2_phase3_backend_flow() -> None:
     realtime = client.post("/v1/realtime/token", headers=headers)
     assert realtime.status_code == 200, realtime.text
     assert realtime.json()["token"]
+
+
+@pytest.mark.anyio
+async def test_payment_denial_switch_cash_and_replay_are_safe() -> None:
+    client = TestClient(create_app())
+    access_token, tenant_id, user_id = await _signup_admin(client)
+    merchant_id, service_id = await _seed_marketplace(tenant_id, user_id)
+    headers = {"Authorization": f"Bearer {access_token}"}
+
+    hold = client.post(
+        "/v1/bookings/holds",
+        json={
+            "merchant_id": str(merchant_id),
+            "merchant_service_id": str(service_id),
+            "bay_number": 1,
+            "idempotency_key": f"denial-{uuid4().hex}",
+        },
+        headers=headers,
+    )
+    assert hold.status_code == 201, hold.text
+    booking = hold.json()
+    assert client.post(f"/v1/bookings/{booking['id']}/check-in", json={"code": booking["check_in_token"][:6].upper()}, headers=headers).status_code == 200
+    assert client.post(f"/v1/bookings/{booking['id']}/start-service", headers=headers).status_code == 200
+    assert client.post(f"/v1/bookings/{booking['id']}/complete-service", headers=headers).status_code == 200
+
+    payment = client.post(
+        "/v1/payments/initiate",
+        json={"booking_id": booking["id"], "method": "qr_transfer", "idempotency_key": f"pay-denial-{uuid4().hex}"},
+        headers=headers,
+    )
+    assert payment.status_code == 200, payment.text
+    payment_id = payment.json()["id"]
+    assert client.post(f"/v1/payments/{payment_id}/user-claimed", headers=headers).status_code == 200
+    denied = client.post(f"/v1/payments/{payment_id}/merchant-denied", json={"reason": "not_received"}, headers=headers)
+    assert denied.status_code == 200, denied.text
+    assert denied.json()["status"] == "merchant_denied"
+    denied_replay = client.post(f"/v1/payments/{payment_id}/merchant-denied", json={"reason": "not_received"}, headers=headers)
+    assert denied_replay.status_code == 200, denied_replay.text
+    assert denied_replay.json()["status"] == "merchant_denied"
+
+    switched = client.post(f"/v1/payments/{payment_id}/switch-method", json={"method": "cash"}, headers=headers)
+    assert switched.status_code == 200, switched.text
+    assert switched.json()["method"] == "cash"
+    assert switched.json()["status"] == "cash_offered"
+    switched_replay = client.post(f"/v1/payments/{payment_id}/switch-method", json={"method": "cash"}, headers=headers)
+    assert switched_replay.status_code == 200, switched_replay.text
+    assert switched_replay.json()["status"] == "cash_offered"
+    cash = client.post(f"/v1/payments/{payment_id}/cash-record", headers=headers)
+    assert cash.status_code == 200, cash.text
+    assert cash.json()["status"] == "verified"
+    cash_replay = client.post(f"/v1/payments/{payment_id}/cash-record", headers=headers)
+    assert cash_replay.status_code == 200, cash_replay.text
+    assert cash_replay.json()["status"] == "verified"
 
 
 @pytest.mark.anyio

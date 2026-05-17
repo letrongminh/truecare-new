@@ -1,6 +1,7 @@
-import { useQuery } from "@tanstack/react-query";
+import { useMutation, useQuery } from "@tanstack/react-query";
 import { DataRow, StateScaffold } from "../../../components/StateScaffold";
 import { apiRequest } from "../../../lib/api";
+import { registerPushToken } from "../../../lib/native-capabilities";
 import { useStoredSession } from "../../../lib/session-query";
 
 type Profile = {
@@ -40,10 +41,30 @@ export default function ProfileScreen() {
     enabled: !!token,
     queryFn: () => apiRequest<Preferences>("get_v1_me_notifications_preferences", { token })
   });
+  const push = useMutation({
+    mutationFn: async () => {
+      if (!session.data) {
+        throw new Error("missing_session");
+      }
+      return registerPushToken(session.data);
+    }
+  });
+  const dataExport = useMutation({
+    mutationFn: () => apiRequest("post_v1_me_data_export", { token })
+  });
   const loading = profile.isLoading || vehicles.isLoading || sessions.isLoading || preferences.isLoading;
   const error = profile.isError || vehicles.isError || sessions.isError || preferences.isError;
   return (
-    <StateScaffold testIDPrefix="profile" title="Ho so" subtitle="Thong tin tai khoan, quyen rieng tu va phien dang nhap." state={!token ? "forbidden" : loading ? "loading" : error ? "error" : "ready"} primaryAction="Cap nhat" onSecondaryAction={() => { profile.refetch(); vehicles.refetch(); sessions.refetch(); preferences.refetch(); }}>
+    <StateScaffold
+      testIDPrefix="profile"
+      title="Ho so"
+      subtitle="Thong tin tai khoan, quyen rieng tu va phien dang nhap."
+      state={!token ? "forbidden" : push.isError || dataExport.isError || error ? "error" : loading ? "loading" : "ready"}
+      primaryAction={push.isPending ? "Dang dang ky" : "Dang ky push"}
+      secondaryAction={dataExport.isPending ? "Dang tao" : "Xuat du lieu"}
+      onPrimaryAction={() => push.mutate()}
+      onSecondaryAction={() => dataExport.mutate()}
+    >
       <DataRow label="Ten" value={profile.data?.display_name || "-"} />
       <DataRow label="Tai khoan" value={profile.data?.email || profile.data?.phone || "-"} />
       <DataRow label="Ma gioi thieu" value={profile.data?.referral_code || "-"} />
@@ -53,6 +74,8 @@ export default function ProfileScreen() {
       <DataRow label="Golden Hour" value={preferences.data?.golden_hour ? "bat" : "tat"} />
       <DataRow label="Locale" value={profile.data?.locale || "vi"} />
       <DataRow label="No-show" value={String(profile.data?.no_show_count ?? 0)} />
+      <DataRow label="Push" value={push.data?.registered ? "da dang ky" : push.data?.reason || "chua dang ky"} />
+      <DataRow label="Data export" value={dataExport.isSuccess ? "da tao yeu cau" : "chua tao"} />
     </StateScaffold>
   );
 }

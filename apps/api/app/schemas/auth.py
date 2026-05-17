@@ -45,6 +45,9 @@ class AuthMeResponse(BaseModel):
     tenant_id: UUID
     roles: list[str]
     locale: str | None = None
+    merchant_id: UUID | None = None
+    merchant_status: str | None = None
+    merchant_pipeline_status: str | None = None
 
 
 class LogoutResponse(BaseModel):

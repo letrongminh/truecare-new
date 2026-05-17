@@ -3,6 +3,7 @@ import { TextInput } from "react-native";
 import { DataRow, StateScaffold } from "../../components/StateScaffold";
 import { apiRequest } from "../../lib/api";
 import { getMerchantOnboardingId, setMerchantOnboardingId } from "../../lib/merchant-onboarding-store";
+import { ensureCameraReady } from "../../lib/native-capabilities";
 import { useStoredSession } from "../../lib/session-query";
 
 type MerchantAdmissionDto = {
@@ -27,6 +28,7 @@ export default function MerchantPhotosServicesScreen() {
     }
     setState("loading");
     try {
+      await ensureCameraReady();
       const response = await apiRequest<MerchantAdmissionDto>("post_v1_merchants_by_id_confirm_photo", {
         token: session.data.accessToken,
         params: { id: merchantId },

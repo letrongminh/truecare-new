@@ -209,13 +209,15 @@ class Phase23Service:
                 payload={"payment_id": str(payment.id), "booking_id": str(booking.id)},
             )
             await self.session.flush()
-        elif payment.status != PaymentState.user_claimed.value:
+        elif payment.status not in {PaymentState.user_claimed.value, PaymentState.verified.value}:
             raise ApiError(ErrorCode.invalid_booking_state, detail="Payment cannot be user-claimed from current state.")
         return self._payment_dto(payment)
 
     async def merchant_confirmed_payment(self, *, current: CurrentUser, payment_id: UUID, ops_confirmed: bool = False) -> PaymentDto:
         payment, booking = await self._payment_for_actor(current, payment_id)
         await self._require_merchant_operator(current=current, merchant_id=booking.merchant_id)
+        if payment.status == PaymentState.verified.value:
+            return self._payment_dto(payment)
         if payment.status not in {PaymentState.user_claimed.value, PaymentState.cash_offered.value}:
             raise ApiError(ErrorCode.invalid_booking_state, detail="Payment cannot be confirmed from current state.")
         now = datetime.now(UTC)
@@ -240,6 +242,8 @@ class Phase23Service:
     async def merchant_denied_payment(self, *, current: CurrentUser, payment_id: UUID, reason: str | None) -> PaymentDto:
         payment, booking = await self._payment_for_actor(current, payment_id)
         await self._require_merchant_operator(current=current, merchant_id=booking.merchant_id)
+        if payment.status == PaymentState.merchant_denied.value:
+            return self._payment_dto(payment)
         if payment.status != PaymentState.user_claimed.value:
             raise ApiError(ErrorCode.invalid_booking_state, detail="Only user-claimed payment can be denied.")
         payment.status = PaymentState.merchant_denied.value
@@ -257,6 +261,8 @@ class Phase23Service:
 
     async def switch_payment_method(self, *, current: CurrentUser, payment_id: UUID, method: str) -> PaymentDto:
         payment, booking = await self._payment_for_actor(current, payment_id, owner_only=True)
+        if payment.method == method and payment.status in {PaymentState.initiated_qr.value, PaymentState.cash_offered.value}:
+            return self._payment_dto(payment)
         if payment.status not in {PaymentState.initiated_qr.value, PaymentState.user_claimed.value, PaymentState.cash_offered.value, PaymentState.merchant_denied.value}:
             raise ApiError(ErrorCode.invalid_booking_state, detail="Payment method can no longer be switched.")
         payment.method = method

@@ -1,0 +1,22 @@
+export const p0MobileRouteContracts = [
+  "auth-signup",
+  "quick-profile",
+  "consumer-home",
+  "merchant-detail",
+  "booking-detail",
+  "checkin",
+  "payment",
+  "evidence",
+  "profile",
+  "rewards",
+  "reward-redeem",
+  "reward-celebration",
+  "merchant-signup",
+  "merchant-shop-info",
+  "merchant-photos-services",
+  "merchant-payment-setup",
+  "merchant-queue",
+  "merchant-slots",
+  "merchant-summary",
+  "merchant-booking"
+] as const;

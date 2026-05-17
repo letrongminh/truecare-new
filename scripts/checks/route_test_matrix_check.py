@@ -85,7 +85,13 @@ def parse_matrix() -> list[MatrixRow]:
 def path_refs(value: str) -> list[Path]:
     if value.upper().startswith("TODO"):
         return []
-    return [ROOT / item.strip() for item in value.split(",") if item.strip()]
+    refs: list[Path] = []
+    for item in value.split(","):
+        cleaned = item.strip()
+        if not cleaned:
+            continue
+        refs.append(ROOT / cleaned.split()[0])
+    return refs
 
 
 def main() -> int:
@@ -111,13 +117,17 @@ def main() -> int:
             errors.append(f"{row.prd_id} {row.route} missing states: {', '.join(sorted(missing_states))}")
 
         if row.status.upper() != "TODO":
+            if row.unit_tests.upper().startswith("TODO"):
+                errors.append(f"{row.prd_id} completed row must reference unit/screen coverage")
+            if row.e2e_tests.upper().startswith("TODO"):
+                errors.append(f"{row.prd_id} completed row must reference E2E coverage")
             for ref in path_refs(row.unit_tests) + path_refs(row.e2e_tests):
                 if not ref.exists():
                     errors.append(f"{row.prd_id} references missing test file: {ref.relative_to(ROOT)}")
             if row.persona == "Ops" and "Playwright" not in row.e2e_tests:
                 errors.append(f"{row.prd_id} ops route must reference Playwright coverage")
-            if row.persona != "Ops" and row.complexity in {"H", "VH"} and "Maestro" not in row.e2e_tests:
-                errors.append(f"{row.prd_id} H/VH mobile route must reference Maestro coverage")
+            if row.persona != "Ops" and "Maestro" not in row.e2e_tests:
+                errors.append(f"{row.prd_id} mobile route must reference Maestro coverage")
 
     if errors:
         print("route-test-matrix check failed:", file=sys.stderr)

@@ -1,0 +1,44 @@
+appId: vn.truecare.app
+---
+- launchApp
+- assertVisible:
+    id: "mobile-shell"
+- openLink: truecare://auth/signup
+- assertVisible:
+    id: "auth-signup-screen"
+- openLink: truecare://auth/quick-profile
+- assertVisible:
+    id: "quick-profile-screen"
+- openLink: truecare://consumer/home
+- assertVisible:
+    id: "consumer-home-screen"
+- openLink: truecare://consumer/rewards
+- assertVisible:
+    id: "rewards-screen"
+- openLink: truecare://consumer/rewards/redeem
+- assertVisible:
+    id: "reward-redeem-screen"
+- openLink: truecare://consumer/rewards/celebration
+- assertVisible:
+    id: "reward-celebration-screen"
+- openLink: truecare://merchant-onboarding/signup
+- assertVisible:
+    id: "merchant-signup-screen"
+- openLink: truecare://merchant-onboarding/shop-info
+- assertVisible:
+    id: "merchant-shop-info-screen"
+- openLink: truecare://merchant-onboarding/photos-services
+- assertVisible:
+    id: "merchant-photos-services-screen"
+- openLink: truecare://merchant-onboarding/payment-setup
+- assertVisible:
+    id: "merchant-payment-setup-screen"
+- openLink: truecare://merchant/queue
+- assertVisible:
+    id: "merchant-queue-screen"
+- openLink: truecare://merchant/slots
+- assertVisible:
+    id: "merchant-slots-screen"
+- openLink: truecare://merchant/summary
+- assertVisible:
+    id: "merchant-summary-screen"

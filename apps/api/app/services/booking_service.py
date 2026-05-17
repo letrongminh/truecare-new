@@ -10,7 +10,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.core.errors import ApiError, ErrorCode
 from app.core.security import CurrentUser
-from app.db.models import Booking, Merchant, MerchantService, ServiceTemplate, SlotCapacity
+from app.db.models import Booking, Merchant, MerchantService, Profile, ServiceTemplate, SlotCapacity
 from app.db.session import set_local_context
 from app.domain.states import BookingState
 from app.schemas.marketplace import BookingDto, CreateHoldRequest
@@ -20,6 +20,8 @@ from app.services.idempotency_service import IdempotencyService, IdempotencyStat
 HOLD_DURATION_MINUTES = 30
 MAX_ACTIVE_HOLDS_PER_USER = 3
 MAX_HOLDS_PER_MERCHANT = 2
+DEPOSIT_AFTER_NO_SHOWS = 2
+REPEAT_NO_SHOW_DEPOSIT_AMOUNT = 50_000
 ACTIVE_USER_STATUSES = (
     BookingState.held.value,
     BookingState.checked_in.value,
@@ -73,6 +75,10 @@ class BookingService:
         now_at = datetime.now(UTC)
         slot_floor = now_at.replace(minute=(now_at.minute // 30) * 30, second=0, microsecond=0)
         expires_at = now_at + timedelta(minutes=HOLD_DURATION_MINUTES)
+        no_show_count = (
+            await self.session.scalar(select(Profile.no_show_count).where(Profile.tenant_id == current.tenant_id, Profile.user_id == current.user_id))
+        ) or 0
+        deposit_amount = REPEAT_NO_SHOW_DEPOSIT_AMOUNT if no_show_count >= DEPOSIT_AFTER_NO_SHOWS else None
         candidate = (
             await self.session.scalars(
                 select(SlotCapacity)
@@ -118,6 +124,7 @@ class BookingService:
             expires_at=expires_at,
             total_amount=service.price,
             discount_amount=0,
+            deposit_amount=deposit_amount,
             idempotency_key=request.idempotency_key,
             check_in_token=secrets.token_hex(16),
             created_at=now_at,
@@ -145,6 +152,7 @@ class BookingService:
                 "expires_at": expires_at.isoformat(),
                 "total_amount": service.price,
                 "discount_amount": 0,
+                "deposit_amount": deposit_amount,
                 "locale": current.locale or "vi",
             },
             idempotency_key=request.idempotency_key,

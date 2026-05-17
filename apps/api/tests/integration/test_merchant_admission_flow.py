@@ -114,6 +114,11 @@ async def test_merchant_admission_go_live_flow_and_audit() -> None:
     assert merchant["status"] == "pending_review"
     assert merchant["pipeline_status"] == "pending_setup"
     assert await _membership_role(owner_id, tenant_id) == "merchant"
+    owner_me = client.get("/v1/auth/me", headers=owner_headers)
+    assert owner_me.status_code == 200, owner_me.text
+    assert owner_me.json()["merchant_id"] == merchant_id
+    assert owner_me.json()["merchant_status"] == "pending_review"
+    assert owner_me.json()["merchant_pipeline_status"] == "pending_setup"
 
     pending = client.get("/v1/ops/merchants/pending", headers=ops_headers)
     assert pending.status_code == 200, pending.text
