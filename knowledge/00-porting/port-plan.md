@@ -1484,12 +1484,14 @@ Completed slices:
 - [x] Core marketplace API slice 2: merchant check-in by QR/manual code, start service, complete service, transition events, integration coverage, and regenerated OpenAPI client.
 - [x] Phase 2/3 backend completion slice: evidence presign/confirm/process, payments, rating, realtime token, promo, rewards, referrals, complaints, merchant custom service review/resubmit, price history, daily summary CSV, commission receivables, integration coverage, and regenerated OpenAPI client.
 - [x] Phase 4 mobile foundation slice: Tamagui provider/config, SecureStore-backed auth store, generated API client runtime wrapper, TanStack Query provider, offline mutation queue, all 20 mandatory Expo Router files, mobile route-file gate, and JavaScript workspace typecheck.
+- [x] Phase 5 Ops Web foundation slice: React Query provider, generated API client runtime wrapper, persisted bearer-token ops guard via `/v1/auth/me`, admissions/commission/complaints/network-health/growth-eKYC/audit route shells, shared loading/empty/error/offline/forbidden state surface, and ops route-file gate.
 
 Current verification:
 - [x] `make infra-prereqs.check`
 - [x] `make secret-leak.check`
 - [x] `make route-test-matrix.check`
 - [x] `make mobile.route-files.check`
+- [x] `make ops.route-files.check`
 - [x] `make db.up`
 - [x] `make db.migrate`
 - [x] `make api.test`
@@ -1609,6 +1611,7 @@ Build lanes:
 
 Exit gate:
 - [x] All mandatory Expo Router files exist and compile in the JavaScript workspace.
+- [x] Mobile route files expose matrix `testIDPrefix` values and use the shared state scaffold.
 - [ ] All mandatory route manifest rows have loading/error/offline/forbidden states.
 - [ ] Maestro smoke passes on iOS and Android.
 - [ ] Physical-device camera/push/GPS tests pass.
@@ -1619,16 +1622,17 @@ Duration: 1-2 weeks.
 
 Build:
 - [x] Ops web scaffold: Vite React shell.
-- [ ] Ops auth/RBAC.
-- [ ] Admissions queue and detail.
-- [ ] Payment recipient verification.
-- [ ] Commission export.
-- [ ] Complaint triage/refund/voucher decision.
-- [ ] Network health/fallback actions.
-- [ ] Growth/eKYC review and merchant pipeline.
-- [ ] Audit log views.
+- [x] Ops auth/RBAC foundation: persisted bearer token and `/v1/auth/me` ops-role guard.
+- [x] Admissions queue route shell with pending merchants API binding and payment-recipient action surface.
+- [x] Payment recipient verification surface inside admissions.
+- [x] Commission receivables route shell with generated client binding.
+- [x] Complaint triage route shell with refund/voucher decision visibility.
+- [x] Network health route shell for stale merchants and fallback actions.
+- [x] Growth/eKYC route shell for merchant pipeline review.
+- [x] Audit log route shell.
 
 Exit gate:
+- [x] Mandatory Ops web route files exist, expose matrix `testIDPrefix` values, and compile.
 - [ ] Playwright ops journeys pass.
 - [ ] Exports return correct CSV headers and totals.
 - [ ] Ops actions write audit log.

@@ -25,6 +25,7 @@ make infra-prereqs.check
 make secret-leak.check
 make route-test-matrix.check
 make mobile.route-files.check
+make ops.route-files.check
 make db.up
 make db.migrate
 make api.test

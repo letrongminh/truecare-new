@@ -41,6 +41,10 @@ route-test-matrix.check:
 mobile.route-files.check:
 	@$(PYTHON) scripts/checks/mobile_route_files_check.py
 
+## ops.route-files.check — verify mandatory Ops web route files exist
+ops.route-files.check:
+	@$(PYTHON) scripts/checks/ops_route_files_check.py
+
 ## api.test — run FastAPI foundation tests through the local venv
 api.test: venv
 	@cd apps/api && ../../$(VENV_PY) -m pytest -m "not integration"
