@@ -30,6 +30,9 @@ class ErrorCode(StrEnum):
     promo_not_applicable = "PROMO_NOT_APPLICABLE"
     evidence_retry_exhausted = "EVIDENCE_RETRY_EXHAUSTED"
     audit_write_failed = "AUDIT_WRITE_FAILED"
+    invalid_invite = "INVALID_INVITE"
+    device_limit_exceeded = "DEVICE_LIMIT_EXCEEDED"
+    resource_not_found = "RESOURCE_NOT_FOUND"
 
 
 class ErrorDefinition(BaseModel):
@@ -225,6 +228,30 @@ ERROR_REGISTRY: dict[ErrorCode, ErrorDefinition] = {
         detail_key="errors.audit_write_failed.detail",
         retryable=True,
         client_action="retry_later_or_contact_support",
+    ),
+    ErrorCode.invalid_invite: ErrorDefinition(
+        status=422,
+        type="https://truecare.vn/problems/invalid-invite",
+        title_key="errors.invalid_invite.title",
+        detail_key="errors.invalid_invite.detail",
+        retryable=False,
+        client_action="enter_valid_invite_code",
+    ),
+    ErrorCode.device_limit_exceeded: ErrorDefinition(
+        status=429,
+        type="https://truecare.vn/problems/device-limit-exceeded",
+        title_key="errors.device_limit_exceeded.title",
+        detail_key="errors.device_limit_exceeded.detail",
+        retryable=False,
+        client_action="contact_support",
+    ),
+    ErrorCode.resource_not_found: ErrorDefinition(
+        status=404,
+        type="https://truecare.vn/problems/resource-not-found",
+        title_key="errors.resource_not_found.title",
+        detail_key="errors.resource_not_found.detail",
+        retryable=False,
+        client_action="refresh_or_contact_support",
     ),
 }
 

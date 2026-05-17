@@ -41,7 +41,7 @@ async def _signup_admin(client: TestClient) -> tuple[str, UUID, UUID]:
     identifier = f"phase23-{uuid4().hex}@example.com"
     signup = client.post(
         "/v1/auth/signup",
-        json={"identifier": identifier, "password": "correct-horse-battery", "display_name": "Phase 23"},
+        json={"identifier": identifier, "password": "correct-horse-battery", "display_name": "Phase 23", "invite_code": "PILOT-HA01"},
     )
     assert signup.status_code == 200, signup.text
     me = client.get("/v1/auth/me", headers={"Authorization": f"Bearer {signup.json()['access_token']}"})

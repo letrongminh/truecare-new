@@ -15,7 +15,9 @@ from app.schemas.auth import (
     SignupRequest,
     TokenPair,
 )
+from app.schemas.me import ForgotPasswordRequest, SupportRequestResponse
 from app.services.auth_service import AuthService
+from app.services.me_service import MeService
 
 router = APIRouter(prefix="/v1/auth", tags=["auth"])
 
@@ -27,6 +29,7 @@ IMPLEMENTED_AUTH_ROUTES = {
     ("POST", "/v1/auth/logout"),
     ("POST", "/v1/auth/logout-all"),
     ("GET", "/v1/auth/me"),
+    ("POST", "/v1/auth/forgot-password"),
 }
 
 
@@ -44,6 +47,9 @@ async def signup(request: Request, body: SignupRequest, session: AsyncSession = 
             password=body.password,
             display_name=body.display_name,
             locale=body.locale,
+            invite_code=body.invite_code,
+            referral_code=body.referral_code,
+            device_id=request.headers.get("x-device-id"),
         )
         token_pair = await AuthService(session).issue_token_pair(user, locale=locale)
     return TokenPair(**token_pair)
@@ -88,3 +94,10 @@ async def me(current: CurrentUser = Depends(require_user)) -> AuthMeResponse:
         roles=list(current.roles),
         locale=current.locale,
     )
+
+
+@router.post("/forgot-password", response_model=SupportRequestResponse, operation_id="post_v1_auth_forgot_password")
+async def forgot_password(body: ForgotPasswordRequest, session: AsyncSession = Depends(get_session)) -> SupportRequestResponse:
+    async with session.begin():
+        request = await MeService(session).create_password_reset_request(identifier=body.identifier)
+    return SupportRequestResponse(request_id=request.id, status=request.status)

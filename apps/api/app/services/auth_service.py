@@ -13,12 +13,13 @@ import jwt
 from argon2 import PasswordHasher
 from argon2.exceptions import VerifyMismatchError
 from cryptography.hazmat.primitives.asymmetric.ed25519 import Ed25519PrivateKey
-from sqlalchemy import Select, select, update
+from sqlalchemy import Select, func, select, update
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.core.config import get_settings
 from app.core.errors import ApiError, ErrorCode
-from app.db.models import Profile, RefreshToken, Tenant, TenantMembership, User
+from app.db.models import DeviceRegistration, InviteCode, NotificationPreference, Profile, RefreshToken, Tenant, TenantMembership, User
+from app.db.session import set_local_context
 
 ACCESS_TOKEN_SECONDS = 15 * 60
 REFRESH_TOKEN_DAYS = 30
@@ -90,13 +91,40 @@ class AuthService:
         stmt = stmt.where(User.email == normalized) if column == "email" else stmt.where(User.phone == normalized)
         return (await session.scalar(stmt)) is not None
 
-    async def signup(self, *, identifier: str, password: str, display_name: str | None, locale: str) -> tuple[User, str]:
+    async def signup(
+        self,
+        *,
+        identifier: str,
+        password: str,
+        display_name: str | None,
+        locale: str,
+        invite_code: str | None = None,
+        referral_code: str | None = None,
+        device_id: str | None = None,
+    ) -> tuple[User, str]:
         session = self._db()
         column, normalized = normalize_identifier(identifier)
         if await self.exists(normalized):
             raise ApiError(ErrorCode.duplicate_identity, detail="Identifier already exists.")
 
         tenant = await self._get_or_create_default_tenant()
+        await set_local_context(session, tenant_id=tenant.id)
+        if not invite_code:
+            raise ApiError(ErrorCode.invalid_invite, detail="Invite code is required for P0 signup.")
+        invite = await self._consume_invite(invite_code)
+        tenant = await session.get(Tenant, invite.tenant_id) or tenant
+        await set_local_context(session, tenant_id=tenant.id)
+        referred_by = invite.referred_by
+        if referral_code:
+            referrer = await session.scalar(select(User).where(User.tenant_id == tenant.id, User.referral_code == referral_code, User.deleted_at.is_(None)))
+            if referrer is not None:
+                referred_by = referrer.id
+        if device_id:
+            distinct_users = (
+                await session.scalar(select(func.count(func.distinct(DeviceRegistration.user_id))).where(DeviceRegistration.device_id == device_id))
+            ) or 0
+            if distinct_users >= 3:
+                raise ApiError(ErrorCode.device_limit_exceeded, detail="This device has reached the P0 signup limit.")
         user = User(
             tenant_id=tenant.id,
             email=normalized if column == "email" else None,
@@ -105,11 +133,15 @@ class AuthService:
             name=display_name,
             role="consumer",
             referral_code=self._referral_code(),
+            referred_by=referred_by,
         )
         session.add(user)
         await session.flush()
         session.add(TenantMembership(user_id=user.id, tenant_id=tenant.id, role="consumer"))
         session.add(Profile(user_id=user.id, tenant_id=tenant.id, display_name=display_name or "", locale=locale or "vi"))
+        session.add(NotificationPreference(user_id=user.id, tenant_id=tenant.id))
+        if device_id:
+            session.add(DeviceRegistration(tenant_id=tenant.id, user_id=user.id, device_id=device_id))
         await session.flush()
         return user, locale or "vi"
 
@@ -183,6 +215,19 @@ class AuthService:
         await session.execute(update(RefreshToken).where(RefreshToken.user_id == user_id).values(revoked_at=datetime.now(UTC)))
         return True
 
+    async def change_password(self, *, user_id: UUID, current_password: str, new_password: str) -> None:
+        session = self._db()
+        user = await session.get(User, user_id)
+        if user is None or user.deleted_at is not None:
+            raise ApiError(ErrorCode.unauthorized, detail="User is not active.")
+        try:
+            password_hasher.verify(user.password_hash, current_password)
+        except VerifyMismatchError:
+            raise ApiError(ErrorCode.invalid_credentials, detail="Current password is invalid.") from None
+        user.password_hash = password_hasher.hash(new_password)
+        await session.execute(update(RefreshToken).where(RefreshToken.user_id == user_id).values(revoked_at=datetime.now(UTC)))
+        await session.flush()
+
     async def roles_for_user(self, user_id: UUID) -> list[str]:
         session = self._db()
         roles = (await session.scalars(select(TenantMembership.role).where(TenantMembership.user_id == user_id))).all()
@@ -235,6 +280,17 @@ class AuthService:
         session.add(tenant)
         await session.flush()
         return tenant
+
+    async def _consume_invite(self, invite_code: str) -> InviteCode:
+        session = self._db()
+        code = invite_code.strip()
+        now = datetime.now(UTC)
+        invite = await session.scalar(select(InviteCode).where(InviteCode.code == code))
+        if invite is None or invite.used_count >= invite.max_uses or (invite.expires_at is not None and invite.expires_at <= now):
+            raise ApiError(ErrorCode.invalid_invite, detail="Invite code is invalid, expired, or exhausted.")
+        invite.used_count += 1
+        await session.flush()
+        return invite
 
     async def _locale_for_user(self, user_id: UUID) -> str | None:
         return await self._db().scalar(select(Profile.locale).where(Profile.user_id == user_id))

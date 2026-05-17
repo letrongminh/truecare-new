@@ -54,9 +54,10 @@ function toSession(pair: TokenPair): ApiSession {
   };
 }
 
-export async function signup(identifier: string, password: string, displayName?: string) {
+export async function signup(identifier: string, password: string, displayName?: string, inviteCode?: string) {
   const pair = await apiRequest<TokenPair>("post_v1_auth_signup", {
-    body: { identifier, password, display_name: displayName }
+    body: { identifier, password, display_name: displayName, invite_code: inviteCode || "PILOT-HA01" },
+    headers: { "x-device-id": "truecare-mobile-dev-device" }
   });
   const session = toSession(pair);
   await saveSession(session);

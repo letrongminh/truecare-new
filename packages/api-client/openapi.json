@@ -1,6 +1,31 @@
 {
   "components": {
     "schemas": {
+      "AccountDeletionResponse": {
+        "properties": {
+          "cancel_until": {
+            "format": "date-time",
+            "title": "Cancel Until",
+            "type": "string"
+          },
+          "request_id": {
+            "format": "uuid",
+            "title": "Request Id",
+            "type": "string"
+          },
+          "status": {
+            "title": "Status",
+            "type": "string"
+          }
+        },
+        "required": [
+          "request_id",
+          "status",
+          "cancel_until"
+        ],
+        "title": "AccountDeletionResponse",
+        "type": "object"
+      },
       "AuditLogDto": {
         "properties": {
           "action": {
@@ -313,6 +338,28 @@
           }
         },
         "title": "CancelBookingRequest",
+        "type": "object"
+      },
+      "ChangePasswordRequest": {
+        "properties": {
+          "current_password": {
+            "maxLength": 256,
+            "minLength": 1,
+            "title": "Current Password",
+            "type": "string"
+          },
+          "new_password": {
+            "maxLength": 256,
+            "minLength": 8,
+            "title": "New Password",
+            "type": "string"
+          }
+        },
+        "required": [
+          "current_password",
+          "new_password"
+        ],
+        "title": "ChangePasswordRequest",
         "type": "object"
       },
       "CheckInRequest": {
@@ -803,6 +850,67 @@
         "title": "DailySummaryResponse",
         "type": "object"
       },
+      "DataExportResponse": {
+        "properties": {
+          "job_id": {
+            "format": "uuid",
+            "title": "Job Id",
+            "type": "string"
+          },
+          "status": {
+            "title": "Status",
+            "type": "string"
+          }
+        },
+        "required": [
+          "job_id",
+          "status"
+        ],
+        "title": "DataExportResponse",
+        "type": "object"
+      },
+      "DataExportStatusResponse": {
+        "properties": {
+          "bundle_url": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Bundle Url"
+          },
+          "expires_at": {
+            "anyOf": [
+              {
+                "format": "date-time",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Expires At"
+          },
+          "job_id": {
+            "format": "uuid",
+            "title": "Job Id",
+            "type": "string"
+          },
+          "status": {
+            "title": "Status",
+            "type": "string"
+          }
+        },
+        "required": [
+          "job_id",
+          "status"
+        ],
+        "title": "DataExportStatusResponse",
+        "type": "object"
+      },
       "ErrorCode": {
         "enum": [
           "NOT_IMPLEMENTED",
@@ -827,7 +935,10 @@
           "RATE_LIMITED",
           "PROMO_NOT_APPLICABLE",
           "EVIDENCE_RETRY_EXHAUSTED",
-          "AUDIT_WRITE_FAILED"
+          "AUDIT_WRITE_FAILED",
+          "INVALID_INVITE",
+          "DEVICE_LIMIT_EXCEEDED",
+          "RESOURCE_NOT_FOUND"
         ],
         "title": "ErrorCode",
         "type": "string"
@@ -1076,6 +1187,21 @@
           "flags"
         ],
         "title": "FlagsResponse",
+        "type": "object"
+      },
+      "ForgotPasswordRequest": {
+        "properties": {
+          "identifier": {
+            "maxLength": 320,
+            "minLength": 3,
+            "title": "Identifier",
+            "type": "string"
+          }
+        },
+        "required": [
+          "identifier"
+        ],
+        "title": "ForgotPasswordRequest",
         "type": "object"
       },
       "HTTPValidationError": {
@@ -1611,6 +1737,174 @@
         "title": "MerchantsNearbyResponse",
         "type": "object"
       },
+      "MutationResponse": {
+        "properties": {
+          "ok": {
+            "default": true,
+            "title": "Ok",
+            "type": "boolean"
+          }
+        },
+        "title": "MutationResponse",
+        "type": "object"
+      },
+      "NotificationPreferencesResponse": {
+        "properties": {
+          "booking_updates": {
+            "title": "Booking Updates",
+            "type": "boolean"
+          },
+          "golden_hour": {
+            "title": "Golden Hour",
+            "type": "boolean"
+          },
+          "quiet_hours_end": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Quiet Hours End"
+          },
+          "quiet_hours_start": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Quiet Hours Start"
+          },
+          "referral_reward": {
+            "title": "Referral Reward",
+            "type": "boolean"
+          },
+          "wash_reminder": {
+            "title": "Wash Reminder",
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "booking_updates",
+          "golden_hour",
+          "referral_reward",
+          "wash_reminder"
+        ],
+        "title": "NotificationPreferencesResponse",
+        "type": "object"
+      },
+      "NotificationPreferencesUpdateRequest": {
+        "properties": {
+          "booking_updates": {
+            "anyOf": [
+              {
+                "type": "boolean"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Booking Updates"
+          },
+          "golden_hour": {
+            "anyOf": [
+              {
+                "type": "boolean"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Golden Hour"
+          },
+          "quiet_hours_end": {
+            "anyOf": [
+              {
+                "maxLength": 16,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Quiet Hours End"
+          },
+          "quiet_hours_start": {
+            "anyOf": [
+              {
+                "maxLength": 16,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Quiet Hours Start"
+          },
+          "referral_reward": {
+            "anyOf": [
+              {
+                "type": "boolean"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Referral Reward"
+          },
+          "wash_reminder": {
+            "anyOf": [
+              {
+                "type": "boolean"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Wash Reminder"
+          }
+        },
+        "title": "NotificationPreferencesUpdateRequest",
+        "type": "object"
+      },
+      "NotificationRegisterRequest": {
+        "properties": {
+          "device_id": {
+            "anyOf": [
+              {
+                "maxLength": 200,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Device Id"
+          },
+          "platform": {
+            "pattern": "^(ios|android|web)$",
+            "title": "Platform",
+            "type": "string"
+          },
+          "token": {
+            "maxLength": 4096,
+            "minLength": 8,
+            "title": "Token",
+            "type": "string"
+          }
+        },
+        "required": [
+          "token",
+          "platform"
+        ],
+        "title": "NotificationRegisterRequest",
+        "type": "object"
+      },
       "OpsComplaintUpdateRequest": {
         "properties": {
           "refund_approved": {
@@ -1680,6 +1974,160 @@
           }
         },
         "title": "OpsMerchantServiceDecisionRequest",
+        "type": "object"
+      },
+      "OpsPasswordResetRequest": {
+        "properties": {
+          "new_password": {
+            "maxLength": 256,
+            "minLength": 8,
+            "title": "New Password",
+            "type": "string"
+          }
+        },
+        "required": [
+          "new_password"
+        ],
+        "title": "OpsPasswordResetRequest",
+        "type": "object"
+      },
+      "OpsPasswordResetResponse": {
+        "properties": {
+          "reset": {
+            "default": true,
+            "title": "Reset",
+            "type": "boolean"
+          },
+          "user_id": {
+            "format": "uuid",
+            "title": "User Id",
+            "type": "string"
+          }
+        },
+        "required": [
+          "user_id"
+        ],
+        "title": "OpsPasswordResetResponse",
+        "type": "object"
+      },
+      "OpsUserCreateRequest": {
+        "properties": {
+          "display_name": {
+            "anyOf": [
+              {
+                "maxLength": 200,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Display Name"
+          },
+          "identifier": {
+            "maxLength": 320,
+            "minLength": 3,
+            "title": "Identifier",
+            "type": "string"
+          },
+          "password": {
+            "maxLength": 256,
+            "minLength": 8,
+            "title": "Password",
+            "type": "string"
+          },
+          "role": {
+            "default": "ops",
+            "pattern": "^(ops|merchant|consumer)$",
+            "title": "Role",
+            "type": "string"
+          }
+        },
+        "required": [
+          "identifier",
+          "password"
+        ],
+        "title": "OpsUserCreateRequest",
+        "type": "object"
+      },
+      "OpsUserDto": {
+        "properties": {
+          "created_at": {
+            "format": "date-time",
+            "title": "Created At",
+            "type": "string"
+          },
+          "email": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Email"
+          },
+          "id": {
+            "format": "uuid",
+            "title": "Id",
+            "type": "string"
+          },
+          "name": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Name"
+          },
+          "phone": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Phone"
+          },
+          "role": {
+            "title": "Role",
+            "type": "string"
+          },
+          "tenant_id": {
+            "format": "uuid",
+            "title": "Tenant Id",
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "tenant_id",
+          "role",
+          "created_at"
+        ],
+        "title": "OpsUserDto",
+        "type": "object"
+      },
+      "OpsUserListResponse": {
+        "properties": {
+          "users": {
+            "items": {
+              "$ref": "#/components/schemas/OpsUserDto"
+            },
+            "title": "Users",
+            "type": "array"
+          }
+        },
+        "required": [
+          "users"
+        ],
+        "title": "OpsUserListResponse",
         "type": "object"
       },
       "PaymentDto": {
@@ -1852,6 +2300,110 @@
           "clientAction"
         ],
         "title": "ProblemDetails",
+        "type": "object"
+      },
+      "ProfileResponse": {
+        "properties": {
+          "created_at": {
+            "format": "date-time",
+            "title": "Created At",
+            "type": "string"
+          },
+          "display_name": {
+            "title": "Display Name",
+            "type": "string"
+          },
+          "email": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Email"
+          },
+          "locale": {
+            "title": "Locale",
+            "type": "string"
+          },
+          "no_show_count": {
+            "default": 0,
+            "title": "No Show Count",
+            "type": "integer"
+          },
+          "phone": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Phone"
+          },
+          "referral_code": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Referral Code"
+          },
+          "tenant_id": {
+            "format": "uuid",
+            "title": "Tenant Id",
+            "type": "string"
+          },
+          "user_id": {
+            "format": "uuid",
+            "title": "User Id",
+            "type": "string"
+          }
+        },
+        "required": [
+          "user_id",
+          "tenant_id",
+          "display_name",
+          "locale",
+          "created_at"
+        ],
+        "title": "ProfileResponse",
+        "type": "object"
+      },
+      "ProfileUpdateRequest": {
+        "properties": {
+          "display_name": {
+            "anyOf": [
+              {
+                "maxLength": 200,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Display Name"
+          },
+          "locale": {
+            "anyOf": [
+              {
+                "maxLength": 16,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Locale"
+          }
+        },
+        "title": "ProfileUpdateRequest",
         "type": "object"
       },
       "PromoCodeDto": {
@@ -2374,6 +2926,70 @@
         "title": "ServiceTemplatesResponse",
         "type": "object"
       },
+      "SessionDto": {
+        "properties": {
+          "created_at": {
+            "format": "date-time",
+            "title": "Created At",
+            "type": "string"
+          },
+          "current": {
+            "default": false,
+            "title": "Current",
+            "type": "boolean"
+          },
+          "expires_at": {
+            "format": "date-time",
+            "title": "Expires At",
+            "type": "string"
+          },
+          "id": {
+            "title": "Id",
+            "type": "string"
+          },
+          "revoked_at": {
+            "anyOf": [
+              {
+                "format": "date-time",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Revoked At"
+          },
+          "subject": {
+            "format": "uuid",
+            "title": "Subject",
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "subject",
+          "created_at",
+          "expires_at"
+        ],
+        "title": "SessionDto",
+        "type": "object"
+      },
+      "SessionsResponse": {
+        "properties": {
+          "sessions": {
+            "items": {
+              "$ref": "#/components/schemas/SessionDto"
+            },
+            "title": "Sessions",
+            "type": "array"
+          }
+        },
+        "required": [
+          "sessions"
+        ],
+        "title": "SessionsResponse",
+        "type": "object"
+      },
       "SignupRequest": {
         "properties": {
           "display_name": {
@@ -2436,6 +3052,25 @@
           "password"
         ],
         "title": "SignupRequest",
+        "type": "object"
+      },
+      "SupportRequestResponse": {
+        "properties": {
+          "request_id": {
+            "format": "uuid",
+            "title": "Request Id",
+            "type": "string"
+          },
+          "status": {
+            "title": "Status",
+            "type": "string"
+          }
+        },
+        "required": [
+          "request_id",
+          "status"
+        ],
+        "title": "SupportRequestResponse",
         "type": "object"
       },
       "SwitchPaymentMethodRequest": {
@@ -2518,6 +3153,287 @@
           "type"
         ],
         "title": "ValidationError",
+        "type": "object"
+      },
+      "VehicleDto": {
+        "properties": {
+          "color": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Color"
+          },
+          "created_at": {
+            "format": "date-time",
+            "title": "Created At",
+            "type": "string"
+          },
+          "id": {
+            "format": "uuid",
+            "title": "Id",
+            "type": "string"
+          },
+          "is_default": {
+            "title": "Is Default",
+            "type": "boolean"
+          },
+          "kind": {
+            "title": "Kind",
+            "type": "string"
+          },
+          "license_plate": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "License Plate"
+          },
+          "make": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Make"
+          },
+          "model": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Model"
+          },
+          "updated_at": {
+            "anyOf": [
+              {
+                "format": "date-time",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Updated At"
+          },
+          "year": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Year"
+          }
+        },
+        "required": [
+          "id",
+          "kind",
+          "is_default",
+          "created_at"
+        ],
+        "title": "VehicleDto",
+        "type": "object"
+      },
+      "VehicleListResponse": {
+        "properties": {
+          "vehicles": {
+            "items": {
+              "$ref": "#/components/schemas/VehicleDto"
+            },
+            "title": "Vehicles",
+            "type": "array"
+          }
+        },
+        "required": [
+          "vehicles"
+        ],
+        "title": "VehicleListResponse",
+        "type": "object"
+      },
+      "VehicleUpdateRequest": {
+        "properties": {
+          "color": {
+            "anyOf": [
+              {
+                "maxLength": 80,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Color"
+          },
+          "is_default": {
+            "anyOf": [
+              {
+                "type": "boolean"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Is Default"
+          },
+          "kind": {
+            "anyOf": [
+              {
+                "pattern": "^(sedan|suv|hatchback|other)$",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Kind"
+          },
+          "license_plate": {
+            "anyOf": [
+              {
+                "maxLength": 40,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "License Plate"
+          },
+          "make": {
+            "anyOf": [
+              {
+                "maxLength": 80,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Make"
+          },
+          "model": {
+            "anyOf": [
+              {
+                "maxLength": 80,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Model"
+          },
+          "year": {
+            "anyOf": [
+              {
+                "maximum": 2100.0,
+                "minimum": 1900.0,
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Year"
+          }
+        },
+        "title": "VehicleUpdateRequest",
+        "type": "object"
+      },
+      "VehicleWriteRequest": {
+        "properties": {
+          "color": {
+            "anyOf": [
+              {
+                "maxLength": 80,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Color"
+          },
+          "is_default": {
+            "default": false,
+            "title": "Is Default",
+            "type": "boolean"
+          },
+          "kind": {
+            "default": "sedan",
+            "pattern": "^(sedan|suv|hatchback|other)$",
+            "title": "Kind",
+            "type": "string"
+          },
+          "license_plate": {
+            "anyOf": [
+              {
+                "maxLength": 40,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "License Plate"
+          },
+          "make": {
+            "anyOf": [
+              {
+                "maxLength": 80,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Make"
+          },
+          "model": {
+            "anyOf": [
+              {
+                "maxLength": 80,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Model"
+          },
+          "year": {
+            "anyOf": [
+              {
+                "maximum": 2100.0,
+                "minimum": 1900.0,
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Year"
+          }
+        },
+        "title": "VehicleWriteRequest",
         "type": "object"
       },
       "VersionCheckResponse": {
@@ -2732,27 +3648,39 @@
     "/v1/auth/forgot-password": {
       "post": {
         "operationId": "post_v1_auth_forgot_password",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ForgotPasswordRequest"
+              }
+            }
+          },
+          "required": true
+        },
         "responses": {
           "200": {
             "content": {
               "application/json": {
-                "schema": {}
+                "schema": {
+                  "$ref": "#/components/schemas/SupportRequestResponse"
+                }
               }
             },
             "description": "Successful Response"
           },
-          "501": {
+          "422": {
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/ProblemDetails"
+                  "$ref": "#/components/schemas/HTTPValidationError"
                 }
               }
             },
-            "description": "Contract stub not implemented yet"
+            "description": "Validation Error"
           }
         },
-        "summary": "Create manual password reset request",
+        "summary": "Forgot Password",
         "tags": [
           "auth"
         ]
@@ -3689,26 +4617,23 @@
       "delete": {
         "operationId": "delete_v1_me_account",
         "responses": {
-          "200": {
-            "content": {
-              "application/json": {
-                "schema": {}
-              }
-            },
-            "description": "Successful Response"
-          },
-          "501": {
+          "202": {
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/ProblemDetails"
+                  "$ref": "#/components/schemas/AccountDeletionResponse"
                 }
               }
             },
-            "description": "Contract stub not implemented yet"
+            "description": "Successful Response"
           }
         },
-        "summary": "Request account deletion",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "summary": "Delete Account",
         "tags": [
           "me"
         ]
@@ -3750,23 +4675,20 @@
           "200": {
             "content": {
               "application/json": {
-                "schema": {}
-              }
-            },
-            "description": "Successful Response"
-          },
-          "501": {
-            "content": {
-              "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/ProblemDetails"
+                  "$ref": "#/components/schemas/AccountDeletionResponse"
                 }
               }
             },
-            "description": "Contract stub not implemented yet"
+            "description": "Successful Response"
           }
         },
-        "summary": "Cancel account deletion",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "summary": "Cancel Delete",
         "tags": [
           "me"
         ]
@@ -3776,26 +4698,23 @@
       "post": {
         "operationId": "post_v1_me_data_export",
         "responses": {
-          "200": {
-            "content": {
-              "application/json": {
-                "schema": {}
-              }
-            },
-            "description": "Successful Response"
-          },
-          "501": {
+          "202": {
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/ProblemDetails"
+                  "$ref": "#/components/schemas/DataExportResponse"
                 }
               }
             },
-            "description": "Contract stub not implemented yet"
+            "description": "Successful Response"
           }
         },
-        "summary": "Request my data export",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "summary": "Request Data Export",
         "tags": [
           "me"
         ]
@@ -3804,27 +4723,46 @@
     "/v1/me/data-export/{job_id}": {
       "get": {
         "operationId": "get_v1_me_data_export_by_job_id",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "job_id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "title": "Job Id",
+              "type": "string"
+            }
+          }
+        ],
         "responses": {
           "200": {
             "content": {
               "application/json": {
-                "schema": {}
+                "schema": {
+                  "$ref": "#/components/schemas/DataExportStatusResponse"
+                }
               }
             },
             "description": "Successful Response"
           },
-          "501": {
+          "422": {
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/ProblemDetails"
+                  "$ref": "#/components/schemas/HTTPValidationError"
                 }
               }
             },
-            "description": "Contract stub not implemented yet"
+            "description": "Validation Error"
           }
         },
-        "summary": "Get my data export status",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "summary": "Get Data Export",
         "tags": [
           "me"
         ]
@@ -3837,50 +4775,64 @@
           "200": {
             "content": {
               "application/json": {
-                "schema": {}
-              }
-            },
-            "description": "Successful Response"
-          },
-          "501": {
-            "content": {
-              "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/ProblemDetails"
+                  "$ref": "#/components/schemas/NotificationPreferencesResponse"
                 }
               }
             },
-            "description": "Contract stub not implemented yet"
+            "description": "Successful Response"
           }
         },
-        "summary": "Get notification preferences",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "summary": "Get Notification Preferences",
         "tags": [
           "me"
         ]
       },
       "patch": {
         "operationId": "patch_v1_me_notifications_preferences",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/NotificationPreferencesUpdateRequest"
+              }
+            }
+          },
+          "required": true
+        },
         "responses": {
           "200": {
             "content": {
               "application/json": {
-                "schema": {}
+                "schema": {
+                  "$ref": "#/components/schemas/NotificationPreferencesResponse"
+                }
               }
             },
             "description": "Successful Response"
           },
-          "501": {
+          "422": {
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/ProblemDetails"
+                  "$ref": "#/components/schemas/HTTPValidationError"
                 }
               }
             },
-            "description": "Contract stub not implemented yet"
+            "description": "Validation Error"
           }
         },
-        "summary": "Update notification preferences",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "summary": "Patch Notification Preferences",
         "tags": [
           "me"
         ]
@@ -3889,27 +4841,44 @@
     "/v1/me/notifications/register": {
       "post": {
         "operationId": "post_v1_me_notifications_register",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/NotificationRegisterRequest"
+              }
+            }
+          },
+          "required": true
+        },
         "responses": {
           "200": {
             "content": {
               "application/json": {
-                "schema": {}
+                "schema": {
+                  "$ref": "#/components/schemas/MutationResponse"
+                }
               }
             },
             "description": "Successful Response"
           },
-          "501": {
+          "422": {
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/ProblemDetails"
+                  "$ref": "#/components/schemas/HTTPValidationError"
                 }
               }
             },
-            "description": "Contract stub not implemented yet"
+            "description": "Validation Error"
           }
         },
-        "summary": "Register notification token",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "summary": "Register Notification Token",
         "tags": [
           "me"
         ]
@@ -3918,27 +4887,44 @@
     "/v1/me/password": {
       "post": {
         "operationId": "post_v1_me_password",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ChangePasswordRequest"
+              }
+            }
+          },
+          "required": true
+        },
         "responses": {
           "200": {
             "content": {
               "application/json": {
-                "schema": {}
+                "schema": {
+                  "$ref": "#/components/schemas/MutationResponse"
+                }
               }
             },
             "description": "Successful Response"
           },
-          "501": {
+          "422": {
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/ProblemDetails"
+                  "$ref": "#/components/schemas/HTTPValidationError"
                 }
               }
             },
-            "description": "Contract stub not implemented yet"
+            "description": "Validation Error"
           }
         },
-        "summary": "Change password",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "summary": "Change Password",
         "tags": [
           "me"
         ]
@@ -3951,50 +4937,64 @@
           "200": {
             "content": {
               "application/json": {
-                "schema": {}
-              }
-            },
-            "description": "Successful Response"
-          },
-          "501": {
-            "content": {
-              "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/ProblemDetails"
+                  "$ref": "#/components/schemas/ProfileResponse"
                 }
               }
             },
-            "description": "Contract stub not implemented yet"
+            "description": "Successful Response"
           }
         },
-        "summary": "Get my profile",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "summary": "Get Profile",
         "tags": [
           "me"
         ]
       },
       "patch": {
         "operationId": "patch_v1_me_profile",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ProfileUpdateRequest"
+              }
+            }
+          },
+          "required": true
+        },
         "responses": {
           "200": {
             "content": {
               "application/json": {
-                "schema": {}
+                "schema": {
+                  "$ref": "#/components/schemas/ProfileResponse"
+                }
               }
             },
             "description": "Successful Response"
           },
-          "501": {
+          "422": {
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/ProblemDetails"
+                  "$ref": "#/components/schemas/HTTPValidationError"
                 }
               }
             },
-            "description": "Contract stub not implemented yet"
+            "description": "Validation Error"
           }
         },
-        "summary": "Update my profile",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "summary": "Patch Profile",
         "tags": [
           "me"
         ]
@@ -4007,23 +5007,20 @@
           "200": {
             "content": {
               "application/json": {
-                "schema": {}
-              }
-            },
-            "description": "Successful Response"
-          },
-          "501": {
-            "content": {
-              "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/ProblemDetails"
+                  "$ref": "#/components/schemas/SessionsResponse"
                 }
               }
             },
-            "description": "Contract stub not implemented yet"
+            "description": "Successful Response"
           }
         },
-        "summary": "List sessions",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "summary": "List Sessions",
         "tags": [
           "me"
         ]
@@ -4032,27 +5029,38 @@
     "/v1/me/sessions/{id}": {
       "delete": {
         "operationId": "delete_v1_me_sessions_by_id",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "title": "Id",
+              "type": "string"
+            }
+          }
+        ],
         "responses": {
-          "200": {
-            "content": {
-              "application/json": {
-                "schema": {}
-              }
-            },
+          "204": {
             "description": "Successful Response"
           },
-          "501": {
+          "422": {
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/ProblemDetails"
+                  "$ref": "#/components/schemas/HTTPValidationError"
                 }
               }
             },
-            "description": "Contract stub not implemented yet"
+            "description": "Validation Error"
           }
         },
-        "summary": "Revoke session",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "summary": "Delete Session",
         "tags": [
           "me"
         ]
@@ -4065,50 +5073,64 @@
           "200": {
             "content": {
               "application/json": {
-                "schema": {}
-              }
-            },
-            "description": "Successful Response"
-          },
-          "501": {
-            "content": {
-              "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/ProblemDetails"
+                  "$ref": "#/components/schemas/VehicleListResponse"
                 }
               }
             },
-            "description": "Contract stub not implemented yet"
+            "description": "Successful Response"
           }
         },
-        "summary": "List my vehicles",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "summary": "List Vehicles",
         "tags": [
           "me"
         ]
       },
       "post": {
         "operationId": "post_v1_me_vehicles",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/VehicleWriteRequest"
+              }
+            }
+          },
+          "required": true
+        },
         "responses": {
-          "200": {
+          "201": {
             "content": {
               "application/json": {
-                "schema": {}
+                "schema": {
+                  "$ref": "#/components/schemas/VehicleDto"
+                }
               }
             },
             "description": "Successful Response"
           },
-          "501": {
+          "422": {
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/ProblemDetails"
+                  "$ref": "#/components/schemas/HTTPValidationError"
                 }
               }
             },
-            "description": "Contract stub not implemented yet"
+            "description": "Validation Error"
           }
         },
-        "summary": "Create my vehicle",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "summary": "Create Vehicle",
         "tags": [
           "me"
         ]
@@ -4117,27 +5139,56 @@
     "/v1/me/vehicles/{id}": {
       "patch": {
         "operationId": "patch_v1_me_vehicles_by_id",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "title": "Id",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/VehicleUpdateRequest"
+              }
+            }
+          },
+          "required": true
+        },
         "responses": {
           "200": {
             "content": {
               "application/json": {
-                "schema": {}
+                "schema": {
+                  "$ref": "#/components/schemas/VehicleDto"
+                }
               }
             },
             "description": "Successful Response"
           },
-          "501": {
+          "422": {
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/ProblemDetails"
+                  "$ref": "#/components/schemas/HTTPValidationError"
                 }
               }
             },
-            "description": "Contract stub not implemented yet"
+            "description": "Validation Error"
           }
         },
-        "summary": "Update my vehicle",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "summary": "Patch Vehicle",
         "tags": [
           "me"
         ]
@@ -5800,55 +6851,111 @@
     "/v1/ops/users": {
       "get": {
         "operationId": "get_v1_ops_users",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "role",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Role"
+            }
+          },
+          {
+            "in": "query",
+            "name": "limit",
+            "required": false,
+            "schema": {
+              "default": 100,
+              "maximum": 500,
+              "minimum": 1,
+              "title": "Limit",
+              "type": "integer"
+            }
+          }
+        ],
         "responses": {
           "200": {
             "content": {
               "application/json": {
-                "schema": {}
+                "schema": {
+                  "$ref": "#/components/schemas/OpsUserListResponse"
+                }
               }
             },
             "description": "Successful Response"
           },
-          "501": {
+          "422": {
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/ProblemDetails"
+                  "$ref": "#/components/schemas/HTTPValidationError"
                 }
               }
             },
-            "description": "Contract stub not implemented yet"
+            "description": "Validation Error"
           }
         },
-        "summary": "List ops users",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "summary": "List Ops Users",
         "tags": [
+          "me",
           "ops"
         ]
       },
       "post": {
         "operationId": "post_v1_ops_users",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/OpsUserCreateRequest"
+              }
+            }
+          },
+          "required": true
+        },
         "responses": {
-          "200": {
+          "201": {
             "content": {
               "application/json": {
-                "schema": {}
+                "schema": {
+                  "$ref": "#/components/schemas/OpsUserDto"
+                }
               }
             },
             "description": "Successful Response"
           },
-          "501": {
+          "422": {
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/ProblemDetails"
+                  "$ref": "#/components/schemas/HTTPValidationError"
                 }
               }
             },
-            "description": "Contract stub not implemented yet"
+            "description": "Validation Error"
           }
         },
-        "summary": "Create ops user",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "summary": "Create Ops User",
         "tags": [
+          "me",
           "ops"
         ]
       }
@@ -5856,28 +6963,58 @@
     "/v1/ops/users/{id}/reset-password": {
       "post": {
         "operationId": "post_v1_ops_users_by_id_reset_password",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "title": "Id",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/OpsPasswordResetRequest"
+              }
+            }
+          },
+          "required": true
+        },
         "responses": {
           "200": {
             "content": {
               "application/json": {
-                "schema": {}
+                "schema": {
+                  "$ref": "#/components/schemas/OpsPasswordResetResponse"
+                }
               }
             },
             "description": "Successful Response"
           },
-          "501": {
+          "422": {
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/ProblemDetails"
+                  "$ref": "#/components/schemas/HTTPValidationError"
                 }
               }
             },
-            "description": "Contract stub not implemented yet"
+            "description": "Validation Error"
           }
         },
-        "summary": "Reset user password",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "summary": "Reset User Password",
         "tags": [
+          "me",
           "ops"
         ]
       }

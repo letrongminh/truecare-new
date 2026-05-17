@@ -17,7 +17,8 @@ def test_signup_login_refresh_logout_flow() -> None:
 
     signup = client.post(
         "/v1/auth/signup",
-        json={"identifier": identifier, "password": "correct-horse-battery", "display_name": "Driver"},
+        headers={"x-device-id": f"test-device-{uuid4().hex}"},
+        json={"identifier": identifier, "password": "correct-horse-battery", "display_name": "Driver", "invite_code": "PILOT-HA01"},
     )
     assert signup.status_code == 200, signup.text
     first_pair = signup.json()
@@ -29,7 +30,8 @@ def test_signup_login_refresh_logout_flow() -> None:
 
     duplicate = client.post(
         "/v1/auth/signup",
-        json={"identifier": identifier, "password": "correct-horse-battery"},
+        headers={"x-device-id": f"test-device-{uuid4().hex}"},
+        json={"identifier": identifier, "password": "correct-horse-battery", "invite_code": "PILOT-HA01"},
     )
     assert duplicate.status_code == 409
     assert duplicate.json()["code"] == "DUPLICATE_IDENTITY"

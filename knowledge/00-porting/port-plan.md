@@ -40,6 +40,25 @@ Infrastructure removed from the P0/P1 production path:
 
 Keep Postgres and PostGIS. They are product complexity, not accidental infrastructure.
 
+### 1.1 End-to-End Completion Contract
+
+This plan is an execution contract for a pilot-ready P0 product, not only a migration inventory. Production is not complete until all P0 PRD journeys are implemented end-to-end across backend, mobile, Ops web, worker, realtime/storage, migration, observability, and rollback.
+
+P0 completion requires:
+- Every P0 `/v1` route in this plan has a real handler, registered errors, OpenAPI schema, generated TypeScript client coverage, authorization checks, and unit or integration tests. No P0 route may return a generic unimplemented placeholder.
+- Every P0 mobile and Ops route listed in the PRD route matrix is wired to generated-client data or a local offline queue, exposes loading/empty/error/offline/forbidden states, and is covered by route-file checks plus at least one screen or E2E test lane before cutover.
+- Consumer, merchant, and ops journeys can complete without manual database intervention: signup or invite entry, discovery, booking, check-in, evidence, payment, rating, reward/referral, complaint, merchant onboarding, admissions, exports, and support fallbacks.
+- Worker behavior is durable and replay-safe: scheduled jobs have a ledger, domain event consumers are idempotent, retries are bounded, dead letters are visible to ops, and crash/redeploy catch-up is tested.
+- Supabase Realtime and Storage are production-configured, not mocked: private Broadcast policies, storage bucket policies, short-lived app-issued realtime JWTs, upload confirmation, and polling fallback are all verified.
+- Migration and cutover are rehearsed: migration dry-run, seed verification, shadow-read comparison, backup restore, 48h staging soak, synthetic bookings, load/security smoke, release dashboards, and rollback runbook all pass.
+- Feature flags are used only for rollout, API-origin switching, and rollback. They cannot hide incomplete P0 PRD journeys at production completion.
+
+The required sources of truth must stay synchronized:
+- OpenAPI spec and generated TypeScript client.
+- `knowledge/00-porting/route-test-matrix-v1.md` and actual mobile/Ops route files.
+- Alembic schema, seed manifest, migration map, and shadow-read harness.
+- Maestro mobile flows, Playwright Ops flows, API integration tests, and readiness checklist below.
+
 ## 2. Verified Current Surface
 
 Verified local facts on 2026-05-17:
@@ -1487,6 +1506,7 @@ Completed slices:
 - [x] Phase 5 Ops Web foundation slice: React Query provider, generated API client runtime wrapper, persisted bearer-token ops guard via `/v1/auth/me`, admissions/commission/complaints/network-health/growth-eKYC/audit route shells, shared loading/empty/error/offline/forbidden state surface, and ops route-file gate.
 - [x] Backend hardening and Phase 6 readiness slice: structured JSON access logging, configurable global/auth rate-limit foundation with tests, migration dry-run planner for the 37-table map, deterministic seed manifest/checker, and shadow-read comparison dry-run harness.
 - [x] Backend correctness closure + local cutover gates: production-table RLS migration and app-role coverage tests, booking hold storm tests for 10/50/100 requests, evidence confirm idempotency and retry exhaustion state, promo validation matrix with discount math, transactional audit rows plus `/v1/ops/audit-log`, daily summary CSV header/totals checks, and regenerated OpenAPI client.
+- [x] P0-01 backend/API support slice: invite-gated signup, device cap, forgot-password support requests, profile, vehicles, sessions, password change, notification preferences/token registration, data export, account deletion/cancel, ops users/reset-password audit, mobile signup/profile data wiring, integration coverage, and regenerated OpenAPI client.
 
 Current verification:
 - [x] `make infra-prereqs.check`
@@ -1613,6 +1633,8 @@ Build lanes:
 - [x] Offline mutation queue foundation.
 - [x] Consumer lane route shells: O1/O2/C1/C3/C4/C5/C6/C7/C9/C10/C11/C12.
 - [x] Merchant lane route shells: MO1-MO4/M1/M2/M4/M-Service.
+- [x] Signup route accepts invite code and triggers real auth/device backend.
+- [x] Profile route reads generated-client data for profile, vehicles, sessions, and notification preferences.
 - [ ] Native capability lane: camera, QR, GPS, SecureStore, push, deep links, file queue.
 
 Exit gate:
@@ -1665,7 +1687,27 @@ Cutover gate:
 - [ ] Mobile release candidate installed on target devices.
 - [ ] Rollback runbook executed once in staging.
 
-## 22. Workstream Parallelization
+## 22. P0 Completion Backlog
+
+These slices are the remaining decision-complete backlog from the current port state to pilot-ready end-to-end production. Each slice must update OpenAPI/client, mobile/Ops surfaces, tests, route matrix, and readiness checklist when it changes public behavior.
+
+| Slice | Scope | Dependencies | Acceptance gate |
+|---|---|---|---|
+| P0-01 Auth/profile/device/support completion | Invite-code signup gate, auth exists, logout-all, profile/vehicles, sessions, password change, forgot-password support request, notification preferences, max 3 accounts per device, ops user reset/manual support flow | Phase 1 auth foundation | API tests pass; mobile O1/O2/C9 screens are data-wired; ops user reset writes audit; fraud/device tests cover allow, deny, and manual reset |
+| P0-02 Merchant onboarding/admission/eKYC go-live | Merchant application, photo confirmation, eKYC CMND/selfie/bank uploads, payment recipient setup/verification, admission score, approve/reject/suspend, go-live guard | Storage policy spike; Ops auth | Merchant cannot go live until checklist passes; Ops admissions Playwright flow passes; audit rows written for every state change |
+| P0-03 Booking/payment/evidence end-to-end | Active booking UX, no-show, rated state, deposit rule after repeated no-show, payment merchant-denied/switch-method/cash-record, evidence offline queue, upload confirmation, weak-evidence review path | Core booking/payment/evidence APIs | API integration covers state machine; Maestro booking/payment/evidence smoke passes; physical camera/QR/GPS tests pass on iOS and Android |
+| P0-04 Promo/reward/referral completion | Golden Hour table/surface, promo stacking rules, voucher reserve/release/redeem, reward C10/C11/C12 mobile flows, referral reward issuance from invite first-touch attribution | Promo/reward/referral backend | Promo 5 stacking cases pass; reward/referral integration tests pass; C10/C11/C12 Maestro flow passes |
+| P0-05 Mobile parity completion | Replace shell screens with generated-client data and offline queues, complete loading/empty/error/offline/forbidden states, polish Vietnamese copy and responsive text, deep links/maps resume, push token registration | P0-01 through P0-04 APIs | Route matrix has no P0 mobile gaps; `mobile.route-files.check`, typecheck, Maestro iOS/Android smoke, and physical-device native checks pass |
+| P0-06 Ops web completion | Admissions, complaints, finance/commission, network health, growth/eKYC, users, data room, exports, fallback booking/check-in/evidence/payment actions, audit search/detail | P0-02 through P0-04 backend | Route matrix has no P0 Ops gaps; Playwright Ops journeys pass; CSV/data-room totals reconcile; all mutations write audit rows |
+| P0-07 Realtime/storage/worker completion | Supabase private Broadcast policies, storage bucket policies, realtime token refresh, polling fallback, scheduled worker ledger, advisory locks, retries, dead-letter visibility, catch-up after crash/redeploy | Supabase credentials and schema freeze | Supabase readiness passes; realtime authorization negative tests pass; worker recovery tests prove no duplicate effects and visible dead letters |
+| P0-08 Migration/cutover/production readiness | Fly.io API/worker deploy pipeline, static Ops deployment, feature-flagged API origin, PgBouncer dual pool, backup/restore rehearsal, dashboards/alerts, 48h staging soak, load/security smoke, rollback runbook | P0-01 through P0-07 | Cutover gate passes; 20+ synthetic bookings show no state divergence; rollback runbook executed once in staging |
+
+Backlog rules:
+- A slice is not done until its API, UI, worker/realtime impact, route matrix, tests, and readiness checklist entries are updated together.
+- Thin implementations are acceptable only when the PRD journey works, the data model is auditable, and the production rollback path is clear.
+- Any newly discovered P0 PRD gap must be assigned to one of the eight slices before implementation starts.
+
+## 23. Workstream Parallelization
 
 | Lane | Scope | Dependencies |
 |---|---|---|
@@ -1683,125 +1725,112 @@ Rules:
 - Ops web can run independently once generated client exists.
 - QA builds fixtures continuously, not at the end.
 
-## 23. Production Readiness Checklist
+## 24. Production Readiness Checklist
 
-Product parity:
-- [ ] Consumer onboarding O1/O2 complete.
-- [ ] Consumer discovery C1/C3 complete.
-- [ ] Booking C4/C5 complete with QR and fallback code.
-- [ ] Payment C6 complete with QR/cash and merchant confirmation.
-- [ ] Evidence/rating C7 complete.
-- [ ] Profile C9 complete.
-- [ ] Reward C10/C11/C12 complete.
-- [ ] Merchant onboarding MO1-MO4 complete.
-- [ ] Merchant queue/service/summary M1/M2/M4 complete.
-- [ ] Merchant service execution complete.
-- [ ] Ops admissions, finance, complaints, network health, growth/eKYC complete.
-
-Backend safety:
-- [ ] OpenAPI v1 frozen.
-- [ ] Generated clients compile.
-- [ ] Auth refresh rotation implemented.
-- [ ] Token theft detection implemented.
-- [ ] Role middleware covers every route.
+Backend and API contract:
+- [ ] OpenAPI v1 frozen for every P0 route.
+- [x] Generated clients compile after OpenAPI generation.
+- [x] Auth refresh rotation implemented.
+- [x] Refresh-token reuse detection implemented.
+- [ ] Role middleware and tenant checks cover every P0 route.
 - [x] DB RLS enabled and tested for production tenant tables.
-- [ ] Idempotency implemented for booking/payment/evidence/promo/reward mutations.
-- [ ] Domain events are idempotent and retryable.
-- [ ] `domain_events` / `processed_domain_events` contract covers async side effects and per-consumer idempotency.
-- [ ] Worker scheduler ledger records every scheduled job run and supports catch-up after crash/redeploy.
-- [ ] Worker has advisory locks and dead-letter handling.
+- [x] P0 auth/profile/device/support API routes implemented for invite-gated signup, auth exists, logout-all, forgot-password support request, profile, vehicles, sessions, password change, notification preferences, notification token registration, data export, account deletion/cancel, ops users, and ops password reset.
+- [ ] Idempotency implemented for booking, payment, evidence, promo, reward, referral, complaint, and ops fallback mutations.
+- [ ] Domain events are idempotent, retryable, and covered by `processed_domain_events` per consumer.
+- [ ] Worker scheduler ledger records every scheduled job run and supports catch-up after crash or redeploy.
+- [ ] Worker advisory locks, bounded retries, dead-letter visibility, and ops review paths are tested.
 
-Data and migration:
-- [ ] Table mapping approved.
-- [ ] Seed scripts approved.
-- [ ] Shadow-read harness implemented.
-- [ ] Migration dry-run clean.
-- [ ] Restore-from-backup rehearsal complete.
-- [ ] Historical completed bookings reconcile against payments/ratings/rewards.
+Consumer product parity:
+- [x] O1/O2 backend: invite code, auth exists, signup/login/logout-all, device cap, and support reset request implemented with integration tests.
+- [ ] O1/O2 onboarding: invite code, auth exists, signup/login/logout-all, device cap, support reset request, loading/error/offline/forbidden states, and Maestro smoke.
+- [ ] C1/C3 discovery: nearby/search/service-template APIs wired to mobile, stale merchant exclusion, empty/error/offline states, and E2E coverage.
+- [ ] C4/C5 booking: hold, active booking, cancel, QR/manual fallback check-in, no-show/deposit states, loading/error/offline states, and E2E coverage.
+- [ ] C6 payment: QR, cash, user-claimed, merchant-confirmed, merchant-denied, switch-method, idempotent replay, and E2E coverage.
+- [ ] C7 evidence/rating: camera/file queue, presign/confirm/retry/weak-evidence path, binary idempotent rating, and physical-device coverage.
+- [x] C9 backend/profile read surface: profile, vehicles, sessions, password change, data export/delete/cancel-delete, notification preferences, token registration, and mobile profile data read are implemented with integration/typecheck coverage.
+- [ ] C9 full mobile parity: profile edit, vehicle edit, session revoke, data export/delete/cancel-delete actions, notification preference edit states, offline/forbidden UX, and Maestro coverage.
+- [ ] C10/C11/C12 rewards: progress, vouchers, reserve/release/redeem, celebration, referral share, referral reward issuance, and Maestro coverage.
 
-Mobile reliability:
-- [ ] SecureStore token handling tested.
-- [ ] Camera and QR tested on physical devices.
-- [ ] GPS allowed/denied/fallback tested.
-- [ ] Offline evidence queue tested.
-- [ ] Payment offline mutation queue tested.
-- [ ] Deep links and maps resume tested.
-- [ ] Push notification token registration and receive behavior tested.
+Merchant product parity:
+- [ ] MO1-MO4 onboarding: application, photo, eKYC CMND/selfie/bank, payment setup, go-live checklist, and loading/error/offline states.
+- [ ] M1 queue/calendar: queue, active booking, calendar, maintenance, realtime or polling refresh, and merchant mobile E2E coverage.
+- [ ] M2 service execution: check-in, start, complete, evidence requirement, payment confirmation/denial, fallback code, and no double-transition tests.
+- [ ] M4 summaries/services: daily summary response/CSV, golden hour, merchant service CRUD, custom service review/resubmit, price history, and stale-service guard.
 
-Ops and support:
-- [x] Audit log for every implemented ops state change.
-- [ ] Audit log coverage for future/manual fallback ops actions.
-- [ ] Manual fallback actions implemented.
-- [ ] Complaint SLA visible.
-- [ ] Commission CSV verified.
-- [ ] Data export/delete account jobs verified.
-- [ ] Support runbook written.
+Ops and support parity:
+- [x] Audit log exists for every implemented ops state change.
+- [ ] Admissions/payment-recipient/eKYC approve-reject-suspend journeys pass Playwright and write audit rows.
+- [ ] Complaints triage shows SLA, refund/voucher decision, resolution history, and writes audit rows.
+- [ ] Finance/commission CSV and data-room sections reconcile totals against API integration fixtures.
+- [ ] Ops fallback booking, check-in, evidence upload, payment confirmation, user creation, and password reset are implemented and audited.
+- [x] Ops user list/create/reset-password backend is implemented; reset-password writes audit and revokes active refresh tokens.
+- [ ] Manual support runbook covers password reset, device-cap reset, weak evidence review, payment dispute, refund/voucher, and merchant suspension.
 
+Realtime, storage, and native reliability:
+- [ ] Supabase private Broadcast policies pass positive and negative tenant/user/merchant/ops authorization tests.
+- [ ] Supabase Storage buckets and signed upload confirmation pass local and Supabase readiness checks.
+- [ ] Realtime token refresh and polling fallback are tested for consumer, merchant, and ops channels.
+- [ ] SecureStore token handling is tested.
+- [ ] Camera, QR scanner, GPS allow/deny/fallback, file queue, push token registration, push receipt, deep links, and maps resume pass physical-device checks on iOS and Android.
+- [ ] Offline evidence and payment mutation queues replay safely after app restart and network recovery.
 
-Additional production gates:
-- [ ] `notification_preferences`, merchant phone, golden hours, and support requests modeled.
-- [ ] Discovery scoring formula verified against stale merchant exclusion.
-- [ ] Referral rewards use invite-code first-touch attribution.
-- [ ] Payment merchant-denied flow implemented.
-- [ ] Rating endpoint is binary and idempotent.
-- [ ] Daily summary, commission export, and data room fields verified.
-- [ ] P0 password reset creates ops support request.
-- [ ] Max 3 accounts per device fraud rule enforced.
-- [ ] Reward, merchant admission, and commission state machines covered by integration tests.
-- [ ] `no_show` and `rated` booking states implemented and migrated.
-- [ ] Search endpoint uses PostGIS + pg_trgm for P0.
-- [x] Promo 8 validation cases implemented.
-- [ ] Promo 5 stacking rules implemented.
-- [ ] Service mode tag enforcement and stale merchant detection implemented.
-- [ ] Force update and feature flags endpoints implemented.
-- [ ] Account deletion cancel window and data export bundle verified.
-- [ ] Backend i18n message bundles enforced.
-- [ ] PgBouncer dual-pool architecture configured.
-- [ ] Slot pre-seeding and retention sweep jobs implemented.
+Data, migration, and cutover:
+- [x] Table migration map exists for the legacy 37-table schema.
+- [x] Seed manifest/checker exists.
+- [x] Shadow-read dry-run harness exists.
+- [x] Migration dry-run planner exists.
+- [ ] Production migration dry-run passes against staging data with checksums.
+- [ ] Restore-from-backup rehearsal completes and is documented.
+- [ ] Historical completed bookings reconcile against payments, ratings, rewards, complaints, and commission exports.
+- [ ] PgBouncer dual-pool architecture is configured for app traffic and migration/admin bypass traffic.
+- [ ] Slot pre-seeding and retention sweep jobs are implemented.
 
-Observability:
-- [ ] Sentry Python and React Native configured.
-- [ ] Structured JSON logs with request ID.
-- [ ] `/healthz`, `/readyz`, `/metrics` implemented.
-- [ ] Alerts for API error rate, p95 latency, worker lag, failed evidence jobs, failed payment confirmations, queue backlog.
-- [ ] Release dashboard for launch week.
+Observability and release:
+- [x] Structured JSON logs with request ID implemented.
+- [x] `/healthz`, `/readyz`, and `/metrics` implemented.
+- [ ] Sentry Python, React Native, and Ops web projects are configured.
+- [ ] Alerts cover API error rate, p95 latency, worker lag, failed evidence jobs, failed payment confirmations, queue backlog, and realtime auth failures.
+- [ ] Force-update and feature-flag endpoints are production-configured for API-origin rollback.
+- [ ] Release dashboard exists for launch week.
+- [ ] 48h staging soak, 20+ synthetic bookings, security smoke, load smoke, mobile RC install, and rollback rehearsal all pass.
 
-## 24. First Tickets
+## 25. First Tickets
 
-1. Create OpenAPI v1 skeleton and generated TypeScript client pipeline.
-2. Create `docs/migration-map-v1.md` with all 37 current tables.
-3. Create Expo route manifest tickets from Section 14.
-4. Implement backend auth/RBAC/RLS proof of concept with one protected route and one RLS table.
-5. Implement booking hold transaction spike against current `slot_capacity` shape.
-6. Implement mobile offline evidence queue spike using `expo-camera`, `expo-image-manipulator`, and `expo-file-system`.
-7. Convert top 10 Maestro flows to new route/testID selectors.
-8. Add Supabase private Broadcast policy spike for `booking:user:{user_id}`.
-9. Add migration dry-run command and staging seed data.
-10. Add k6/Locust smoke for nearby and booking hold.
-11. Implement version check and feature flags endpoints.
-12. Implement PostGIS + pg_trgm search endpoint.
-13. Implement account deletion cancel window and export bundle.
-14. Implement promo validation matrix and stacking rules.
-15. Configure PgBouncer dual-pool deployment.
-16. Implement notification preferences and support reset request table.
-17. Implement merchant-denied payment flow.
-18. Implement daily summary response/CSV and ops data room sections.
-19. Implement referral reward rules using invite-code first-touch attribution.
-20. Implement signup device cap and manual password reset flow.
+| # | Status | Ticket | Owner lane | Dependency | Acceptance gate |
+|---|---|---|---|---|---|
+| 1 | [x] Backend/API done; Maestro/full mobile actions remain in P0-05 | Implement invite-gated signup, auth exists, logout-all, forgot-password support request, sessions, and password change | A/B/C/E | Existing auth foundation | API tests pass; O1/O2/C9 screens are wired; ops reset writes audit |
+| 2 | [x] Backend/API done; explicit blocked mobile state remains in P0-05 | Add device registration and max 3 accounts per device with ops/manual reset path | A/C/E | Ticket 1 | Fraud tests cover allow, deny, and reset; mobile shows blocked state |
+| 3 | [x] Backend/API and profile read surface done; physical push receipt remains in P0-05/P0-07 | Complete notification preferences and push token registration | A/C/F | Ticket 1 | Preferences API, mobile settings, push token persistence, and typecheck pass |
+| 4 | [ ] Next | Complete merchant onboarding, photo, eKYC, bank/payment setup, and go-live checklist | A/D/E | Storage policy spike | Merchant cannot go live until checklist passes; Playwright admissions flow passes |
+| 5 | [ ] Open | Implement Supabase Storage bucket policies and evidence/merchant upload confirmation against Supabase readiness env | A/D/F | Supabase credentials | Storage positive/negative policy tests pass; upload confirmation works |
+| 6 | [ ] Open | Complete booking no-show, deposit, rated state, payment merchant-denied, switch-method, and cash-record flows | A/C/D | Core booking/payment APIs | State-machine integration tests and Maestro booking/payment smoke pass |
+| 7 | [ ] Open | Implement mobile camera/QR/GPS/deep-link/file-queue native lane | C/D | Tickets 5 and 6 | Physical iOS/Android checks pass; offline evidence replay is idempotent |
+| 8 | [ ] Open | Complete promo stacking, Golden Hour surface, voucher reserve/release/redeem, and referral reward issuance | A/C | Promo/reward backend | Promo 5 stacking tests, reward/referral tests, and C10/C11/C12 Maestro pass |
+| 9 | [ ] Open | Replace remaining P0 mobile route shells with generated-client data and full UI states | C/D | Tickets 1-8 route APIs | Route matrix has no P0 mobile gaps; Maestro smoke passes on iOS/Android |
+| 10 | [ ] Open | Complete Ops admissions, complaints, users, fallback actions, data room, exports, and audit search/detail | E/A | Tickets 1, 4, 6, 8 | Playwright Ops journeys pass; CSV/data-room totals reconcile; all mutations audited |
+| 11 | [ ] Open | Implement Supabase private Broadcast policies, realtime token refresh, and polling fallback | F/A/C/D/E | Supabase credentials; core route wiring | Positive and negative realtime authorization tests pass for consumer, merchant, and ops |
+| 12 | [ ] Open | Upgrade worker from drain skeleton to durable scheduler with ledger, locks, retries, dead letters, and catch-up | F/A | Domain event schema | Worker recovery tests pass; dead letters visible to Ops |
+| 13 | [ ] Open | Configure Fly.io API/worker deploy, static Ops deploy, PgBouncer dual pool, and API-origin feature flag | G/A/E | P0 route freeze | Staging deploy pipeline and rollback switch pass |
+| 14 | [ ] Open | Run migration/cutover rehearsal: staging migration, seed, shadow-read, restore, synthetic bookings, load/security smoke | G/QA | Tickets 1-13 | Cutover gate passes with documented rollback evidence |
+| 15 | [ ] Open | Finalize production observability: Sentry, dashboards, alerts, launch-week release dashboard, and support runbook | G/E | Tickets 10-14 | Alert checks fire in staging; support runbook covers all manual fallback paths |
 
-## 25. Remaining Decisions
+## 26. Locked P0 Decisions
 
-| Decision | Recommended answer | Owner |
-|---|---|---|
-| Push provider | Expo Push Service for pilot; direct APNs/FCM only if Expo limits block requirements | Mobile/backend |
-| Deploy target | Fly/Render/Railway for API+worker; managed Postgres/Supabase for DB/realtime/storage | Tech lead |
-| Auth owner | FastAPI owns auth; Supabase Realtime uses short-lived app-issued JWTs with tenant/user/merchant/ops-scope claims | Backend |
-| E2E runner | Maestro for mobile, Playwright for Ops web | QA |
-| UI library | Tamagui mobile, shadcn/Radix Ops web | Frontend |
-| RLS launch stance | DB RLS required for production cutover | Backend/security |
-| P1 search upgrade | Keep P0 merchant-only PostGIS + pg_trgm; add Meilisearch/place search only if pilot quality requires it | Backend |
+| Decision | Locked P0 choice | Implementation constraint | Owner |
+|---|---|---|---|
+| Push provider | Expo Push Service | Direct APNs/FCM is P1 unless Expo limits block pilot requirements | Mobile/backend |
+| Deploy target | Fly.io for API and worker; Supabase Singapore for Postgres, Realtime, and Storage; static hosting from the selected deploy pipeline for Ops web | API and worker image tags include git SHA; mobile API origin can roll back through feature flags | Tech lead |
+| Auth owner | FastAPI owns auth | Supabase Realtime only verifies short-lived FastAPI-issued JWTs with tenant/user/merchant/ops-scope claims | Backend |
+| E2E runner | Maestro for mobile, Playwright for Ops web | Release is blocked if required P0 flows fail | QA |
+| UI library | Tamagui mobile, shadcn/Radix-style Ops web | Generated client is the shared API boundary; no hand-written duplicate service clients | Frontend |
+| RLS launch stance | DB RLS is required for production cutover | App-role and bypass/admin paths are separate and tested | Backend/security |
+| P0 search | Merchant-only PostGIS + pg_trgm | `type=place` remains a P1 placeholder until pilot quality requires it | Backend |
 
-## 26. Source References
+P1 defaults:
+- Search upgrade: evaluate Meilisearch/place search only after P0 pilot metrics show merchant-only search is insufficient.
+- Push upgrade: evaluate direct APNs/FCM only if Expo Push Service fails latency, deliverability, or compliance needs.
+
+## 27. Source References
 
 Local:
 - `/Users/minhlt/Downloads/Projects/TASCO/09-product-requirements-document.md`

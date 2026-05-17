@@ -11,6 +11,8 @@ from app.routers.contract_stubs import build_contract_router
 from app.routers.control import router as control_router
 from app.routers.marketplace import IMPLEMENTED_MARKETPLACE_ROUTES
 from app.routers.marketplace import router as marketplace_router
+from app.routers.me import IMPLEMENTED_ME_ROUTES
+from app.routers.me import router as me_router
 from app.routers.phase23 import IMPLEMENTED_PHASE23_ROUTES
 from app.routers.phase23 import router as phase23_router
 
@@ -46,9 +48,10 @@ def create_app(rate_limit_config: RateLimitConfig | None = None) -> FastAPI:
     app.add_exception_handler(Exception, unhandled_error_handler)
     app.include_router(control_router)
     app.include_router(auth_router)
+    app.include_router(me_router)
     app.include_router(marketplace_router)
     app.include_router(phase23_router)
-    app.include_router(build_contract_router(exclude=IMPLEMENTED_AUTH_ROUTES | IMPLEMENTED_MARKETPLACE_ROUTES | IMPLEMENTED_PHASE23_ROUTES))
+    app.include_router(build_contract_router(exclude=IMPLEMENTED_AUTH_ROUTES | IMPLEMENTED_ME_ROUTES | IMPLEMENTED_MARKETPLACE_ROUTES | IMPLEMENTED_PHASE23_ROUTES))
     return app
 
 

@@ -93,6 +93,140 @@ class RefreshToken(Base):
     reused_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
 
 
+class InviteCode(Base):
+    __tablename__ = "invite_codes"
+    __table_args__ = (
+        UniqueConstraint("code", name="invite_codes_code_uidx"),
+        Index("invite_codes_tenant", "tenant_id", "expires_at"),
+    )
+
+    id: Mapped[UUID] = uuid_pk()
+    tenant_id: Mapped[UUID] = mapped_column(Uuid(as_uuid=True), ForeignKey("tenants.id"), nullable=False)
+    code: Mapped[str] = mapped_column(String(80), nullable=False)
+    source: Mapped[str] = mapped_column(String(80), nullable=False, default="direct_ops")
+    max_uses: Mapped[int] = mapped_column(Integer, nullable=False, default=1)
+    used_count: Mapped[int] = mapped_column(Integer, nullable=False, default=0)
+    created_by: Mapped[UUID | None] = mapped_column(Uuid(as_uuid=True), ForeignKey("users.id"))
+    referred_by: Mapped[UUID | None] = mapped_column(Uuid(as_uuid=True), ForeignKey("users.id"))
+    created_at: Mapped[datetime] = utc_now_column()
+    expires_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
+
+
+class DeviceRegistration(Base):
+    __tablename__ = "device_registrations"
+    __table_args__ = (
+        UniqueConstraint("device_id", "user_id", name="device_registrations_device_user_uidx"),
+        Index("device_registrations_device", "device_id"),
+        Index("device_registrations_user", "user_id"),
+    )
+
+    id: Mapped[UUID] = uuid_pk()
+    tenant_id: Mapped[UUID] = mapped_column(Uuid(as_uuid=True), ForeignKey("tenants.id"), nullable=False)
+    user_id: Mapped[UUID] = mapped_column(Uuid(as_uuid=True), ForeignKey("users.id"), nullable=False)
+    device_id: Mapped[str] = mapped_column(String(200), nullable=False)
+    created_at: Mapped[datetime] = utc_now_column()
+
+
+class Vehicle(Base):
+    __tablename__ = "vehicles"
+    __table_args__ = (
+        Index("vehicles_user_active", "user_id", postgresql_where=text("deleted_at is null")),
+        Index("vehicles_tenant_user", "tenant_id", "user_id"),
+    )
+
+    id: Mapped[UUID] = uuid_pk()
+    tenant_id: Mapped[UUID] = mapped_column(Uuid(as_uuid=True), ForeignKey("tenants.id"), nullable=False)
+    user_id: Mapped[UUID] = mapped_column(Uuid(as_uuid=True), ForeignKey("users.id"), nullable=False)
+    kind: Mapped[str] = mapped_column(String(40), nullable=False, default="sedan")
+    license_plate: Mapped[str | None] = mapped_column(String(40))
+    make: Mapped[str | None] = mapped_column(String(80))
+    model: Mapped[str | None] = mapped_column(String(80))
+    year: Mapped[int | None] = mapped_column(Integer)
+    color: Mapped[str | None] = mapped_column(String(80))
+    is_default: Mapped[bool] = mapped_column(Boolean, nullable=False, default=False)
+    created_at: Mapped[datetime] = utc_now_column()
+    updated_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
+    deleted_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
+
+
+class DeviceToken(Base):
+    __tablename__ = "device_tokens"
+    __table_args__ = (
+        Index("device_tokens_user", "user_id", "registered_at"),
+        Index("device_tokens_device", "device_id"),
+    )
+
+    token: Mapped[str] = mapped_column(Text, primary_key=True)
+    tenant_id: Mapped[UUID] = mapped_column(Uuid(as_uuid=True), ForeignKey("tenants.id"), nullable=False)
+    user_id: Mapped[UUID] = mapped_column(Uuid(as_uuid=True), ForeignKey("users.id"), nullable=False)
+    platform: Mapped[str] = mapped_column(String(40), nullable=False)
+    device_id: Mapped[str | None] = mapped_column(String(200))
+    registered_at: Mapped[datetime] = utc_now_column()
+    last_seen_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
+
+
+class NotificationPreference(Base):
+    __tablename__ = "notification_preferences"
+
+    user_id: Mapped[UUID] = mapped_column(Uuid(as_uuid=True), ForeignKey("users.id"), primary_key=True)
+    tenant_id: Mapped[UUID] = mapped_column(Uuid(as_uuid=True), ForeignKey("tenants.id"), nullable=False)
+    booking_updates: Mapped[bool] = mapped_column(Boolean, nullable=False, default=True)
+    golden_hour: Mapped[bool] = mapped_column(Boolean, nullable=False, default=True)
+    referral_reward: Mapped[bool] = mapped_column(Boolean, nullable=False, default=True)
+    wash_reminder: Mapped[bool] = mapped_column(Boolean, nullable=False, default=True)
+    quiet_hours_start: Mapped[str | None] = mapped_column(String(16))
+    quiet_hours_end: Mapped[str | None] = mapped_column(String(16))
+    updated_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
+    created_at: Mapped[datetime] = utc_now_column()
+
+
+class SupportRequest(Base):
+    __tablename__ = "support_requests"
+    __table_args__ = (
+        Index("support_requests_tenant_status", "tenant_id", "status", "created_at"),
+        Index("support_requests_subject", "subject_user_id", "created_at"),
+    )
+
+    id: Mapped[UUID] = uuid_pk()
+    tenant_id: Mapped[UUID] = mapped_column(Uuid(as_uuid=True), ForeignKey("tenants.id"), nullable=False)
+    subject_user_id: Mapped[UUID | None] = mapped_column(Uuid(as_uuid=True), ForeignKey("users.id"))
+    created_by_user_id: Mapped[UUID | None] = mapped_column(Uuid(as_uuid=True), ForeignKey("users.id"))
+    owner_user_id: Mapped[UUID | None] = mapped_column(Uuid(as_uuid=True), ForeignKey("users.id"))
+    kind: Mapped[str] = mapped_column(String(80), nullable=False)
+    identifier: Mapped[str | None] = mapped_column(String(320))
+    status: Mapped[str] = mapped_column(String(40), nullable=False, default="open")
+    payload: Mapped[dict[str, Any]] = mapped_column(JSONType, nullable=False, default=dict)
+    created_at: Mapped[datetime] = utc_now_column()
+    updated_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
+
+
+class DataExportJob(Base):
+    __tablename__ = "data_export_jobs"
+    __table_args__ = (Index("data_export_jobs_user", "user_id", "created_at"),)
+
+    id: Mapped[UUID] = uuid_pk()
+    tenant_id: Mapped[UUID] = mapped_column(Uuid(as_uuid=True), ForeignKey("tenants.id"), nullable=False)
+    user_id: Mapped[UUID] = mapped_column(Uuid(as_uuid=True), ForeignKey("users.id"), nullable=False)
+    status: Mapped[str] = mapped_column(String(40), nullable=False, default="queued")
+    bundle_url: Mapped[str | None] = mapped_column(Text)
+    expires_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
+    created_at: Mapped[datetime] = utc_now_column()
+    completed_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
+
+
+class AccountDeletionRequest(Base):
+    __tablename__ = "account_deletion_requests"
+    __table_args__ = (Index("account_deletion_requests_user", "user_id", "requested_at"),)
+
+    id: Mapped[UUID] = uuid_pk()
+    tenant_id: Mapped[UUID] = mapped_column(Uuid(as_uuid=True), ForeignKey("tenants.id"), nullable=False)
+    user_id: Mapped[UUID] = mapped_column(Uuid(as_uuid=True), ForeignKey("users.id"), nullable=False)
+    status: Mapped[str] = mapped_column(String(40), nullable=False, default="waiting")
+    requested_at: Mapped[datetime] = utc_now_column()
+    cancel_until: Mapped[datetime] = mapped_column(DateTime(timezone=True), nullable=False)
+    cancelled_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
+
+
 class IdempotencyKey(Base):
     __tablename__ = "idempotency_keys"
 

@@ -271,6 +271,7 @@ export const operations = [
     "path": "/v1/ops/users",
     "operationId": "get_v1_ops_users",
     "tags": [
+      "me",
       "ops"
     ]
   },
@@ -799,6 +800,7 @@ export const operations = [
     "path": "/v1/ops/users",
     "operationId": "post_v1_ops_users",
     "tags": [
+      "me",
       "ops"
     ]
   },
@@ -807,6 +809,7 @@ export const operations = [
     "path": "/v1/ops/users/{id}/reset-password",
     "operationId": "post_v1_ops_users_by_id_reset_password",
     "tags": [
+      "me",
       "ops"
     ]
   },

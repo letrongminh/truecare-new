@@ -6,12 +6,13 @@ import { signup } from "../../lib/auth-store";
 export default function SignupScreen() {
   const [identifier, setIdentifier] = useState("");
   const [password, setPassword] = useState("");
+  const [inviteCode, setInviteCode] = useState("PILOT-HA01");
   const [state, setState] = useState<"ready" | "loading" | "error">("ready");
 
   async function submit() {
     setState("loading");
     try {
-      await signup(identifier, password, "TrueCare user");
+      await signup(identifier, password, "TrueCare user", inviteCode);
       setState("ready");
     } catch {
       setState("error");
@@ -19,9 +20,10 @@ export default function SignupScreen() {
   }
 
   return (
-    <StateScaffold testIDPrefix="auth-signup" title="Dang ky TrueCare" subtitle="Tao tai khoan bang email hoac so dien thoai." state={state} primaryAction="Tao tai khoan">
+    <StateScaffold testIDPrefix="auth-signup" title="Dang ky TrueCare" subtitle="Tao tai khoan bang email hoac so dien thoai." state={state} primaryAction="Tao tai khoan" onPrimaryAction={submit} onSecondaryAction={() => setState("ready")}>
       <TextInput testID="auth-signup-identifier" placeholder="Email hoac so dien thoai" value={identifier} onChangeText={setIdentifier} style={{ minHeight: 48, borderWidth: 1, borderColor: "#d0d5dd", borderRadius: 8, paddingHorizontal: 12 }} />
       <TextInput testID="auth-signup-password" placeholder="Mat khau" secureTextEntry value={password} onChangeText={setPassword} onSubmitEditing={submit} style={{ minHeight: 48, borderWidth: 1, borderColor: "#d0d5dd", borderRadius: 8, paddingHorizontal: 12 }} />
+      <TextInput testID="auth-signup-invite-code" placeholder="Ma moi" value={inviteCode} onChangeText={setInviteCode} autoCapitalize="characters" style={{ minHeight: 48, borderWidth: 1, borderColor: "#d0d5dd", borderRadius: 8, paddingHorizontal: 12 }} />
     </StateScaffold>
   );
 }

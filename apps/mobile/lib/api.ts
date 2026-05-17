@@ -57,6 +57,7 @@ export async function apiRequest<T>(
     query?: Record<string, string | number | boolean | undefined | null>;
     body?: unknown;
     token?: string | null;
+    headers?: Record<string, string>;
   } = {}
 ): Promise<T> {
   const operation = byOperationId.get(operationId);
@@ -74,7 +75,8 @@ export async function apiRequest<T>(
     method: operation.method,
     headers: {
       "content-type": "application/json",
-      ...(options.token ? { authorization: `Bearer ${options.token}` } : {})
+      ...(options.token ? { authorization: `Bearer ${options.token}` } : {}),
+      ...(options.headers || {})
     },
     body: options.body === undefined ? undefined : JSON.stringify(options.body)
   });

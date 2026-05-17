@@ -8,6 +8,8 @@ export type StateScaffoldProps = {
   state?: "ready" | "loading" | "empty" | "error" | "offline" | "forbidden";
   primaryAction?: string;
   secondaryAction?: string;
+  onPrimaryAction?: () => void;
+  onSecondaryAction?: () => void;
   children?: ReactNode;
 };
 
@@ -27,6 +29,8 @@ export function StateScaffold({
   state = "ready",
   primaryAction = "Tiep tuc",
   secondaryAction = "Thu lai",
+  onPrimaryAction,
+  onSecondaryAction,
   children
 }: StateScaffoldProps) {
   return (
@@ -60,12 +64,14 @@ export function StateScaffold({
       <View style={{ flexDirection: "row", gap: 10 }}>
         <Pressable
           testID={`${testIDPrefix}-primary`}
+          onPress={onPrimaryAction}
           style={{ minHeight: 48, flex: 1, borderRadius: 8, alignItems: "center", justifyContent: "center", backgroundColor: "#0f766e" }}
         >
           <Text style={{ color: "#ffffff", fontWeight: "700" }}>{primaryAction}</Text>
         </Pressable>
         <Pressable
           testID={`${testIDPrefix}-retry`}
+          onPress={onSecondaryAction}
           style={{ minHeight: 48, flex: 1, borderRadius: 8, alignItems: "center", justifyContent: "center", borderColor: "#98a2b3", borderWidth: 1 }}
         >
           <Text style={{ color: "#344054", fontWeight: "700" }}>{secondaryAction}</Text>
