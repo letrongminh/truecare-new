@@ -1,3 +1,4 @@
+import { Link } from "expo-router";
 import { Text, View } from "react-native";
 
 export default function IndexScreen() {
@@ -16,6 +17,9 @@ export default function IndexScreen() {
       <Text style={{ marginTop: 8, color: "#526071", textAlign: "center" }}>
         Nearby car care marketplace
       </Text>
+      <Link href="/(consumer)/home" style={{ marginTop: 20, color: "#0f766e", fontWeight: "700" }}>
+        Open app
+      </Link>
     </View>
   );
 }

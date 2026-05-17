@@ -1483,19 +1483,21 @@ Completed slices:
 - [x] Core marketplace API slice 1: service templates, merchant discovery/detail/services/bays, booking hold/list/get/cancel, merchant queue read, same-transaction booking domain events, and regenerated OpenAPI client.
 - [x] Core marketplace API slice 2: merchant check-in by QR/manual code, start service, complete service, transition events, integration coverage, and regenerated OpenAPI client.
 - [x] Phase 2/3 backend completion slice: evidence presign/confirm/process, payments, rating, realtime token, promo, rewards, referrals, complaints, merchant custom service review/resubmit, price history, daily summary CSV, commission receivables, integration coverage, and regenerated OpenAPI client.
+- [x] Phase 4 mobile foundation slice: Tamagui provider/config, SecureStore-backed auth store, generated API client runtime wrapper, TanStack Query provider, offline mutation queue, all 20 mandatory Expo Router files, mobile route-file gate, and JavaScript workspace typecheck.
 
 Current verification:
 - [x] `make infra-prereqs.check`
 - [x] `make secret-leak.check`
 - [x] `make route-test-matrix.check`
+- [x] `make mobile.route-files.check`
 - [x] `make db.up`
 - [x] `make db.migrate`
 - [x] `make api.test`
 - [x] `make api.integration`
 - [x] `make client.generate`
 - [x] `make worker.once`
+- [x] `pnpm -r typecheck`
 - [ ] `make supabase-readiness.check` after real Supabase credentials, `psql`, and `jq` are available.
-- [ ] JavaScript workspace install/typecheck after `pnpm` is enabled.
 
 ### Phase 0 - Production Design Freeze
 
@@ -1596,16 +1598,17 @@ Duration: 4-6 weeks, parallelizable after Phase 0 and backend contract freeze.
 
 Build lanes:
 - [x] Mobile shell scaffold: Expo Router app shell.
-- [ ] Tamagui primitives.
-- [ ] Auth store.
-- [ ] Generated client integration in app runtime.
-- [ ] Query client.
-- [ ] Offline queue.
-- [ ] Consumer lane: O1/O2/C1/C3/C4/C5/C6/C7/C9/C10/C11/C12.
-- [ ] Merchant lane: MO1-MO4/M1/M2/M4/M-Service.
+- [x] Tamagui primitives/provider/config foundation.
+- [x] Auth store foundation with SecureStore token persistence.
+- [x] Generated client integration in app runtime.
+- [x] Query client provider.
+- [x] Offline mutation queue foundation.
+- [x] Consumer lane route shells: O1/O2/C1/C3/C4/C5/C6/C7/C9/C10/C11/C12.
+- [x] Merchant lane route shells: MO1-MO4/M1/M2/M4/M-Service.
 - [ ] Native capability lane: camera, QR, GPS, SecureStore, push, deep links, file queue.
 
 Exit gate:
+- [x] All mandatory Expo Router files exist and compile in the JavaScript workspace.
 - [ ] All mandatory route manifest rows have loading/error/offline/forbidden states.
 - [ ] Maestro smoke passes on iOS and Android.
 - [ ] Physical-device camera/push/GPS tests pass.

@@ -24,6 +24,7 @@ Useful commands:
 make infra-prereqs.check
 make secret-leak.check
 make route-test-matrix.check
+make mobile.route-files.check
 make db.up
 make db.migrate
 make api.test
@@ -31,4 +32,5 @@ make api.integration
 make api.openapi
 make client.generate
 make worker.once
+pnpm -r typecheck
 ```

@@ -37,6 +37,10 @@ secret-leak.check:
 route-test-matrix.check:
 	@$(PYTHON) scripts/checks/route_test_matrix_check.py
 
+## mobile.route-files.check — verify mandatory Expo Router files exist
+mobile.route-files.check:
+	@$(PYTHON) scripts/checks/mobile_route_files_check.py
+
 ## api.test — run FastAPI foundation tests through the local venv
 api.test: venv
 	@cd apps/api && ../../$(VENV_PY) -m pytest -m "not integration"
