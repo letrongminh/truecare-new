@@ -8,6 +8,8 @@ from app.routers.contract_stubs import build_contract_router
 from app.routers.control import router as control_router
 from app.routers.marketplace import IMPLEMENTED_MARKETPLACE_ROUTES
 from app.routers.marketplace import router as marketplace_router
+from app.routers.phase23 import IMPLEMENTED_PHASE23_ROUTES
+from app.routers.phase23 import router as phase23_router
 
 
 def create_app() -> FastAPI:
@@ -22,7 +24,8 @@ def create_app() -> FastAPI:
     app.include_router(control_router)
     app.include_router(auth_router)
     app.include_router(marketplace_router)
-    app.include_router(build_contract_router(exclude=IMPLEMENTED_AUTH_ROUTES | IMPLEMENTED_MARKETPLACE_ROUTES))
+    app.include_router(phase23_router)
+    app.include_router(build_contract_router(exclude=IMPLEMENTED_AUTH_ROUTES | IMPLEMENTED_MARKETPLACE_ROUTES | IMPLEMENTED_PHASE23_ROUTES))
     return app
 
 

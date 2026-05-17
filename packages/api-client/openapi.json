@@ -255,6 +255,187 @@
         "title": "CheckInRequest",
         "type": "object"
       },
+      "CommissionReceivableDto": {
+        "properties": {
+          "commission_receivable": {
+            "title": "Commission Receivable",
+            "type": "integer"
+          },
+          "commission_status": {
+            "title": "Commission Status",
+            "type": "string"
+          },
+          "merchant_id": {
+            "format": "uuid",
+            "title": "Merchant Id",
+            "type": "string"
+          },
+          "merchant_name": {
+            "title": "Merchant Name",
+            "type": "string"
+          },
+          "total_bookings": {
+            "title": "Total Bookings",
+            "type": "integer"
+          },
+          "total_revenue": {
+            "title": "Total Revenue",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "merchant_id",
+          "merchant_name",
+          "total_bookings",
+          "total_revenue",
+          "commission_receivable",
+          "commission_status"
+        ],
+        "title": "CommissionReceivableDto",
+        "type": "object"
+      },
+      "CommissionReceivablesResponse": {
+        "properties": {
+          "receivables": {
+            "items": {
+              "$ref": "#/components/schemas/CommissionReceivableDto"
+            },
+            "title": "Receivables",
+            "type": "array"
+          }
+        },
+        "required": [
+          "receivables"
+        ],
+        "title": "CommissionReceivablesResponse",
+        "type": "object"
+      },
+      "ComplaintDto": {
+        "properties": {
+          "booking_id": {
+            "format": "uuid",
+            "title": "Booking Id",
+            "type": "string"
+          },
+          "category": {
+            "title": "Category",
+            "type": "string"
+          },
+          "created_at": {
+            "format": "date-time",
+            "title": "Created At",
+            "type": "string"
+          },
+          "description": {
+            "title": "Description",
+            "type": "string"
+          },
+          "evidence_refs": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Evidence Refs",
+            "type": "array"
+          },
+          "id": {
+            "format": "uuid",
+            "title": "Id",
+            "type": "string"
+          },
+          "refund_approved": {
+            "default": false,
+            "title": "Refund Approved",
+            "type": "boolean"
+          },
+          "resolution": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Resolution"
+          },
+          "status": {
+            "title": "Status",
+            "type": "string"
+          },
+          "voucher_action": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Voucher Action"
+          }
+        },
+        "required": [
+          "id",
+          "booking_id",
+          "category",
+          "description",
+          "evidence_refs",
+          "status",
+          "created_at"
+        ],
+        "title": "ComplaintDto",
+        "type": "object"
+      },
+      "ComplaintListResponse": {
+        "properties": {
+          "complaints": {
+            "items": {
+              "$ref": "#/components/schemas/ComplaintDto"
+            },
+            "title": "Complaints",
+            "type": "array"
+          }
+        },
+        "required": [
+          "complaints"
+        ],
+        "title": "ComplaintListResponse",
+        "type": "object"
+      },
+      "CreateComplaintRequest": {
+        "properties": {
+          "booking_id": {
+            "format": "uuid",
+            "title": "Booking Id",
+            "type": "string"
+          },
+          "category": {
+            "maxLength": 80,
+            "title": "Category",
+            "type": "string"
+          },
+          "description": {
+            "maxLength": 2000,
+            "minLength": 1,
+            "title": "Description",
+            "type": "string"
+          },
+          "evidence_refs": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Evidence Refs",
+            "type": "array"
+          }
+        },
+        "required": [
+          "booking_id",
+          "category",
+          "description"
+        ],
+        "title": "CreateComplaintRequest",
+        "type": "object"
+      },
       "CreateHoldRequest": {
         "properties": {
           "bay_number": {
@@ -300,6 +481,223 @@
         "title": "CreateHoldRequest",
         "type": "object"
       },
+      "CreatePromoCodeRequest": {
+        "properties": {
+          "code": {
+            "maxLength": 80,
+            "minLength": 2,
+            "title": "Code",
+            "type": "string"
+          },
+          "discount_type": {
+            "pattern": "^(percent|fixed)$",
+            "title": "Discount Type",
+            "type": "string"
+          },
+          "discount_value": {
+            "exclusiveMinimum": 0.0,
+            "title": "Discount Value",
+            "type": "integer"
+          },
+          "max_discount_amount": {
+            "anyOf": [
+              {
+                "minimum": 0.0,
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Max Discount Amount"
+          },
+          "min_order_amount": {
+            "anyOf": [
+              {
+                "minimum": 0.0,
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Min Order Amount"
+          },
+          "usage_limit_total": {
+            "default": 100,
+            "minimum": 1.0,
+            "title": "Usage Limit Total",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "code",
+          "discount_type",
+          "discount_value"
+        ],
+        "title": "CreatePromoCodeRequest",
+        "type": "object"
+      },
+      "CreateRatingRequest": {
+        "properties": {
+          "comment": {
+            "anyOf": [
+              {
+                "maxLength": 500,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Comment"
+          },
+          "evidence_urls": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Evidence Urls",
+            "type": "array"
+          },
+          "rating": {
+            "pattern": "^(positive|negative)$",
+            "title": "Rating",
+            "type": "string"
+          },
+          "reasons": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Reasons",
+            "type": "array"
+          },
+          "tip": {
+            "anyOf": [
+              {
+                "minimum": 0.0,
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Tip"
+          }
+        },
+        "required": [
+          "rating"
+        ],
+        "title": "CreateRatingRequest",
+        "type": "object"
+      },
+      "DailySummaryBookingRow": {
+        "properties": {
+          "amount": {
+            "title": "Amount",
+            "type": "integer"
+          },
+          "method": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Method"
+          },
+          "promo_code": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Promo Code"
+          },
+          "service_name": {
+            "title": "Service Name",
+            "type": "string"
+          },
+          "status": {
+            "title": "Status",
+            "type": "string"
+          },
+          "time": {
+            "format": "date-time",
+            "title": "Time",
+            "type": "string"
+          }
+        },
+        "required": [
+          "time",
+          "service_name",
+          "amount",
+          "method",
+          "status"
+        ],
+        "title": "DailySummaryBookingRow",
+        "type": "object"
+      },
+      "DailySummaryResponse": {
+        "properties": {
+          "average_rating": {
+            "title": "Average Rating",
+            "type": "number"
+          },
+          "bookings": {
+            "items": {
+              "$ref": "#/components/schemas/DailySummaryBookingRow"
+            },
+            "title": "Bookings",
+            "type": "array"
+          },
+          "cash_revenue": {
+            "title": "Cash Revenue",
+            "type": "integer"
+          },
+          "complaint_count": {
+            "title": "Complaint Count",
+            "type": "integer"
+          },
+          "payout_status": {
+            "title": "Payout Status",
+            "type": "string"
+          },
+          "promo_discount_total": {
+            "title": "Promo Discount Total",
+            "type": "integer"
+          },
+          "qr_revenue": {
+            "title": "Qr Revenue",
+            "type": "integer"
+          },
+          "services_completed": {
+            "title": "Services Completed",
+            "type": "integer"
+          },
+          "total_revenue": {
+            "title": "Total Revenue",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "services_completed",
+          "total_revenue",
+          "qr_revenue",
+          "cash_revenue",
+          "promo_discount_total",
+          "average_rating",
+          "complaint_count",
+          "payout_status",
+          "bookings"
+        ],
+        "title": "DailySummaryResponse",
+        "type": "object"
+      },
       "ErrorCode": {
         "enum": [
           "NOT_IMPLEMENTED",
@@ -324,6 +722,214 @@
         ],
         "title": "ErrorCode",
         "type": "string"
+      },
+      "EvidenceConfirmRequest": {
+        "properties": {
+          "gps_accuracy_meters": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Gps Accuracy Meters"
+          },
+          "latitude": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Latitude"
+          },
+          "longitude": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Longitude"
+          },
+          "object_key": {
+            "title": "Object Key",
+            "type": "string"
+          },
+          "perceptual_hash": {
+            "anyOf": [
+              {
+                "maxLength": 128,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Perceptual Hash"
+          }
+        },
+        "required": [
+          "object_key"
+        ],
+        "title": "EvidenceConfirmRequest",
+        "type": "object"
+      },
+      "EvidenceDto": {
+        "properties": {
+          "booking_id": {
+            "format": "uuid",
+            "title": "Booking Id",
+            "type": "string"
+          },
+          "exif_stripped": {
+            "default": false,
+            "title": "Exif Stripped",
+            "type": "boolean"
+          },
+          "id": {
+            "format": "uuid",
+            "title": "Id",
+            "type": "string"
+          },
+          "latitude": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Latitude"
+          },
+          "longitude": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Longitude"
+          },
+          "perceptual_hash": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Perceptual Hash"
+          },
+          "photo_url": {
+            "title": "Photo Url",
+            "type": "string"
+          },
+          "quality": {
+            "title": "Quality",
+            "type": "string"
+          },
+          "status": {
+            "title": "Status",
+            "type": "string"
+          },
+          "type": {
+            "title": "Type",
+            "type": "string"
+          },
+          "watermarked_at": {
+            "anyOf": [
+              {
+                "format": "date-time",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Watermarked At"
+          }
+        },
+        "required": [
+          "id",
+          "booking_id",
+          "type",
+          "photo_url",
+          "status",
+          "quality"
+        ],
+        "title": "EvidenceDto",
+        "type": "object"
+      },
+      "EvidenceListResponse": {
+        "properties": {
+          "evidence": {
+            "items": {
+              "$ref": "#/components/schemas/EvidenceDto"
+            },
+            "title": "Evidence",
+            "type": "array"
+          }
+        },
+        "required": [
+          "evidence"
+        ],
+        "title": "EvidenceListResponse",
+        "type": "object"
+      },
+      "EvidencePresignRequest": {
+        "properties": {
+          "content_type": {
+            "default": "image/jpeg",
+            "pattern": "^image/(jpeg|png)$",
+            "title": "Content Type",
+            "type": "string"
+          },
+          "type": {
+            "pattern": "^(before|after)$",
+            "title": "Type",
+            "type": "string"
+          }
+        },
+        "required": [
+          "type"
+        ],
+        "title": "EvidencePresignRequest",
+        "type": "object"
+      },
+      "EvidencePresignResponse": {
+        "properties": {
+          "evidence_id": {
+            "format": "uuid",
+            "title": "Evidence Id",
+            "type": "string"
+          },
+          "object_key": {
+            "title": "Object Key",
+            "type": "string"
+          },
+          "upload_url": {
+            "title": "Upload Url",
+            "type": "string"
+          }
+        },
+        "required": [
+          "evidence_id",
+          "object_key",
+          "upload_url"
+        ],
+        "title": "EvidencePresignResponse",
+        "type": "object"
       },
       "FlagsResponse": {
         "properties": {
@@ -365,6 +971,33 @@
           "status"
         ],
         "title": "HealthResponse",
+        "type": "object"
+      },
+      "InitiatePaymentRequest": {
+        "properties": {
+          "booking_id": {
+            "format": "uuid",
+            "title": "Booking Id",
+            "type": "string"
+          },
+          "idempotency_key": {
+            "maxLength": 200,
+            "minLength": 8,
+            "title": "Idempotency Key",
+            "type": "string"
+          },
+          "method": {
+            "pattern": "^(qr_transfer|cash|vetc_wallet)$",
+            "title": "Method",
+            "type": "string"
+          }
+        },
+        "required": [
+          "booking_id",
+          "method",
+          "idempotency_key"
+        ],
+        "title": "InitiatePaymentRequest",
         "type": "object"
       },
       "LoginRequest": {
@@ -460,6 +1093,24 @@
           "bays"
         ],
         "title": "MerchantBaysResponse",
+        "type": "object"
+      },
+      "MerchantDeniedPaymentRequest": {
+        "properties": {
+          "reason": {
+            "anyOf": [
+              {
+                "pattern": "^(not_received|wrong_amount|other)$",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Reason"
+          }
+        },
+        "title": "MerchantDeniedPaymentRequest",
         "type": "object"
       },
       "MerchantNearbyDto": {
@@ -661,6 +1312,132 @@
         "title": "MerchantServiceDto",
         "type": "object"
       },
+      "MerchantServiceUpdateRequest": {
+        "properties": {
+          "duration_max": {
+            "anyOf": [
+              {
+                "exclusiveMinimum": 0.0,
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Duration Max"
+          },
+          "duration_min": {
+            "anyOf": [
+              {
+                "exclusiveMinimum": 0.0,
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Duration Min"
+          },
+          "price": {
+            "anyOf": [
+              {
+                "exclusiveMinimum": 0.0,
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Price"
+          },
+          "status": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Status"
+          }
+        },
+        "title": "MerchantServiceUpdateRequest",
+        "type": "object"
+      },
+      "MerchantServiceWriteRequest": {
+        "properties": {
+          "description": {
+            "anyOf": [
+              {
+                "maxLength": 1000,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Description"
+          },
+          "duration_max": {
+            "exclusiveMinimum": 0.0,
+            "title": "Duration Max",
+            "type": "integer"
+          },
+          "duration_min": {
+            "exclusiveMinimum": 0.0,
+            "title": "Duration Min",
+            "type": "integer"
+          },
+          "merchant_id": {
+            "format": "uuid",
+            "title": "Merchant Id",
+            "type": "string"
+          },
+          "name": {
+            "anyOf": [
+              {
+                "maxLength": 200,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Name"
+          },
+          "price": {
+            "exclusiveMinimum": 0.0,
+            "title": "Price",
+            "type": "integer"
+          },
+          "status": {
+            "default": "active",
+            "title": "Status",
+            "type": "string"
+          },
+          "template_id": {
+            "anyOf": [
+              {
+                "format": "uuid",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Template Id"
+          }
+        },
+        "required": [
+          "merchant_id",
+          "price",
+          "duration_min",
+          "duration_max"
+        ],
+        "title": "MerchantServiceWriteRequest",
+        "type": "object"
+      },
       "MerchantServicesResponse": {
         "properties": {
           "services": {
@@ -701,6 +1478,191 @@
           "total"
         ],
         "title": "MerchantsNearbyResponse",
+        "type": "object"
+      },
+      "OpsComplaintUpdateRequest": {
+        "properties": {
+          "refund_approved": {
+            "anyOf": [
+              {
+                "type": "boolean"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Refund Approved"
+          },
+          "resolution": {
+            "anyOf": [
+              {
+                "maxLength": 2000,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Resolution"
+          },
+          "status": {
+            "anyOf": [
+              {
+                "maxLength": 40,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Status"
+          },
+          "voucher_action": {
+            "anyOf": [
+              {
+                "maxLength": 40,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Voucher Action"
+          }
+        },
+        "title": "OpsComplaintUpdateRequest",
+        "type": "object"
+      },
+      "OpsMerchantServiceDecisionRequest": {
+        "properties": {
+          "reason": {
+            "anyOf": [
+              {
+                "maxLength": 1000,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Reason"
+          }
+        },
+        "title": "OpsMerchantServiceDecisionRequest",
+        "type": "object"
+      },
+      "PaymentDto": {
+        "properties": {
+          "amount": {
+            "title": "Amount",
+            "type": "integer"
+          },
+          "booking_id": {
+            "format": "uuid",
+            "title": "Booking Id",
+            "type": "string"
+          },
+          "commission_amount": {
+            "default": 0,
+            "title": "Commission Amount",
+            "type": "integer"
+          },
+          "commission_status": {
+            "default": "not_applicable",
+            "title": "Commission Status",
+            "type": "string"
+          },
+          "created_at": {
+            "format": "date-time",
+            "title": "Created At",
+            "type": "string"
+          },
+          "id": {
+            "format": "uuid",
+            "title": "Id",
+            "type": "string"
+          },
+          "merchant_confirmed_at": {
+            "anyOf": [
+              {
+                "format": "date-time",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Merchant Confirmed At"
+          },
+          "merchant_payment_qr_url": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Merchant Payment Qr Url"
+          },
+          "method": {
+            "title": "Method",
+            "type": "string"
+          },
+          "status": {
+            "title": "Status",
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "booking_id",
+          "amount",
+          "method",
+          "status",
+          "created_at"
+        ],
+        "title": "PaymentDto",
+        "type": "object"
+      },
+      "PriceChangeDto": {
+        "properties": {
+          "changed_at": {
+            "format": "date-time",
+            "title": "Changed At",
+            "type": "string"
+          },
+          "new_price": {
+            "title": "New Price",
+            "type": "integer"
+          },
+          "old_price": {
+            "title": "Old Price",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "old_price",
+          "new_price",
+          "changed_at"
+        ],
+        "title": "PriceChangeDto",
+        "type": "object"
+      },
+      "PriceHistoryResponse": {
+        "properties": {
+          "price_changes": {
+            "items": {
+              "$ref": "#/components/schemas/PriceChangeDto"
+            },
+            "title": "Price Changes",
+            "type": "array"
+          }
+        },
+        "required": [
+          "price_changes"
+        ],
+        "title": "PriceHistoryResponse",
         "type": "object"
       },
       "ProblemDetails": {
@@ -761,6 +1723,209 @@
         "title": "ProblemDetails",
         "type": "object"
       },
+      "PromoCodeDto": {
+        "properties": {
+          "code": {
+            "title": "Code",
+            "type": "string"
+          },
+          "discount_type": {
+            "title": "Discount Type",
+            "type": "string"
+          },
+          "discount_value": {
+            "title": "Discount Value",
+            "type": "integer"
+          },
+          "id": {
+            "format": "uuid",
+            "title": "Id",
+            "type": "string"
+          },
+          "is_active": {
+            "title": "Is Active",
+            "type": "boolean"
+          },
+          "max_discount_amount": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Max Discount Amount"
+          },
+          "min_order_amount": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Min Order Amount"
+          },
+          "usage_limit_total": {
+            "title": "Usage Limit Total",
+            "type": "integer"
+          },
+          "used_count": {
+            "title": "Used Count",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "id",
+          "code",
+          "discount_type",
+          "discount_value",
+          "usage_limit_total",
+          "used_count",
+          "is_active"
+        ],
+        "title": "PromoCodeDto",
+        "type": "object"
+      },
+      "PromoListResponse": {
+        "properties": {
+          "promo_codes": {
+            "items": {
+              "$ref": "#/components/schemas/PromoCodeDto"
+            },
+            "title": "Promo Codes",
+            "type": "array"
+          }
+        },
+        "required": [
+          "promo_codes"
+        ],
+        "title": "PromoListResponse",
+        "type": "object"
+      },
+      "PromoValidateRequest": {
+        "properties": {
+          "code": {
+            "maxLength": 80,
+            "minLength": 2,
+            "title": "Code",
+            "type": "string"
+          },
+          "merchant_id": {
+            "anyOf": [
+              {
+                "format": "uuid",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Merchant Id"
+          },
+          "order_amount": {
+            "exclusiveMinimum": 0.0,
+            "title": "Order Amount",
+            "type": "integer"
+          },
+          "service_template_id": {
+            "anyOf": [
+              {
+                "format": "uuid",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Service Template Id"
+          }
+        },
+        "required": [
+          "code",
+          "order_amount"
+        ],
+        "title": "PromoValidateRequest",
+        "type": "object"
+      },
+      "PromoValidateResponse": {
+        "properties": {
+          "code": {
+            "title": "Code",
+            "type": "string"
+          },
+          "discount_amount": {
+            "default": 0,
+            "title": "Discount Amount",
+            "type": "integer"
+          },
+          "reason": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Reason"
+          },
+          "valid": {
+            "title": "Valid",
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "valid",
+          "code"
+        ],
+        "title": "PromoValidateResponse",
+        "type": "object"
+      },
+      "RatingDto": {
+        "properties": {
+          "booking_id": {
+            "format": "uuid",
+            "title": "Booking Id",
+            "type": "string"
+          },
+          "comment": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Comment"
+          },
+          "created_at": {
+            "format": "date-time",
+            "title": "Created At",
+            "type": "string"
+          },
+          "id": {
+            "format": "uuid",
+            "title": "Id",
+            "type": "string"
+          },
+          "rating": {
+            "title": "Rating",
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "booking_id",
+          "rating",
+          "created_at"
+        ],
+        "title": "RatingDto",
+        "type": "object"
+      },
       "ReadyResponse": {
         "properties": {
           "checks": {
@@ -782,6 +1947,117 @@
         "title": "ReadyResponse",
         "type": "object"
       },
+      "RealtimeTokenResponse": {
+        "properties": {
+          "expires_in": {
+            "default": 300,
+            "title": "Expires In",
+            "type": "integer"
+          },
+          "token": {
+            "title": "Token",
+            "type": "string"
+          }
+        },
+        "required": [
+          "token"
+        ],
+        "title": "RealtimeTokenResponse",
+        "type": "object"
+      },
+      "ReferralDto": {
+        "properties": {
+          "code": {
+            "title": "Code",
+            "type": "string"
+          },
+          "created_at": {
+            "format": "date-time",
+            "title": "Created At",
+            "type": "string"
+          },
+          "id": {
+            "format": "uuid",
+            "title": "Id",
+            "type": "string"
+          },
+          "reward_status": {
+            "title": "Reward Status",
+            "type": "string"
+          },
+          "status": {
+            "title": "Status",
+            "type": "string"
+          },
+          "type": {
+            "title": "Type",
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "type",
+          "code",
+          "status",
+          "reward_status",
+          "created_at"
+        ],
+        "title": "ReferralDto",
+        "type": "object"
+      },
+      "ReferralMeResponse": {
+        "properties": {
+          "referral_code": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Referral Code"
+          },
+          "referrals": {
+            "items": {
+              "$ref": "#/components/schemas/ReferralDto"
+            },
+            "title": "Referrals",
+            "type": "array"
+          }
+        },
+        "required": [
+          "referral_code",
+          "referrals"
+        ],
+        "title": "ReferralMeResponse",
+        "type": "object"
+      },
+      "ReferralShareEventRequest": {
+        "properties": {
+          "channel": {
+            "default": "copy_link",
+            "maxLength": 80,
+            "title": "Channel",
+            "type": "string"
+          }
+        },
+        "title": "ReferralShareEventRequest",
+        "type": "object"
+      },
+      "ReferralShareEventResponse": {
+        "properties": {
+          "recorded": {
+            "title": "Recorded",
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "recorded"
+        ],
+        "title": "ReferralShareEventResponse",
+        "type": "object"
+      },
       "RefreshRequest": {
         "properties": {
           "refresh_token": {
@@ -795,6 +2071,105 @@
           "refresh_token"
         ],
         "title": "RefreshRequest",
+        "type": "object"
+      },
+      "RewardProgressResponse": {
+        "properties": {
+          "finalized_stamps": {
+            "title": "Finalized Stamps",
+            "type": "integer"
+          },
+          "next_reward_at": {
+            "title": "Next Reward At",
+            "type": "integer"
+          },
+          "pending_stamps": {
+            "title": "Pending Stamps",
+            "type": "integer"
+          },
+          "threshold": {
+            "default": 5,
+            "title": "Threshold",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "finalized_stamps",
+          "pending_stamps",
+          "next_reward_at"
+        ],
+        "title": "RewardProgressResponse",
+        "type": "object"
+      },
+      "RewardVoucherDto": {
+        "properties": {
+          "expires_at": {
+            "format": "date-time",
+            "title": "Expires At",
+            "type": "string"
+          },
+          "id": {
+            "format": "uuid",
+            "title": "Id",
+            "type": "string"
+          },
+          "issued_at": {
+            "format": "date-time",
+            "title": "Issued At",
+            "type": "string"
+          },
+          "redeemed_booking_id": {
+            "anyOf": [
+              {
+                "format": "uuid",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Redeemed Booking Id"
+          },
+          "reserved_booking_id": {
+            "anyOf": [
+              {
+                "format": "uuid",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Reserved Booking Id"
+          },
+          "status": {
+            "title": "Status",
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "status",
+          "issued_at",
+          "expires_at"
+        ],
+        "title": "RewardVoucherDto",
+        "type": "object"
+      },
+      "RewardVoucherListResponse": {
+        "properties": {
+          "vouchers": {
+            "items": {
+              "$ref": "#/components/schemas/RewardVoucherDto"
+            },
+            "title": "Vouchers",
+            "type": "array"
+          }
+        },
+        "required": [
+          "vouchers"
+        ],
+        "title": "RewardVoucherListResponse",
         "type": "object"
       },
       "ServiceTemplateDto": {
@@ -932,6 +2307,20 @@
         "title": "SignupRequest",
         "type": "object"
       },
+      "SwitchPaymentMethodRequest": {
+        "properties": {
+          "method": {
+            "pattern": "^(qr_transfer|cash)$",
+            "title": "Method",
+            "type": "string"
+          }
+        },
+        "required": [
+          "method"
+        ],
+        "title": "SwitchPaymentMethodRequest",
+        "type": "object"
+      },
       "TokenPair": {
         "properties": {
           "access_token": {
@@ -1051,6 +2440,24 @@
           "messages"
         ],
         "title": "VersionCheckResponse",
+        "type": "object"
+      },
+      "VoucherBookingRequest": {
+        "properties": {
+          "booking_id": {
+            "anyOf": [
+              {
+                "format": "uuid",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Booking Id"
+          }
+        },
+        "title": "VoucherBookingRequest",
         "type": "object"
       }
     },
@@ -1758,28 +3165,58 @@
     "/v1/bookings/{id}/rate": {
       "post": {
         "operationId": "post_v1_bookings_by_id_rate",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "title": "Id",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateRatingRequest"
+              }
+            }
+          },
+          "required": true
+        },
         "responses": {
           "200": {
             "content": {
               "application/json": {
-                "schema": {}
+                "schema": {
+                  "$ref": "#/components/schemas/RatingDto"
+                }
               }
             },
             "description": "Successful Response"
           },
-          "501": {
+          "422": {
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/ProblemDetails"
+                  "$ref": "#/components/schemas/HTTPValidationError"
                 }
               }
             },
-            "description": "Contract stub not implemented yet"
+            "description": "Validation Error"
           }
         },
-        "summary": "Rate booking",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "summary": "Rate Booking",
         "tags": [
+          "phase2-phase3",
           "bookings"
         ]
       }
@@ -1836,28 +3273,46 @@
     "/v1/complaints": {
       "post": {
         "operationId": "post_v1_complaints",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateComplaintRequest"
+              }
+            }
+          },
+          "required": true
+        },
         "responses": {
-          "200": {
+          "201": {
             "content": {
               "application/json": {
-                "schema": {}
+                "schema": {
+                  "$ref": "#/components/schemas/ComplaintDto"
+                }
               }
             },
             "description": "Successful Response"
           },
-          "501": {
+          "422": {
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/ProblemDetails"
+                  "$ref": "#/components/schemas/HTTPValidationError"
                 }
               }
             },
-            "description": "Contract stub not implemented yet"
+            "description": "Validation Error"
           }
         },
-        "summary": "Create complaint",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "summary": "Create Complaint",
         "tags": [
+          "phase2-phase3",
           "complaints"
         ]
       }
@@ -1865,28 +3320,48 @@
     "/v1/complaints/{id}": {
       "get": {
         "operationId": "get_v1_complaints_by_id",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "title": "Id",
+              "type": "string"
+            }
+          }
+        ],
         "responses": {
           "200": {
             "content": {
               "application/json": {
-                "schema": {}
+                "schema": {
+                  "$ref": "#/components/schemas/ComplaintDto"
+                }
               }
             },
             "description": "Successful Response"
           },
-          "501": {
+          "422": {
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/ProblemDetails"
+                  "$ref": "#/components/schemas/HTTPValidationError"
                 }
               }
             },
-            "description": "Contract stub not implemented yet"
+            "description": "Validation Error"
           }
         },
-        "summary": "Get complaint",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "summary": "Get Complaint",
         "tags": [
+          "phase2-phase3",
           "complaints"
         ]
       }
@@ -1894,28 +3369,48 @@
     "/v1/evidence/{booking_id}": {
       "get": {
         "operationId": "get_v1_evidence_by_booking_id",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "booking_id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "title": "Booking Id",
+              "type": "string"
+            }
+          }
+        ],
         "responses": {
           "200": {
             "content": {
               "application/json": {
-                "schema": {}
+                "schema": {
+                  "$ref": "#/components/schemas/EvidenceListResponse"
+                }
               }
             },
             "description": "Successful Response"
           },
-          "501": {
+          "422": {
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/ProblemDetails"
+                  "$ref": "#/components/schemas/HTTPValidationError"
                 }
               }
             },
-            "description": "Contract stub not implemented yet"
+            "description": "Validation Error"
           }
         },
-        "summary": "List booking evidence",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "summary": "List Evidence",
         "tags": [
+          "phase2-phase3",
           "evidence"
         ]
       }
@@ -1923,28 +3418,58 @@
     "/v1/evidence/{booking_id}/presign": {
       "post": {
         "operationId": "post_v1_evidence_by_booking_id_presign",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "booking_id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "title": "Booking Id",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/EvidencePresignRequest"
+              }
+            }
+          },
+          "required": true
+        },
         "responses": {
           "200": {
             "content": {
               "application/json": {
-                "schema": {}
+                "schema": {
+                  "$ref": "#/components/schemas/EvidencePresignResponse"
+                }
               }
             },
             "description": "Successful Response"
           },
-          "501": {
+          "422": {
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/ProblemDetails"
+                  "$ref": "#/components/schemas/HTTPValidationError"
                 }
               }
             },
-            "description": "Contract stub not implemented yet"
+            "description": "Validation Error"
           }
         },
-        "summary": "Presign evidence upload",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "summary": "Presign Evidence",
         "tags": [
+          "phase2-phase3",
           "evidence"
         ]
       }
@@ -1952,28 +3477,58 @@
     "/v1/evidence/{evidence_id}/confirm": {
       "post": {
         "operationId": "post_v1_evidence_by_evidence_id_confirm",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "evidence_id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "title": "Evidence Id",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/EvidenceConfirmRequest"
+              }
+            }
+          },
+          "required": true
+        },
         "responses": {
           "200": {
             "content": {
               "application/json": {
-                "schema": {}
+                "schema": {
+                  "$ref": "#/components/schemas/EvidenceDto"
+                }
               }
             },
             "description": "Successful Response"
           },
-          "501": {
+          "422": {
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/ProblemDetails"
+                  "$ref": "#/components/schemas/HTTPValidationError"
                 }
               }
             },
-            "description": "Contract stub not implemented yet"
+            "description": "Validation Error"
           }
         },
-        "summary": "Confirm evidence upload",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "summary": "Confirm Evidence",
         "tags": [
+          "phase2-phase3",
           "evidence"
         ]
       }
@@ -2460,28 +4015,46 @@
     "/v1/merchant-services": {
       "post": {
         "operationId": "post_v1_merchant_services",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/MerchantServiceWriteRequest"
+              }
+            }
+          },
+          "required": true
+        },
         "responses": {
           "200": {
             "content": {
               "application/json": {
-                "schema": {}
+                "schema": {
+                  "$ref": "#/components/schemas/MerchantServiceDto"
+                }
               }
             },
             "description": "Successful Response"
           },
-          "501": {
+          "422": {
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/ProblemDetails"
+                  "$ref": "#/components/schemas/HTTPValidationError"
                 }
               }
             },
-            "description": "Contract stub not implemented yet"
+            "description": "Validation Error"
           }
         },
-        "summary": "Create merchant service",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "summary": "Create Merchant Service",
         "tags": [
+          "phase2-phase3",
           "merchant-services"
         ]
       }
@@ -2489,28 +4062,46 @@
     "/v1/merchant-services/custom": {
       "post": {
         "operationId": "post_v1_merchant_services_custom",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/MerchantServiceWriteRequest"
+              }
+            }
+          },
+          "required": true
+        },
         "responses": {
           "200": {
             "content": {
               "application/json": {
-                "schema": {}
+                "schema": {
+                  "$ref": "#/components/schemas/MerchantServiceDto"
+                }
               }
             },
             "description": "Successful Response"
           },
-          "501": {
+          "422": {
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/ProblemDetails"
+                  "$ref": "#/components/schemas/HTTPValidationError"
                 }
               }
             },
-            "description": "Contract stub not implemented yet"
+            "description": "Validation Error"
           }
         },
-        "summary": "Create custom merchant service",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "summary": "Create Custom Merchant Service",
         "tags": [
+          "phase2-phase3",
           "merchant-services"
         ]
       }
@@ -2518,28 +4109,58 @@
     "/v1/merchant-services/{id}": {
       "patch": {
         "operationId": "patch_v1_merchant_services_by_id",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "title": "Id",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/MerchantServiceUpdateRequest"
+              }
+            }
+          },
+          "required": true
+        },
         "responses": {
           "200": {
             "content": {
               "application/json": {
-                "schema": {}
+                "schema": {
+                  "$ref": "#/components/schemas/MerchantServiceDto"
+                }
               }
             },
             "description": "Successful Response"
           },
-          "501": {
+          "422": {
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/ProblemDetails"
+                  "$ref": "#/components/schemas/HTTPValidationError"
                 }
               }
             },
-            "description": "Contract stub not implemented yet"
+            "description": "Validation Error"
           }
         },
-        "summary": "Update merchant service",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "summary": "Update Merchant Service",
         "tags": [
+          "phase2-phase3",
           "merchant-services"
         ]
       }
@@ -2547,28 +4168,48 @@
     "/v1/merchant-services/{id}/price-history": {
       "get": {
         "operationId": "get_v1_merchant_services_by_id_price_history",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "title": "Id",
+              "type": "string"
+            }
+          }
+        ],
         "responses": {
           "200": {
             "content": {
               "application/json": {
-                "schema": {}
+                "schema": {
+                  "$ref": "#/components/schemas/PriceHistoryResponse"
+                }
               }
             },
             "description": "Successful Response"
           },
-          "501": {
+          "422": {
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/ProblemDetails"
+                  "$ref": "#/components/schemas/HTTPValidationError"
                 }
               }
             },
-            "description": "Contract stub not implemented yet"
+            "description": "Validation Error"
           }
         },
-        "summary": "Get merchant service price history",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "summary": "Price History",
         "tags": [
+          "phase2-phase3",
           "merchant-services"
         ]
       }
@@ -2576,28 +4217,48 @@
     "/v1/merchant-services/{id}/resubmit": {
       "post": {
         "operationId": "post_v1_merchant_services_by_id_resubmit",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "title": "Id",
+              "type": "string"
+            }
+          }
+        ],
         "responses": {
           "200": {
             "content": {
               "application/json": {
-                "schema": {}
+                "schema": {
+                  "$ref": "#/components/schemas/MerchantServiceDto"
+                }
               }
             },
             "description": "Successful Response"
           },
-          "501": {
+          "422": {
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/ProblemDetails"
+                  "$ref": "#/components/schemas/HTTPValidationError"
                 }
               }
             },
-            "description": "Contract stub not implemented yet"
+            "description": "Validation Error"
           }
         },
-        "summary": "Resubmit merchant service",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "summary": "Resubmit Merchant Service",
         "tags": [
+          "phase2-phase3",
           "merchant-services"
         ]
       }
@@ -2917,28 +4578,48 @@
     "/v1/merchants/{id}/daily-summary": {
       "get": {
         "operationId": "get_v1_merchants_by_id_daily_summary",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "title": "Id",
+              "type": "string"
+            }
+          }
+        ],
         "responses": {
           "200": {
             "content": {
               "application/json": {
-                "schema": {}
+                "schema": {
+                  "$ref": "#/components/schemas/DailySummaryResponse"
+                }
               }
             },
             "description": "Successful Response"
           },
-          "501": {
+          "422": {
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/ProblemDetails"
+                  "$ref": "#/components/schemas/HTTPValidationError"
                 }
               }
             },
-            "description": "Contract stub not implemented yet"
+            "description": "Validation Error"
           }
         },
-        "summary": "Get merchant daily summary",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "summary": "Daily Summary",
         "tags": [
+          "phase2-phase3",
           "merchant"
         ]
       }
@@ -2946,6 +4627,18 @@
     "/v1/merchants/{id}/daily-summary.csv": {
       "get": {
         "operationId": "get_v1_merchants_by_id_daily_summary_csv",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "title": "Id",
+              "type": "string"
+            }
+          }
+        ],
         "responses": {
           "200": {
             "content": {
@@ -2955,19 +4648,25 @@
             },
             "description": "Successful Response"
           },
-          "501": {
+          "422": {
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/ProblemDetails"
+                  "$ref": "#/components/schemas/HTTPValidationError"
                 }
               }
             },
-            "description": "Contract stub not implemented yet"
+            "description": "Validation Error"
           }
         },
-        "summary": "Export merchant daily summary CSV",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "summary": "Daily Summary Csv",
         "tags": [
+          "phase2-phase3",
           "merchant"
         ]
       }
@@ -3365,24 +5064,22 @@
           "200": {
             "content": {
               "application/json": {
-                "schema": {}
-              }
-            },
-            "description": "Successful Response"
-          },
-          "501": {
-            "content": {
-              "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/ProblemDetails"
+                  "$ref": "#/components/schemas/CommissionReceivablesResponse"
                 }
               }
             },
-            "description": "Contract stub not implemented yet"
+            "description": "Successful Response"
           }
         },
-        "summary": "List commission receivables",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "summary": "Commission Receivables",
         "tags": [
+          "phase2-phase3",
           "ops"
         ]
       }
@@ -3394,24 +5091,22 @@
           "200": {
             "content": {
               "application/json": {
-                "schema": {}
-              }
-            },
-            "description": "Successful Response"
-          },
-          "501": {
-            "content": {
-              "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/ProblemDetails"
+                  "$ref": "#/components/schemas/ComplaintListResponse"
                 }
               }
             },
-            "description": "Contract stub not implemented yet"
+            "description": "Successful Response"
           }
         },
-        "summary": "List ops complaints",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "summary": "Ops Complaints",
         "tags": [
+          "phase2-phase3",
           "ops"
         ]
       }
@@ -3419,28 +5114,58 @@
     "/v1/ops/complaints/{id}": {
       "patch": {
         "operationId": "patch_v1_ops_complaints_by_id",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "title": "Id",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/OpsComplaintUpdateRequest"
+              }
+            }
+          },
+          "required": true
+        },
         "responses": {
           "200": {
             "content": {
               "application/json": {
-                "schema": {}
+                "schema": {
+                  "$ref": "#/components/schemas/ComplaintDto"
+                }
               }
             },
             "description": "Successful Response"
           },
-          "501": {
+          "422": {
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/ProblemDetails"
+                  "$ref": "#/components/schemas/HTTPValidationError"
                 }
               }
             },
-            "description": "Contract stub not implemented yet"
+            "description": "Validation Error"
           }
         },
-        "summary": "Update ops complaint",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "summary": "Ops Update Complaint",
         "tags": [
+          "phase2-phase3",
           "ops"
         ]
       }
@@ -3564,28 +5289,48 @@
     "/v1/ops/merchant-services/{id}/approve": {
       "post": {
         "operationId": "post_v1_ops_merchant_services_by_id_approve",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "title": "Id",
+              "type": "string"
+            }
+          }
+        ],
         "responses": {
           "200": {
             "content": {
               "application/json": {
-                "schema": {}
+                "schema": {
+                  "$ref": "#/components/schemas/MerchantServiceDto"
+                }
               }
             },
             "description": "Successful Response"
           },
-          "501": {
+          "422": {
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/ProblemDetails"
+                  "$ref": "#/components/schemas/HTTPValidationError"
                 }
               }
             },
-            "description": "Contract stub not implemented yet"
+            "description": "Validation Error"
           }
         },
-        "summary": "Approve merchant service",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "summary": "Ops Approve Merchant Service",
         "tags": [
+          "phase2-phase3",
           "ops"
         ]
       }
@@ -3593,28 +5338,58 @@
     "/v1/ops/merchant-services/{id}/reject": {
       "post": {
         "operationId": "post_v1_ops_merchant_services_by_id_reject",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "title": "Id",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/OpsMerchantServiceDecisionRequest"
+              }
+            }
+          },
+          "required": true
+        },
         "responses": {
           "200": {
             "content": {
               "application/json": {
-                "schema": {}
+                "schema": {
+                  "$ref": "#/components/schemas/MerchantServiceDto"
+                }
               }
             },
             "description": "Successful Response"
           },
-          "501": {
+          "422": {
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/ProblemDetails"
+                  "$ref": "#/components/schemas/HTTPValidationError"
                 }
               }
             },
-            "description": "Contract stub not implemented yet"
+            "description": "Validation Error"
           }
         },
-        "summary": "Reject merchant service",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "summary": "Ops Reject Merchant Service",
         "tags": [
+          "phase2-phase3",
           "ops"
         ]
       }
@@ -3796,28 +5571,46 @@
     "/v1/ops/promo-codes": {
       "post": {
         "operationId": "post_v1_ops_promo_codes",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreatePromoCodeRequest"
+              }
+            }
+          },
+          "required": true
+        },
         "responses": {
           "200": {
             "content": {
               "application/json": {
-                "schema": {}
+                "schema": {
+                  "$ref": "#/components/schemas/PromoValidateResponse"
+                }
               }
             },
             "description": "Successful Response"
           },
-          "501": {
+          "422": {
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/ProblemDetails"
+                  "$ref": "#/components/schemas/HTTPValidationError"
                 }
               }
             },
-            "description": "Contract stub not implemented yet"
+            "description": "Validation Error"
           }
         },
-        "summary": "Create ops promo code",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "summary": "Ops Create Promo",
         "tags": [
+          "phase2-phase3",
           "ops"
         ]
       }
@@ -3939,28 +5732,46 @@
     "/v1/payments/initiate": {
       "post": {
         "operationId": "post_v1_payments_initiate",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/InitiatePaymentRequest"
+              }
+            }
+          },
+          "required": true
+        },
         "responses": {
           "200": {
             "content": {
               "application/json": {
-                "schema": {}
+                "schema": {
+                  "$ref": "#/components/schemas/PaymentDto"
+                }
               }
             },
             "description": "Successful Response"
           },
-          "501": {
+          "422": {
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/ProblemDetails"
+                  "$ref": "#/components/schemas/HTTPValidationError"
                 }
               }
             },
-            "description": "Contract stub not implemented yet"
+            "description": "Validation Error"
           }
         },
-        "summary": "Initiate payment",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "summary": "Initiate Payment",
         "tags": [
+          "phase2-phase3",
           "payments"
         ]
       }
@@ -3968,28 +5779,48 @@
     "/v1/payments/{id}": {
       "get": {
         "operationId": "get_v1_payments_by_id",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "title": "Id",
+              "type": "string"
+            }
+          }
+        ],
         "responses": {
           "200": {
             "content": {
               "application/json": {
-                "schema": {}
+                "schema": {
+                  "$ref": "#/components/schemas/PaymentDto"
+                }
               }
             },
             "description": "Successful Response"
           },
-          "501": {
+          "422": {
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/ProblemDetails"
+                  "$ref": "#/components/schemas/HTTPValidationError"
                 }
               }
             },
-            "description": "Contract stub not implemented yet"
+            "description": "Validation Error"
           }
         },
-        "summary": "Get payment",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "summary": "Get Payment",
         "tags": [
+          "phase2-phase3",
           "payments"
         ]
       }
@@ -3997,28 +5828,48 @@
     "/v1/payments/{id}/cash-record": {
       "post": {
         "operationId": "post_v1_payments_by_id_cash_record",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "title": "Id",
+              "type": "string"
+            }
+          }
+        ],
         "responses": {
           "200": {
             "content": {
               "application/json": {
-                "schema": {}
+                "schema": {
+                  "$ref": "#/components/schemas/PaymentDto"
+                }
               }
             },
             "description": "Successful Response"
           },
-          "501": {
+          "422": {
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/ProblemDetails"
+                  "$ref": "#/components/schemas/HTTPValidationError"
                 }
               }
             },
-            "description": "Contract stub not implemented yet"
+            "description": "Validation Error"
           }
         },
-        "summary": "Record cash payment",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "summary": "Cash Record",
         "tags": [
+          "phase2-phase3",
           "payments"
         ]
       }
@@ -4026,28 +5877,48 @@
     "/v1/payments/{id}/merchant-confirmed": {
       "post": {
         "operationId": "post_v1_payments_by_id_merchant_confirmed",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "title": "Id",
+              "type": "string"
+            }
+          }
+        ],
         "responses": {
           "200": {
             "content": {
               "application/json": {
-                "schema": {}
+                "schema": {
+                  "$ref": "#/components/schemas/PaymentDto"
+                }
               }
             },
             "description": "Successful Response"
           },
-          "501": {
+          "422": {
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/ProblemDetails"
+                  "$ref": "#/components/schemas/HTTPValidationError"
                 }
               }
             },
-            "description": "Contract stub not implemented yet"
+            "description": "Validation Error"
           }
         },
-        "summary": "Merchant confirms payment",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "summary": "Merchant Confirmed Payment",
         "tags": [
+          "phase2-phase3",
           "payments"
         ]
       }
@@ -4055,28 +5926,58 @@
     "/v1/payments/{id}/merchant-denied": {
       "post": {
         "operationId": "post_v1_payments_by_id_merchant_denied",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "title": "Id",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/MerchantDeniedPaymentRequest"
+              }
+            }
+          },
+          "required": true
+        },
         "responses": {
           "200": {
             "content": {
               "application/json": {
-                "schema": {}
+                "schema": {
+                  "$ref": "#/components/schemas/PaymentDto"
+                }
               }
             },
             "description": "Successful Response"
           },
-          "501": {
+          "422": {
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/ProblemDetails"
+                  "$ref": "#/components/schemas/HTTPValidationError"
                 }
               }
             },
-            "description": "Contract stub not implemented yet"
+            "description": "Validation Error"
           }
         },
-        "summary": "Merchant denies payment",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "summary": "Merchant Denied Payment",
         "tags": [
+          "phase2-phase3",
           "payments"
         ]
       }
@@ -4084,28 +5985,58 @@
     "/v1/payments/{id}/switch-method": {
       "post": {
         "operationId": "post_v1_payments_by_id_switch_method",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "title": "Id",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SwitchPaymentMethodRequest"
+              }
+            }
+          },
+          "required": true
+        },
         "responses": {
           "200": {
             "content": {
               "application/json": {
-                "schema": {}
+                "schema": {
+                  "$ref": "#/components/schemas/PaymentDto"
+                }
               }
             },
             "description": "Successful Response"
           },
-          "501": {
+          "422": {
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/ProblemDetails"
+                  "$ref": "#/components/schemas/HTTPValidationError"
                 }
               }
             },
-            "description": "Contract stub not implemented yet"
+            "description": "Validation Error"
           }
         },
-        "summary": "Switch payment method",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "summary": "Switch Payment Method",
         "tags": [
+          "phase2-phase3",
           "payments"
         ]
       }
@@ -4113,28 +6044,48 @@
     "/v1/payments/{id}/user-claimed": {
       "post": {
         "operationId": "post_v1_payments_by_id_user_claimed",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "title": "Id",
+              "type": "string"
+            }
+          }
+        ],
         "responses": {
           "200": {
             "content": {
               "application/json": {
-                "schema": {}
+                "schema": {
+                  "$ref": "#/components/schemas/PaymentDto"
+                }
               }
             },
             "description": "Successful Response"
           },
-          "501": {
+          "422": {
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/ProblemDetails"
+                  "$ref": "#/components/schemas/HTTPValidationError"
                 }
               }
             },
-            "description": "Contract stub not implemented yet"
+            "description": "Validation Error"
           }
         },
-        "summary": "Mark payment user claimed",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "summary": "User Claimed Payment",
         "tags": [
+          "phase2-phase3",
           "payments"
         ]
       }
@@ -4146,24 +6097,22 @@
           "200": {
             "content": {
               "application/json": {
-                "schema": {}
-              }
-            },
-            "description": "Successful Response"
-          },
-          "501": {
-            "content": {
-              "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/ProblemDetails"
+                  "$ref": "#/components/schemas/PromoListResponse"
                 }
               }
             },
-            "description": "Contract stub not implemented yet"
+            "description": "Successful Response"
           }
         },
-        "summary": "List user promo codes",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "summary": "User Promos",
         "tags": [
+          "phase2-phase3",
           "promo"
         ]
       }
@@ -4171,28 +6120,46 @@
     "/v1/promo-codes/validate": {
       "post": {
         "operationId": "post_v1_promo_codes_validate",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PromoValidateRequest"
+              }
+            }
+          },
+          "required": true
+        },
         "responses": {
           "200": {
             "content": {
               "application/json": {
-                "schema": {}
+                "schema": {
+                  "$ref": "#/components/schemas/PromoValidateResponse"
+                }
               }
             },
             "description": "Successful Response"
           },
-          "501": {
+          "422": {
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/ProblemDetails"
+                  "$ref": "#/components/schemas/HTTPValidationError"
                 }
               }
             },
-            "description": "Contract stub not implemented yet"
+            "description": "Validation Error"
           }
         },
-        "summary": "Validate promo code",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "summary": "Validate Promo",
         "tags": [
+          "phase2-phase3",
           "promo"
         ]
       }
@@ -4204,24 +6171,22 @@
           "200": {
             "content": {
               "application/json": {
-                "schema": {}
-              }
-            },
-            "description": "Successful Response"
-          },
-          "501": {
-            "content": {
-              "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/ProblemDetails"
+                  "$ref": "#/components/schemas/RealtimeTokenResponse"
                 }
               }
             },
-            "description": "Contract stub not implemented yet"
+            "description": "Successful Response"
           }
         },
-        "summary": "Create realtime token",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "summary": "Realtime Token",
         "tags": [
+          "phase2-phase3",
           "realtime"
         ]
       }
@@ -4233,24 +6198,22 @@
           "200": {
             "content": {
               "application/json": {
-                "schema": {}
-              }
-            },
-            "description": "Successful Response"
-          },
-          "501": {
-            "content": {
-              "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/ProblemDetails"
+                  "$ref": "#/components/schemas/ReferralMeResponse"
                 }
               }
             },
-            "description": "Contract stub not implemented yet"
+            "description": "Successful Response"
           }
         },
-        "summary": "Get referral state",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "summary": "Referrals Me",
         "tags": [
+          "phase2-phase3",
           "referrals"
         ]
       }
@@ -4258,28 +6221,46 @@
     "/v1/referrals/share-event": {
       "post": {
         "operationId": "post_v1_referrals_share_event",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ReferralShareEventRequest"
+              }
+            }
+          },
+          "required": true
+        },
         "responses": {
           "200": {
             "content": {
               "application/json": {
-                "schema": {}
+                "schema": {
+                  "$ref": "#/components/schemas/ReferralShareEventResponse"
+                }
               }
             },
             "description": "Successful Response"
           },
-          "501": {
+          "422": {
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/ProblemDetails"
+                  "$ref": "#/components/schemas/HTTPValidationError"
                 }
               }
             },
-            "description": "Contract stub not implemented yet"
+            "description": "Validation Error"
           }
         },
-        "summary": "Record referral share event",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "summary": "Referral Share Event",
         "tags": [
+          "phase2-phase3",
           "referrals"
         ]
       }
@@ -4291,24 +6272,22 @@
           "200": {
             "content": {
               "application/json": {
-                "schema": {}
-              }
-            },
-            "description": "Successful Response"
-          },
-          "501": {
-            "content": {
-              "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/ProblemDetails"
+                  "$ref": "#/components/schemas/RewardProgressResponse"
                 }
               }
             },
-            "description": "Contract stub not implemented yet"
+            "description": "Successful Response"
           }
         },
-        "summary": "Get reward progress",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "summary": "Reward Progress",
         "tags": [
+          "phase2-phase3",
           "rewards"
         ]
       }
@@ -4320,24 +6299,22 @@
           "200": {
             "content": {
               "application/json": {
-                "schema": {}
-              }
-            },
-            "description": "Successful Response"
-          },
-          "501": {
-            "content": {
-              "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/ProblemDetails"
+                  "$ref": "#/components/schemas/RewardVoucherListResponse"
                 }
               }
             },
-            "description": "Contract stub not implemented yet"
+            "description": "Successful Response"
           }
         },
-        "summary": "List reward vouchers",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "summary": "Reward Vouchers",
         "tags": [
+          "phase2-phase3",
           "rewards"
         ]
       }
@@ -4345,28 +6322,58 @@
     "/v1/rewards/vouchers/{id}/redeem": {
       "post": {
         "operationId": "post_v1_rewards_vouchers_by_id_redeem",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "title": "Id",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/VoucherBookingRequest"
+              }
+            }
+          },
+          "required": true
+        },
         "responses": {
           "200": {
             "content": {
               "application/json": {
-                "schema": {}
+                "schema": {
+                  "$ref": "#/components/schemas/RewardVoucherDto"
+                }
               }
             },
             "description": "Successful Response"
           },
-          "501": {
+          "422": {
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/ProblemDetails"
+                  "$ref": "#/components/schemas/HTTPValidationError"
                 }
               }
             },
-            "description": "Contract stub not implemented yet"
+            "description": "Validation Error"
           }
         },
-        "summary": "Redeem voucher",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "summary": "Redeem Voucher",
         "tags": [
+          "phase2-phase3",
           "rewards"
         ]
       }
@@ -4374,28 +6381,48 @@
     "/v1/rewards/vouchers/{id}/release": {
       "post": {
         "operationId": "post_v1_rewards_vouchers_by_id_release",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "title": "Id",
+              "type": "string"
+            }
+          }
+        ],
         "responses": {
           "200": {
             "content": {
               "application/json": {
-                "schema": {}
+                "schema": {
+                  "$ref": "#/components/schemas/RewardVoucherDto"
+                }
               }
             },
             "description": "Successful Response"
           },
-          "501": {
+          "422": {
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/ProblemDetails"
+                  "$ref": "#/components/schemas/HTTPValidationError"
                 }
               }
             },
-            "description": "Contract stub not implemented yet"
+            "description": "Validation Error"
           }
         },
-        "summary": "Release voucher",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "summary": "Release Voucher",
         "tags": [
+          "phase2-phase3",
           "rewards"
         ]
       }
@@ -4403,28 +6430,58 @@
     "/v1/rewards/vouchers/{id}/reserve": {
       "post": {
         "operationId": "post_v1_rewards_vouchers_by_id_reserve",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "title": "Id",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/VoucherBookingRequest"
+              }
+            }
+          },
+          "required": true
+        },
         "responses": {
           "200": {
             "content": {
               "application/json": {
-                "schema": {}
+                "schema": {
+                  "$ref": "#/components/schemas/RewardVoucherDto"
+                }
               }
             },
             "description": "Successful Response"
           },
-          "501": {
+          "422": {
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/ProblemDetails"
+                  "$ref": "#/components/schemas/HTTPValidationError"
                 }
               }
             },
-            "description": "Contract stub not implemented yet"
+            "description": "Validation Error"
           }
         },
-        "summary": "Reserve voucher",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "summary": "Reserve Voucher",
         "tags": [
+          "phase2-phase3",
           "rewards"
         ]
       }

@@ -200,6 +200,10 @@ class MerchantService(Base):
     is_custom: Mapped[bool] = mapped_column(Boolean, nullable=False, default=False)
     description: Mapped[str | None] = mapped_column(Text)
     photo_url: Mapped[str | None] = mapped_column(Text)
+    ops_reviewed_by: Mapped[UUID | None] = mapped_column(Uuid(as_uuid=True), ForeignKey("users.id"))
+    ops_reviewed_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
+    ops_rejection_reason: Mapped[str | None] = mapped_column(Text)
+    resubmit_count: Mapped[int] = mapped_column(Integer, nullable=False, default=0)
     created_at: Mapped[datetime] = utc_now_column()
     updated_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
 
@@ -251,6 +255,200 @@ class Booking(Base):
     completed_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
     payment_method: Mapped[str | None] = mapped_column(String(40))
     payment_status: Mapped[str | None] = mapped_column(String(40))
+    created_at: Mapped[datetime] = utc_now_column()
+    updated_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
+
+
+class PriceChangeLog(Base):
+    __tablename__ = "price_change_log"
+    __table_args__ = (Index("price_change_log_service", "merchant_service_id", "changed_at"),)
+
+    id: Mapped[UUID] = uuid_pk()
+    tenant_id: Mapped[UUID] = mapped_column(Uuid(as_uuid=True), ForeignKey("tenants.id"), nullable=False)
+    merchant_service_id: Mapped[UUID] = mapped_column(Uuid(as_uuid=True), ForeignKey("merchant_services.id"), nullable=False)
+    old_price: Mapped[int] = mapped_column(BigInteger, nullable=False)
+    new_price: Mapped[int] = mapped_column(BigInteger, nullable=False)
+    changed_at: Mapped[datetime] = utc_now_column()
+
+
+class Evidence(Base):
+    __tablename__ = "evidence"
+    __table_args__ = (Index("evidence_booking", "booking_id", "type"),)
+
+    id: Mapped[UUID] = uuid_pk()
+    tenant_id: Mapped[UUID] = mapped_column(Uuid(as_uuid=True), ForeignKey("tenants.id"), nullable=False)
+    booking_id: Mapped[UUID] = mapped_column(Uuid(as_uuid=True), ForeignKey("bookings.id"), nullable=False)
+    type: Mapped[str] = mapped_column(String(32), nullable=False)
+    object_key: Mapped[str] = mapped_column(Text, nullable=False)
+    photo_url: Mapped[str] = mapped_column(Text, nullable=False)
+    content_type: Mapped[str] = mapped_column(String(80), nullable=False)
+    status: Mapped[str] = mapped_column(String(40), nullable=False)
+    quality: Mapped[str] = mapped_column(String(40), nullable=False, default="pending")
+    latitude: Mapped[float | None] = mapped_column(Float)
+    longitude: Mapped[float | None] = mapped_column(Float)
+    gps_accuracy_meters: Mapped[float | None] = mapped_column(Float)
+    perceptual_hash: Mapped[str | None] = mapped_column(String(128))
+    watermarked_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
+    exif_stripped: Mapped[bool] = mapped_column(Boolean, nullable=False, default=False)
+    created_at: Mapped[datetime] = utc_now_column()
+    uploaded_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
+
+
+class Payment(Base):
+    __tablename__ = "payments"
+    __table_args__ = (
+        Index("payments_booking", "booking_id"),
+        UniqueConstraint("tenant_id", "booking_id", "idempotency_key", name="payments_tenant_booking_idempotency_uidx"),
+    )
+
+    id: Mapped[UUID] = uuid_pk()
+    tenant_id: Mapped[UUID] = mapped_column(Uuid(as_uuid=True), ForeignKey("tenants.id"), nullable=False)
+    booking_id: Mapped[UUID] = mapped_column(Uuid(as_uuid=True), ForeignKey("bookings.id"), nullable=False)
+    amount: Mapped[int] = mapped_column(BigInteger, nullable=False)
+    method: Mapped[str] = mapped_column(String(40), nullable=False)
+    status: Mapped[str] = mapped_column(String(40), nullable=False)
+    merchant_confirmed_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
+    merchant_denied_reason: Mapped[str | None] = mapped_column(String(80))
+    commission_amount: Mapped[int] = mapped_column(BigInteger, nullable=False, default=0)
+    commission_status: Mapped[str] = mapped_column(String(40), nullable=False, default="not_applicable")
+    invoice_id: Mapped[str | None] = mapped_column(Text)
+    settled_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
+    waived_reason: Mapped[str | None] = mapped_column(Text)
+    dispute_status: Mapped[str] = mapped_column(String(40), nullable=False, default="none")
+    idempotency_key: Mapped[str] = mapped_column(String(200), nullable=False)
+    ops_confirmed: Mapped[bool] = mapped_column(Boolean, nullable=False, default=False)
+    created_at: Mapped[datetime] = utc_now_column()
+
+
+class Rating(Base):
+    __tablename__ = "ratings"
+    __table_args__ = (
+        UniqueConstraint("booking_id", name="ratings_booking_unique"),
+        Index("ratings_merchant", "merchant_id"),
+    )
+
+    id: Mapped[UUID] = uuid_pk()
+    tenant_id: Mapped[UUID] = mapped_column(Uuid(as_uuid=True), ForeignKey("tenants.id"), nullable=False)
+    booking_id: Mapped[UUID] = mapped_column(Uuid(as_uuid=True), ForeignKey("bookings.id"), nullable=False)
+    user_id: Mapped[UUID] = mapped_column(Uuid(as_uuid=True), ForeignKey("users.id"), nullable=False)
+    merchant_id: Mapped[UUID] = mapped_column(Uuid(as_uuid=True), ForeignKey("merchants.id"), nullable=False)
+    rating: Mapped[str] = mapped_column(String(16), nullable=False)
+    comment: Mapped[str | None] = mapped_column(Text)
+    tip: Mapped[int | None] = mapped_column(BigInteger)
+    reasons: Mapped[list[str]] = mapped_column(JSONType, nullable=False, default=list)
+    evidence_urls: Mapped[list[str]] = mapped_column(JSONType, nullable=False, default=list)
+    created_at: Mapped[datetime] = utc_now_column()
+    modified_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
+
+
+class PromoCode(Base):
+    __tablename__ = "promo_codes"
+    __table_args__ = (UniqueConstraint("tenant_id", "code", name="promo_codes_tenant_code_uidx"),)
+
+    id: Mapped[UUID] = uuid_pk()
+    tenant_id: Mapped[UUID] = mapped_column(Uuid(as_uuid=True), ForeignKey("tenants.id"), nullable=False)
+    code: Mapped[str] = mapped_column(String(80), nullable=False)
+    discount_type: Mapped[str] = mapped_column(String(20), nullable=False)
+    discount_value: Mapped[int] = mapped_column(BigInteger, nullable=False)
+    max_discount_amount: Mapped[int | None] = mapped_column(BigInteger)
+    min_order_amount: Mapped[int | None] = mapped_column(BigInteger)
+    merchant_id: Mapped[UUID | None] = mapped_column(Uuid(as_uuid=True), ForeignKey("merchants.id"))
+    service_template_id: Mapped[UUID | None] = mapped_column(Uuid(as_uuid=True), ForeignKey("service_templates.id"))
+    usage_limit_total: Mapped[int] = mapped_column(Integer, nullable=False)
+    usage_limit_per_user: Mapped[int] = mapped_column(Integer, nullable=False, default=1)
+    used_count: Mapped[int] = mapped_column(Integer, nullable=False, default=0)
+    is_active: Mapped[bool] = mapped_column(Boolean, nullable=False, default=True)
+    starts_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
+    expires_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
+    platform_funded: Mapped[bool] = mapped_column(Boolean, nullable=False, default=True)
+    created_by_ops: Mapped[UUID | None] = mapped_column(Uuid(as_uuid=True), ForeignKey("users.id"))
+    created_at: Mapped[datetime] = utc_now_column()
+
+
+class PromoCodeUsage(Base):
+    __tablename__ = "promo_code_usages"
+    __table_args__ = (
+        Index("promo_code_usages_promo", "promo_code_id"),
+        UniqueConstraint("user_id", "promo_code_id", name="promo_code_usages_user_promo"),
+    )
+
+    id: Mapped[UUID] = uuid_pk()
+    tenant_id: Mapped[UUID] = mapped_column(Uuid(as_uuid=True), ForeignKey("tenants.id"), nullable=False)
+    promo_code_id: Mapped[UUID] = mapped_column(Uuid(as_uuid=True), ForeignKey("promo_codes.id"), nullable=False)
+    user_id: Mapped[UUID] = mapped_column(Uuid(as_uuid=True), ForeignKey("users.id"), nullable=False)
+    booking_id: Mapped[UUID] = mapped_column(Uuid(as_uuid=True), ForeignKey("bookings.id"), nullable=False)
+    discount_amount: Mapped[int] = mapped_column(BigInteger, nullable=False)
+    created_at: Mapped[datetime] = utc_now_column()
+
+
+class RewardStamp(Base):
+    __tablename__ = "reward_stamps"
+    __table_args__ = (Index("reward_stamps_user", "user_id", "status"),)
+
+    booking_id: Mapped[UUID] = mapped_column(Uuid(as_uuid=True), ForeignKey("bookings.id"), primary_key=True)
+    tenant_id: Mapped[UUID] = mapped_column(Uuid(as_uuid=True), ForeignKey("tenants.id"), nullable=False)
+    user_id: Mapped[UUID] = mapped_column(Uuid(as_uuid=True), ForeignKey("users.id"), nullable=False)
+    status: Mapped[str] = mapped_column(String(40), nullable=False, default="pending")
+    earned_at: Mapped[datetime] = utc_now_column()
+    finalized_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
+
+
+class RewardVoucher(Base):
+    __tablename__ = "reward_vouchers"
+    __table_args__ = (Index("reward_vouchers_user_status", "user_id", "status"),)
+
+    id: Mapped[UUID] = uuid_pk()
+    tenant_id: Mapped[UUID] = mapped_column(Uuid(as_uuid=True), ForeignKey("tenants.id"), nullable=False)
+    user_id: Mapped[UUID] = mapped_column(Uuid(as_uuid=True), ForeignKey("users.id"), nullable=False)
+    service_template_id: Mapped[UUID | None] = mapped_column(Uuid(as_uuid=True), ForeignKey("service_templates.id"))
+    stamp_threshold_reached_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), nullable=False)
+    issued_at: Mapped[datetime] = utc_now_column()
+    expires_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), nullable=False)
+    reserved_booking_id: Mapped[UUID | None] = mapped_column(Uuid(as_uuid=True), ForeignKey("bookings.id"))
+    reserved_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
+    redeemed_booking_id: Mapped[UUID | None] = mapped_column(Uuid(as_uuid=True), ForeignKey("bookings.id"))
+    redeemed_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
+    released_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
+    status: Mapped[str] = mapped_column(String(40), nullable=False, default="issued")
+    frozen_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
+
+
+class Referral(Base):
+    __tablename__ = "referrals"
+    __table_args__ = (Index("referrals_referrer", "referrer_id"),)
+
+    id: Mapped[UUID] = uuid_pk()
+    tenant_id: Mapped[UUID] = mapped_column(Uuid(as_uuid=True), ForeignKey("tenants.id"), nullable=False)
+    referrer_id: Mapped[UUID] = mapped_column(Uuid(as_uuid=True), ForeignKey("users.id"), nullable=False)
+    referee_id: Mapped[UUID | None] = mapped_column(Uuid(as_uuid=True), ForeignKey("users.id"))
+    type: Mapped[str] = mapped_column(String(16), nullable=False)
+    code: Mapped[str] = mapped_column(String(80), nullable=False)
+    status: Mapped[str] = mapped_column(String(40), nullable=False, default="pending")
+    reward_status: Mapped[str] = mapped_column(String(40), nullable=False, default="pending")
+    qualified_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
+    reward_paid_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
+    created_at: Mapped[datetime] = utc_now_column()
+
+
+class Complaint(Base):
+    __tablename__ = "complaints"
+    __table_args__ = (
+        Index("complaints_user", "user_id", "status"),
+        Index("complaints_merchant", "merchant_id", "status"),
+    )
+
+    id: Mapped[UUID] = uuid_pk()
+    tenant_id: Mapped[UUID] = mapped_column(Uuid(as_uuid=True), ForeignKey("tenants.id"), nullable=False)
+    booking_id: Mapped[UUID] = mapped_column(Uuid(as_uuid=True), ForeignKey("bookings.id"), nullable=False)
+    user_id: Mapped[UUID] = mapped_column(Uuid(as_uuid=True), ForeignKey("users.id"), nullable=False)
+    merchant_id: Mapped[UUID] = mapped_column(Uuid(as_uuid=True), ForeignKey("merchants.id"), nullable=False)
+    category: Mapped[str] = mapped_column(String(80), nullable=False)
+    description: Mapped[str] = mapped_column(Text, nullable=False)
+    evidence_refs: Mapped[list[str]] = mapped_column(JSONType, nullable=False, default=list)
+    status: Mapped[str] = mapped_column(String(40), nullable=False, default="created")
+    resolution: Mapped[str | None] = mapped_column(Text)
+    refund_approved: Mapped[bool] = mapped_column(Boolean, nullable=False, default=False)
+    voucher_action: Mapped[str | None] = mapped_column(String(40))
     created_at: Mapped[datetime] = utc_now_column()
     updated_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
 

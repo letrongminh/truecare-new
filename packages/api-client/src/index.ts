@@ -58,6 +58,7 @@ export const operations = [
     "path": "/v1/complaints/{id}",
     "operationId": "get_v1_complaints_by_id",
     "tags": [
+      "phase2-phase3",
       "complaints"
     ]
   },
@@ -66,6 +67,7 @@ export const operations = [
     "path": "/v1/evidence/{booking_id}",
     "operationId": "get_v1_evidence_by_booking_id",
     "tags": [
+      "phase2-phase3",
       "evidence"
     ]
   },
@@ -122,6 +124,7 @@ export const operations = [
     "path": "/v1/merchant-services/{id}/price-history",
     "operationId": "get_v1_merchant_services_by_id_price_history",
     "tags": [
+      "phase2-phase3",
       "merchant-services"
     ]
   },
@@ -156,6 +159,7 @@ export const operations = [
     "path": "/v1/merchants/{id}/daily-summary",
     "operationId": "get_v1_merchants_by_id_daily_summary",
     "tags": [
+      "phase2-phase3",
       "merchant"
     ]
   },
@@ -164,6 +168,7 @@ export const operations = [
     "path": "/v1/merchants/{id}/daily-summary.csv",
     "operationId": "get_v1_merchants_by_id_daily_summary_csv",
     "tags": [
+      "phase2-phase3",
       "merchant"
     ]
   },
@@ -223,6 +228,7 @@ export const operations = [
     "path": "/v1/ops/commission-receivables",
     "operationId": "get_v1_ops_commission_receivables",
     "tags": [
+      "phase2-phase3",
       "ops"
     ]
   },
@@ -231,6 +237,7 @@ export const operations = [
     "path": "/v1/ops/complaints",
     "operationId": "get_v1_ops_complaints",
     "tags": [
+      "phase2-phase3",
       "ops"
     ]
   },
@@ -271,6 +278,7 @@ export const operations = [
     "path": "/v1/payments/{id}",
     "operationId": "get_v1_payments_by_id",
     "tags": [
+      "phase2-phase3",
       "payments"
     ]
   },
@@ -279,6 +287,7 @@ export const operations = [
     "path": "/v1/promo-codes/user",
     "operationId": "get_v1_promo_codes_user",
     "tags": [
+      "phase2-phase3",
       "promo"
     ]
   },
@@ -287,6 +296,7 @@ export const operations = [
     "path": "/v1/referrals/me",
     "operationId": "get_v1_referrals_me",
     "tags": [
+      "phase2-phase3",
       "referrals"
     ]
   },
@@ -295,6 +305,7 @@ export const operations = [
     "path": "/v1/rewards/progress",
     "operationId": "get_v1_rewards_progress",
     "tags": [
+      "phase2-phase3",
       "rewards"
     ]
   },
@@ -303,6 +314,7 @@ export const operations = [
     "path": "/v1/rewards/vouchers",
     "operationId": "get_v1_rewards_vouchers",
     "tags": [
+      "phase2-phase3",
       "rewards"
     ]
   },
@@ -393,6 +405,7 @@ export const operations = [
     "path": "/v1/merchant-services/{id}",
     "operationId": "patch_v1_merchant_services_by_id",
     "tags": [
+      "phase2-phase3",
       "merchant-services"
     ]
   },
@@ -401,6 +414,7 @@ export const operations = [
     "path": "/v1/ops/complaints/{id}",
     "operationId": "patch_v1_ops_complaints_by_id",
     "tags": [
+      "phase2-phase3",
       "ops"
     ]
   },
@@ -500,6 +514,7 @@ export const operations = [
     "path": "/v1/bookings/{id}/rate",
     "operationId": "post_v1_bookings_by_id_rate",
     "tags": [
+      "phase2-phase3",
       "bookings"
     ]
   },
@@ -526,6 +541,7 @@ export const operations = [
     "path": "/v1/complaints",
     "operationId": "post_v1_complaints",
     "tags": [
+      "phase2-phase3",
       "complaints"
     ]
   },
@@ -534,6 +550,7 @@ export const operations = [
     "path": "/v1/evidence/{booking_id}/presign",
     "operationId": "post_v1_evidence_by_booking_id_presign",
     "tags": [
+      "phase2-phase3",
       "evidence"
     ]
   },
@@ -542,6 +559,7 @@ export const operations = [
     "path": "/v1/evidence/{evidence_id}/confirm",
     "operationId": "post_v1_evidence_by_evidence_id_confirm",
     "tags": [
+      "phase2-phase3",
       "evidence"
     ]
   },
@@ -590,6 +608,7 @@ export const operations = [
     "path": "/v1/merchant-services",
     "operationId": "post_v1_merchant_services",
     "tags": [
+      "phase2-phase3",
       "merchant-services"
     ]
   },
@@ -598,6 +617,7 @@ export const operations = [
     "path": "/v1/merchant-services/{id}/resubmit",
     "operationId": "post_v1_merchant_services_by_id_resubmit",
     "tags": [
+      "phase2-phase3",
       "merchant-services"
     ]
   },
@@ -606,6 +626,7 @@ export const operations = [
     "path": "/v1/merchant-services/custom",
     "operationId": "post_v1_merchant_services_custom",
     "tags": [
+      "phase2-phase3",
       "merchant-services"
     ]
   },
@@ -702,6 +723,7 @@ export const operations = [
     "path": "/v1/ops/merchant-services/{id}/approve",
     "operationId": "post_v1_ops_merchant_services_by_id_approve",
     "tags": [
+      "phase2-phase3",
       "ops"
     ]
   },
@@ -710,6 +732,7 @@ export const operations = [
     "path": "/v1/ops/merchant-services/{id}/reject",
     "operationId": "post_v1_ops_merchant_services_by_id_reject",
     "tags": [
+      "phase2-phase3",
       "ops"
     ]
   },
@@ -758,6 +781,7 @@ export const operations = [
     "path": "/v1/ops/promo-codes",
     "operationId": "post_v1_ops_promo_codes",
     "tags": [
+      "phase2-phase3",
       "ops"
     ]
   },
@@ -790,6 +814,7 @@ export const operations = [
     "path": "/v1/payments/{id}/cash-record",
     "operationId": "post_v1_payments_by_id_cash_record",
     "tags": [
+      "phase2-phase3",
       "payments"
     ]
   },
@@ -798,6 +823,7 @@ export const operations = [
     "path": "/v1/payments/{id}/merchant-confirmed",
     "operationId": "post_v1_payments_by_id_merchant_confirmed",
     "tags": [
+      "phase2-phase3",
       "payments"
     ]
   },
@@ -806,6 +832,7 @@ export const operations = [
     "path": "/v1/payments/{id}/merchant-denied",
     "operationId": "post_v1_payments_by_id_merchant_denied",
     "tags": [
+      "phase2-phase3",
       "payments"
     ]
   },
@@ -814,6 +841,7 @@ export const operations = [
     "path": "/v1/payments/{id}/switch-method",
     "operationId": "post_v1_payments_by_id_switch_method",
     "tags": [
+      "phase2-phase3",
       "payments"
     ]
   },
@@ -822,6 +850,7 @@ export const operations = [
     "path": "/v1/payments/{id}/user-claimed",
     "operationId": "post_v1_payments_by_id_user_claimed",
     "tags": [
+      "phase2-phase3",
       "payments"
     ]
   },
@@ -830,6 +859,7 @@ export const operations = [
     "path": "/v1/payments/initiate",
     "operationId": "post_v1_payments_initiate",
     "tags": [
+      "phase2-phase3",
       "payments"
     ]
   },
@@ -838,6 +868,7 @@ export const operations = [
     "path": "/v1/promo-codes/validate",
     "operationId": "post_v1_promo_codes_validate",
     "tags": [
+      "phase2-phase3",
       "promo"
     ]
   },
@@ -846,6 +877,7 @@ export const operations = [
     "path": "/v1/realtime/token",
     "operationId": "post_v1_realtime_token",
     "tags": [
+      "phase2-phase3",
       "realtime"
     ]
   },
@@ -854,6 +886,7 @@ export const operations = [
     "path": "/v1/referrals/share-event",
     "operationId": "post_v1_referrals_share_event",
     "tags": [
+      "phase2-phase3",
       "referrals"
     ]
   },
@@ -862,6 +895,7 @@ export const operations = [
     "path": "/v1/rewards/vouchers/{id}/redeem",
     "operationId": "post_v1_rewards_vouchers_by_id_redeem",
     "tags": [
+      "phase2-phase3",
       "rewards"
     ]
   },
@@ -870,6 +904,7 @@ export const operations = [
     "path": "/v1/rewards/vouchers/{id}/release",
     "operationId": "post_v1_rewards_vouchers_by_id_release",
     "tags": [
+      "phase2-phase3",
       "rewards"
     ]
   },
@@ -878,6 +913,7 @@ export const operations = [
     "path": "/v1/rewards/vouchers/{id}/reserve",
     "operationId": "post_v1_rewards_vouchers_by_id_reserve",
     "tags": [
+      "phase2-phase3",
       "rewards"
     ]
   },

@@ -7,7 +7,7 @@ import pytest
 from fastapi.testclient import TestClient
 from sqlalchemy import delete, select
 
-from app.db.models import Booking, Merchant, MerchantService, ServiceTemplate, SlotCapacity
+from app.db.models import Booking, Complaint, Evidence, Merchant, MerchantService, Payment, PromoCodeUsage, Rating, RewardStamp, SlotCapacity, ServiceTemplate
 from app.db.session import get_sessionmaker
 from app.main import create_app
 from app.services.marketplace_service import round_to_current_slot
@@ -38,6 +38,12 @@ async def _seed_marketplace(tenant_id: UUID, user_id: UUID) -> tuple[UUID, UUID]
     now_slot = round_to_current_slot()
     async with get_sessionmaker()() as session:
         async with session.begin():
+            await session.execute(delete(Complaint).where(Complaint.tenant_id == tenant_id))
+            await session.execute(delete(Evidence).where(Evidence.tenant_id == tenant_id))
+            await session.execute(delete(Payment).where(Payment.tenant_id == tenant_id))
+            await session.execute(delete(Rating).where(Rating.tenant_id == tenant_id))
+            await session.execute(delete(PromoCodeUsage).where(PromoCodeUsage.tenant_id == tenant_id))
+            await session.execute(delete(RewardStamp).where(RewardStamp.tenant_id == tenant_id))
             await session.execute(delete(Booking).where(Booking.tenant_id == tenant_id))
             await session.execute(delete(SlotCapacity).where(SlotCapacity.tenant_id == tenant_id))
             await session.execute(delete(MerchantService).where(MerchantService.tenant_id == tenant_id))
