@@ -1480,6 +1480,8 @@ Status last updated: 2026-05-17.
 Completed slices:
 - [x] Foundation scaffold: FastAPI API, Expo shell, Ops web shell, OpenAPI export, generated TypeScript client, migration map, route-test-matrix gate, and local Makefile gates.
 - [x] Backend foundation POC: SQLAlchemy async session, Alembic baseline, auth signup/login/refresh/logout/me, RBAC dependencies, tenant context, RLS proof table, idempotency service, domain events repository, worker drain skeleton, and local Docker Postgres commands.
+- [x] Core marketplace API slice 1: service templates, merchant discovery/detail/services/bays, booking hold/list/get/cancel, merchant queue read, same-transaction booking domain events, and regenerated OpenAPI client.
+- [x] Core marketplace API slice 2: merchant check-in by QR/manual code, start service, complete service, transition events, integration coverage, and regenerated OpenAPI client.
 
 Current verification:
 - [x] `make infra-prereqs.check`
@@ -1550,15 +1552,15 @@ Exit gate:
 Duration: 2-3 weeks.
 
 Build:
-- [ ] Merchant discovery and detail.
-- [ ] Service templates and merchant services.
-- [ ] Slot capacity and booking hold lifecycle.
-- [ ] Merchant queue APIs.
-- [ ] Check-in QR/manual code.
+- [x] Merchant discovery and detail.
+- [x] Service templates and merchant service catalog reads.
+- [x] Slot capacity and booking hold/list/get/cancel first cut.
+- [x] Merchant queue read API.
+- [x] Check-in QR/manual code.
 - [ ] Evidence presign/confirm/process.
 - [ ] Payment QR/cash/user-claimed/merchant-confirmed.
 - [ ] Rating.
-- [ ] Realtime events and polling fallback.
+- [ ] Realtime Broadcast delivery and polling fallback.
 
 Exit gate:
 - [ ] Full core loop passes API integration and Maestro smoke.

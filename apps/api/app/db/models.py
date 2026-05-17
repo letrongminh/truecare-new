@@ -4,7 +4,7 @@ from datetime import datetime
 from typing import Any
 from uuid import UUID, uuid4
 
-from sqlalchemy import BigInteger, Boolean, DateTime, ForeignKey, Index, Integer, String, Text, UniqueConstraint, text
+from sqlalchemy import BigInteger, Boolean, DateTime, Float, ForeignKey, Index, Integer, String, Text, UniqueConstraint, text
 from sqlalchemy.dialects.postgresql import JSONB
 from sqlalchemy.orm import Mapped, mapped_column
 from sqlalchemy.types import JSON
@@ -139,6 +139,120 @@ class ProcessedDomainEvent(Base):
     processed_at: Mapped[datetime] = utc_now_column()
     result_hash: Mapped[str | None] = mapped_column(String(128))
     error_context: Mapped[dict[str, Any] | None] = mapped_column(JSONType)
+
+
+class ServiceTemplate(Base):
+    __tablename__ = "service_templates"
+
+    id: Mapped[UUID] = uuid_pk()
+    name: Mapped[str] = mapped_column(Text, nullable=False)
+    floor_price: Mapped[int] = mapped_column(BigInteger, nullable=False)
+    ceiling_price: Mapped[int] = mapped_column(BigInteger, nullable=False)
+    duration_min: Mapped[int] = mapped_column(Integer, nullable=False)
+    duration_max: Mapped[int] = mapped_column(Integer, nullable=False)
+    evidence_required: Mapped[str] = mapped_column(Text, nullable=False)
+    sop_checklist_url: Mapped[str | None] = mapped_column(Text)
+    created_at: Mapped[datetime] = utc_now_column()
+
+
+class Merchant(Base):
+    __tablename__ = "merchants"
+    __table_args__ = (Index("merchants_tenant_status", "tenant_id", "status"),)
+
+    id: Mapped[UUID] = uuid_pk()
+    tenant_id: Mapped[UUID] = mapped_column(Uuid(as_uuid=True), ForeignKey("tenants.id"), nullable=False)
+    user_id: Mapped[UUID] = mapped_column(Uuid(as_uuid=True), ForeignKey("users.id"), nullable=False)
+    name: Mapped[str] = mapped_column(Text, nullable=False)
+    address: Mapped[str] = mapped_column(Text, nullable=False)
+    phone: Mapped[str | None] = mapped_column(String(32))
+    latitude: Mapped[float] = mapped_column(Float, nullable=False)
+    longitude: Mapped[float] = mapped_column(Float, nullable=False)
+    bay_count: Mapped[int] = mapped_column(Integer, nullable=False)
+    operating_hours_start: Mapped[str] = mapped_column(String(16), nullable=False)
+    operating_hours_end: Mapped[str] = mapped_column(String(16), nullable=False)
+    status: Mapped[str] = mapped_column(String(40), nullable=False)
+    pipeline_status: Mapped[str] = mapped_column(String(40), nullable=False, default="longlist")
+    tags: Mapped[list[str]] = mapped_column(JSONType, nullable=False, default=list)
+    rating_average: Mapped[float] = mapped_column(Float, nullable=False, default=0)
+    rating_count: Mapped[int] = mapped_column(Integer, nullable=False, default=0)
+    commission_rate: Mapped[float] = mapped_column(Float, nullable=False, default=0.10)
+    max_bookings_per_day: Mapped[int] = mapped_column(Integer, nullable=False, default=5)
+    storefront_photo_url: Mapped[str | None] = mapped_column(Text)
+    bay_photo_url: Mapped[str | None] = mapped_column(Text)
+    stale: Mapped[bool] = mapped_column(Boolean, nullable=False, default=False)
+    created_at: Mapped[datetime] = utc_now_column()
+    deleted_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
+
+
+class MerchantService(Base):
+    __tablename__ = "merchant_services"
+    __table_args__ = (Index("merchant_services_merchant", "merchant_id"),)
+
+    id: Mapped[UUID] = uuid_pk()
+    tenant_id: Mapped[UUID] = mapped_column(Uuid(as_uuid=True), ForeignKey("tenants.id"), nullable=False)
+    merchant_id: Mapped[UUID] = mapped_column(Uuid(as_uuid=True), ForeignKey("merchants.id"), nullable=False)
+    template_id: Mapped[UUID | None] = mapped_column(Uuid(as_uuid=True), ForeignKey("service_templates.id"))
+    name: Mapped[str] = mapped_column(Text, nullable=False)
+    price: Mapped[int] = mapped_column(BigInteger, nullable=False)
+    duration_min: Mapped[int] = mapped_column(Integer, nullable=False)
+    duration_max: Mapped[int] = mapped_column(Integer, nullable=False)
+    status: Mapped[str] = mapped_column(String(40), nullable=False)
+    is_custom: Mapped[bool] = mapped_column(Boolean, nullable=False, default=False)
+    description: Mapped[str | None] = mapped_column(Text)
+    photo_url: Mapped[str | None] = mapped_column(Text)
+    created_at: Mapped[datetime] = utc_now_column()
+    updated_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
+
+
+class SlotCapacity(Base):
+    __tablename__ = "slot_capacity"
+    __table_args__ = (
+        UniqueConstraint("merchant_id", "bay_number", "time_slot", name="slot_capacity_merchant_bay_time"),
+        Index("slot_capacity_merchant_status", "merchant_id", "status"),
+        Index("slot_capacity_held_by_user", "held_by_user_id", postgresql_where=text("status = 'held'")),
+    )
+
+    id: Mapped[UUID] = uuid_pk()
+    tenant_id: Mapped[UUID] = mapped_column(Uuid(as_uuid=True), ForeignKey("tenants.id"), nullable=False)
+    merchant_id: Mapped[UUID] = mapped_column(Uuid(as_uuid=True), ForeignKey("merchants.id"), nullable=False)
+    bay_number: Mapped[int] = mapped_column(Integer, nullable=False)
+    time_slot: Mapped[datetime] = mapped_column(DateTime(timezone=True), nullable=False)
+    status: Mapped[str] = mapped_column(String(40), nullable=False)
+    held_by_user_id: Mapped[UUID | None] = mapped_column(Uuid(as_uuid=True), ForeignKey("users.id"))
+    held_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
+    expires_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
+
+
+class Booking(Base):
+    __tablename__ = "bookings"
+    __table_args__ = (
+        Index("bookings_user_status", "user_id", "status", "expires_at"),
+        Index("bookings_merchant_status", "merchant_id", "status", "held_at"),
+        UniqueConstraint("user_id", "idempotency_key", name="bookings_user_idempotency_uidx"),
+    )
+
+    id: Mapped[UUID] = uuid_pk()
+    tenant_id: Mapped[UUID] = mapped_column(Uuid(as_uuid=True), ForeignKey("tenants.id"), nullable=False)
+    user_id: Mapped[UUID] = mapped_column(Uuid(as_uuid=True), ForeignKey("users.id"), nullable=False)
+    merchant_id: Mapped[UUID] = mapped_column(Uuid(as_uuid=True), ForeignKey("merchants.id"), nullable=False)
+    merchant_service_id: Mapped[UUID] = mapped_column(Uuid(as_uuid=True), ForeignKey("merchant_services.id"), nullable=False)
+    slot_capacity_id: Mapped[UUID] = mapped_column(Uuid(as_uuid=True), ForeignKey("slot_capacity.id"), nullable=False)
+    bay_number: Mapped[int] = mapped_column(Integer, nullable=False)
+    status: Mapped[str] = mapped_column(String(40), nullable=False)
+    held_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), nullable=False)
+    expires_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), nullable=False)
+    total_amount: Mapped[int] = mapped_column(BigInteger, nullable=False)
+    discount_amount: Mapped[int] = mapped_column(BigInteger, nullable=False, default=0)
+    deposit_amount: Mapped[int | None] = mapped_column(BigInteger)
+    idempotency_key: Mapped[str] = mapped_column(String(200), nullable=False)
+    check_in_token: Mapped[str] = mapped_column(String(64), nullable=False)
+    checked_in_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
+    service_completed_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
+    completed_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
+    payment_method: Mapped[str | None] = mapped_column(String(40))
+    payment_status: Mapped[str | None] = mapped_column(String(40))
+    created_at: Mapped[datetime] = utc_now_column()
+    updated_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
 
 
 class WorkerJob(Base):

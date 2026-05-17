@@ -40,6 +40,7 @@ export const operations = [
     "path": "/v1/bookings",
     "operationId": "get_v1_bookings",
     "tags": [
+      "marketplace",
       "bookings"
     ]
   },
@@ -48,6 +49,7 @@ export const operations = [
     "path": "/v1/bookings/{id}",
     "operationId": "get_v1_bookings_by_id",
     "tags": [
+      "marketplace",
       "bookings"
     ]
   },
@@ -128,6 +130,7 @@ export const operations = [
     "path": "/v1/merchants/{id}",
     "operationId": "get_v1_merchants_by_id",
     "tags": [
+      "marketplace",
       "merchants"
     ]
   },
@@ -136,6 +139,7 @@ export const operations = [
     "path": "/v1/merchants/{id}/bays",
     "operationId": "get_v1_merchants_by_id_bays",
     "tags": [
+      "marketplace",
       "merchants"
     ]
   },
@@ -184,6 +188,7 @@ export const operations = [
     "path": "/v1/merchants/{id}/queue",
     "operationId": "get_v1_merchants_by_id_queue",
     "tags": [
+      "marketplace",
       "merchant"
     ]
   },
@@ -192,6 +197,7 @@ export const operations = [
     "path": "/v1/merchants/{id}/services",
     "operationId": "get_v1_merchants_by_id_services",
     "tags": [
+      "marketplace",
       "merchants"
     ]
   },
@@ -200,6 +206,7 @@ export const operations = [
     "path": "/v1/merchants/nearby",
     "operationId": "get_v1_merchants_nearby",
     "tags": [
+      "marketplace",
       "merchants"
     ]
   },
@@ -304,6 +311,7 @@ export const operations = [
     "path": "/v1/search",
     "operationId": "get_v1_search",
     "tags": [
+      "marketplace",
       "search"
     ]
   },
@@ -312,6 +320,7 @@ export const operations = [
     "path": "/v1/service-templates",
     "operationId": "get_v1_service_templates",
     "tags": [
+      "marketplace",
       "search"
     ]
   },
@@ -464,6 +473,7 @@ export const operations = [
     "path": "/v1/bookings/{id}/cancel",
     "operationId": "post_v1_bookings_by_id_cancel",
     "tags": [
+      "marketplace",
       "bookings"
     ]
   },
@@ -472,6 +482,7 @@ export const operations = [
     "path": "/v1/bookings/{id}/check-in",
     "operationId": "post_v1_bookings_by_id_check_in",
     "tags": [
+      "marketplace",
       "merchant"
     ]
   },
@@ -480,6 +491,7 @@ export const operations = [
     "path": "/v1/bookings/{id}/complete-service",
     "operationId": "post_v1_bookings_by_id_complete_service",
     "tags": [
+      "marketplace",
       "merchant"
     ]
   },
@@ -496,6 +508,7 @@ export const operations = [
     "path": "/v1/bookings/{id}/start-service",
     "operationId": "post_v1_bookings_by_id_start_service",
     "tags": [
+      "marketplace",
       "merchant"
     ]
   },
@@ -504,6 +517,7 @@ export const operations = [
     "path": "/v1/bookings/holds",
     "operationId": "post_v1_bookings_holds",
     "tags": [
+      "marketplace",
       "bookings"
     ]
   },

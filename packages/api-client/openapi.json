@@ -68,6 +68,238 @@
         "title": "AuthMeResponse",
         "type": "object"
       },
+      "BookingDto": {
+        "properties": {
+          "bay_number": {
+            "title": "Bay Number",
+            "type": "integer"
+          },
+          "check_in_token": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Check In Token"
+          },
+          "checked_in_at": {
+            "anyOf": [
+              {
+                "format": "date-time",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Checked In At"
+          },
+          "completed_at": {
+            "anyOf": [
+              {
+                "format": "date-time",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Completed At"
+          },
+          "created_at": {
+            "format": "date-time",
+            "title": "Created At",
+            "type": "string"
+          },
+          "deposit_amount": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Deposit Amount"
+          },
+          "discount_amount": {
+            "title": "Discount Amount",
+            "type": "integer"
+          },
+          "expires_at": {
+            "format": "date-time",
+            "title": "Expires At",
+            "type": "string"
+          },
+          "held_at": {
+            "format": "date-time",
+            "title": "Held At",
+            "type": "string"
+          },
+          "id": {
+            "format": "uuid",
+            "title": "Id",
+            "type": "string"
+          },
+          "merchant_id": {
+            "format": "uuid",
+            "title": "Merchant Id",
+            "type": "string"
+          },
+          "merchant_service_id": {
+            "format": "uuid",
+            "title": "Merchant Service Id",
+            "type": "string"
+          },
+          "payment_method": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Payment Method"
+          },
+          "payment_status": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Payment Status"
+          },
+          "service_completed_at": {
+            "anyOf": [
+              {
+                "format": "date-time",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Service Completed At"
+          },
+          "status": {
+            "title": "Status",
+            "type": "string"
+          },
+          "total_amount": {
+            "title": "Total Amount",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "id",
+          "merchant_id",
+          "merchant_service_id",
+          "bay_number",
+          "status",
+          "total_amount",
+          "discount_amount",
+          "held_at",
+          "expires_at",
+          "created_at"
+        ],
+        "title": "BookingDto",
+        "type": "object"
+      },
+      "BookingListResponse": {
+        "properties": {
+          "bookings": {
+            "items": {
+              "$ref": "#/components/schemas/BookingDto"
+            },
+            "title": "Bookings",
+            "type": "array"
+          }
+        },
+        "required": [
+          "bookings"
+        ],
+        "title": "BookingListResponse",
+        "type": "object"
+      },
+      "CancelBookingRequest": {
+        "properties": {
+          "reason": {
+            "default": "user_cancelled",
+            "maxLength": 200,
+            "title": "Reason",
+            "type": "string"
+          }
+        },
+        "title": "CancelBookingRequest",
+        "type": "object"
+      },
+      "CheckInRequest": {
+        "properties": {
+          "code": {
+            "maxLength": 128,
+            "minLength": 1,
+            "title": "Code",
+            "type": "string"
+          }
+        },
+        "required": [
+          "code"
+        ],
+        "title": "CheckInRequest",
+        "type": "object"
+      },
+      "CreateHoldRequest": {
+        "properties": {
+          "bay_number": {
+            "minimum": 1.0,
+            "title": "Bay Number",
+            "type": "integer"
+          },
+          "idempotency_key": {
+            "maxLength": 200,
+            "minLength": 8,
+            "title": "Idempotency Key",
+            "type": "string"
+          },
+          "merchant_id": {
+            "format": "uuid",
+            "title": "Merchant Id",
+            "type": "string"
+          },
+          "merchant_service_id": {
+            "format": "uuid",
+            "title": "Merchant Service Id",
+            "type": "string"
+          },
+          "promo_code": {
+            "anyOf": [
+              {
+                "maxLength": 64,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Promo Code"
+          }
+        },
+        "required": [
+          "merchant_id",
+          "merchant_service_id",
+          "bay_number",
+          "idempotency_key"
+        ],
+        "title": "CreateHoldRequest",
+        "type": "object"
+      },
       "ErrorCode": {
         "enum": [
           "NOT_IMPLEMENTED",
@@ -79,7 +311,16 @@
           "TOKEN_REUSED",
           "IDEMPOTENCY_MISMATCH",
           "TENANT_CONTEXT_MISSING",
-          "DUPLICATE_IDENTITY"
+          "DUPLICATE_IDENTITY",
+          "MERCHANT_NOT_FOUND",
+          "MERCHANT_SERVICE_NOT_FOUND",
+          "BOOKING_NOT_FOUND",
+          "SLOT_FULL",
+          "HOLD_LIMIT_EXCEEDED",
+          "INVALID_BOOKING_HOLD",
+          "INVALID_BOOKING_STATE",
+          "INVALID_CHECK_IN_CODE",
+          "HOLD_EXPIRED"
         ],
         "title": "ErrorCode",
         "type": "string"
@@ -176,6 +417,292 @@
         "title": "LogoutResponse",
         "type": "object"
       },
+      "MerchantBayDto": {
+        "properties": {
+          "bay_number": {
+            "title": "Bay Number",
+            "type": "integer"
+          },
+          "capacity": {
+            "default": 1,
+            "title": "Capacity",
+            "type": "integer"
+          },
+          "status": {
+            "title": "Status",
+            "type": "string"
+          },
+          "time_slot": {
+            "format": "date-time",
+            "title": "Time Slot",
+            "type": "string"
+          }
+        },
+        "required": [
+          "bay_number",
+          "time_slot",
+          "status"
+        ],
+        "title": "MerchantBayDto",
+        "type": "object"
+      },
+      "MerchantBaysResponse": {
+        "properties": {
+          "bays": {
+            "items": {
+              "$ref": "#/components/schemas/MerchantBayDto"
+            },
+            "title": "Bays",
+            "type": "array"
+          }
+        },
+        "required": [
+          "bays"
+        ],
+        "title": "MerchantBaysResponse",
+        "type": "object"
+      },
+      "MerchantNearbyDto": {
+        "properties": {
+          "address": {
+            "title": "Address",
+            "type": "string"
+          },
+          "available_bays": {
+            "title": "Available Bays",
+            "type": "integer"
+          },
+          "bay_count": {
+            "title": "Bay Count",
+            "type": "integer"
+          },
+          "distance_meters": {
+            "title": "Distance Meters",
+            "type": "integer"
+          },
+          "id": {
+            "format": "uuid",
+            "title": "Id",
+            "type": "string"
+          },
+          "latitude": {
+            "title": "Latitude",
+            "type": "number"
+          },
+          "longitude": {
+            "title": "Longitude",
+            "type": "number"
+          },
+          "name": {
+            "title": "Name",
+            "type": "string"
+          },
+          "operating_hours_end": {
+            "title": "Operating Hours End",
+            "type": "string"
+          },
+          "operating_hours_start": {
+            "title": "Operating Hours Start",
+            "type": "string"
+          },
+          "phone": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Phone"
+          },
+          "rating_average": {
+            "title": "Rating Average",
+            "type": "number"
+          },
+          "rating_count": {
+            "title": "Rating Count",
+            "type": "integer"
+          },
+          "service_tags": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Service Tags",
+            "type": "array"
+          },
+          "storefront_photo_url": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Storefront Photo Url"
+          }
+        },
+        "required": [
+          "id",
+          "name",
+          "address",
+          "latitude",
+          "longitude",
+          "distance_meters",
+          "available_bays",
+          "bay_count",
+          "rating_average",
+          "rating_count",
+          "service_tags",
+          "operating_hours_start",
+          "operating_hours_end"
+        ],
+        "title": "MerchantNearbyDto",
+        "type": "object"
+      },
+      "MerchantQueueResponse": {
+        "properties": {
+          "queue": {
+            "items": {
+              "$ref": "#/components/schemas/BookingDto"
+            },
+            "title": "Queue",
+            "type": "array"
+          }
+        },
+        "required": [
+          "queue"
+        ],
+        "title": "MerchantQueueResponse",
+        "type": "object"
+      },
+      "MerchantServiceDto": {
+        "properties": {
+          "description": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Description"
+          },
+          "duration_max": {
+            "title": "Duration Max",
+            "type": "integer"
+          },
+          "duration_min": {
+            "title": "Duration Min",
+            "type": "integer"
+          },
+          "id": {
+            "format": "uuid",
+            "title": "Id",
+            "type": "string"
+          },
+          "is_custom": {
+            "title": "Is Custom",
+            "type": "boolean"
+          },
+          "merchant_id": {
+            "format": "uuid",
+            "title": "Merchant Id",
+            "type": "string"
+          },
+          "name": {
+            "title": "Name",
+            "type": "string"
+          },
+          "photo_url": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Photo Url"
+          },
+          "price": {
+            "title": "Price",
+            "type": "integer"
+          },
+          "status": {
+            "title": "Status",
+            "type": "string"
+          },
+          "template_id": {
+            "anyOf": [
+              {
+                "format": "uuid",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Template Id"
+          }
+        },
+        "required": [
+          "id",
+          "merchant_id",
+          "name",
+          "price",
+          "duration_min",
+          "duration_max",
+          "status",
+          "is_custom"
+        ],
+        "title": "MerchantServiceDto",
+        "type": "object"
+      },
+      "MerchantServicesResponse": {
+        "properties": {
+          "services": {
+            "items": {
+              "$ref": "#/components/schemas/MerchantServiceDto"
+            },
+            "title": "Services",
+            "type": "array"
+          }
+        },
+        "required": [
+          "services"
+        ],
+        "title": "MerchantServicesResponse",
+        "type": "object"
+      },
+      "MerchantsNearbyResponse": {
+        "properties": {
+          "gps_fallback": {
+            "default": false,
+            "title": "Gps Fallback",
+            "type": "boolean"
+          },
+          "merchants": {
+            "items": {
+              "$ref": "#/components/schemas/MerchantNearbyDto"
+            },
+            "title": "Merchants",
+            "type": "array"
+          },
+          "total": {
+            "title": "Total",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "merchants",
+          "total"
+        ],
+        "title": "MerchantsNearbyResponse",
+        "type": "object"
+      },
       "ProblemDetails": {
         "properties": {
           "clientAction": {
@@ -268,6 +795,77 @@
           "refresh_token"
         ],
         "title": "RefreshRequest",
+        "type": "object"
+      },
+      "ServiceTemplateDto": {
+        "properties": {
+          "ceiling_price": {
+            "title": "Ceiling Price",
+            "type": "integer"
+          },
+          "duration_max": {
+            "title": "Duration Max",
+            "type": "integer"
+          },
+          "duration_min": {
+            "title": "Duration Min",
+            "type": "integer"
+          },
+          "evidence_required": {
+            "title": "Evidence Required",
+            "type": "string"
+          },
+          "floor_price": {
+            "title": "Floor Price",
+            "type": "integer"
+          },
+          "id": {
+            "format": "uuid",
+            "title": "Id",
+            "type": "string"
+          },
+          "name": {
+            "title": "Name",
+            "type": "string"
+          },
+          "sop_checklist_url": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Sop Checklist Url"
+          }
+        },
+        "required": [
+          "id",
+          "name",
+          "floor_price",
+          "ceiling_price",
+          "duration_min",
+          "duration_max",
+          "evidence_required"
+        ],
+        "title": "ServiceTemplateDto",
+        "type": "object"
+      },
+      "ServiceTemplatesResponse": {
+        "properties": {
+          "templates": {
+            "items": {
+              "$ref": "#/components/schemas/ServiceTemplateDto"
+            },
+            "title": "Templates",
+            "type": "array"
+          }
+        },
+        "required": [
+          "templates"
+        ],
+        "title": "ServiceTemplatesResponse",
         "type": "object"
       },
       "SignupRequest": {
@@ -845,24 +1443,22 @@
           "200": {
             "content": {
               "application/json": {
-                "schema": {}
-              }
-            },
-            "description": "Successful Response"
-          },
-          "501": {
-            "content": {
-              "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/ProblemDetails"
+                  "$ref": "#/components/schemas/BookingListResponse"
                 }
               }
             },
-            "description": "Contract stub not implemented yet"
+            "description": "Successful Response"
           }
         },
-        "summary": "List bookings",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "summary": "List Bookings",
         "tags": [
+          "marketplace",
           "bookings"
         ]
       }
@@ -870,28 +1466,46 @@
     "/v1/bookings/holds": {
       "post": {
         "operationId": "post_v1_bookings_holds",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateHoldRequest"
+              }
+            }
+          },
+          "required": true
+        },
         "responses": {
-          "200": {
+          "201": {
             "content": {
               "application/json": {
-                "schema": {}
+                "schema": {
+                  "$ref": "#/components/schemas/BookingDto"
+                }
               }
             },
             "description": "Successful Response"
           },
-          "501": {
+          "422": {
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/ProblemDetails"
+                  "$ref": "#/components/schemas/HTTPValidationError"
                 }
               }
             },
-            "description": "Contract stub not implemented yet"
+            "description": "Validation Error"
           }
         },
-        "summary": "Create booking hold",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "summary": "Create Booking Hold",
         "tags": [
+          "marketplace",
           "bookings"
         ]
       }
@@ -899,28 +1513,48 @@
     "/v1/bookings/{id}": {
       "get": {
         "operationId": "get_v1_bookings_by_id",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "title": "Id",
+              "type": "string"
+            }
+          }
+        ],
         "responses": {
           "200": {
             "content": {
               "application/json": {
-                "schema": {}
+                "schema": {
+                  "$ref": "#/components/schemas/BookingDto"
+                }
               }
             },
             "description": "Successful Response"
           },
-          "501": {
+          "422": {
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/ProblemDetails"
+                  "$ref": "#/components/schemas/HTTPValidationError"
                 }
               }
             },
-            "description": "Contract stub not implemented yet"
+            "description": "Validation Error"
           }
         },
-        "summary": "Get booking",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "summary": "Get Booking",
         "tags": [
+          "marketplace",
           "bookings"
         ]
       }
@@ -957,28 +1591,58 @@
     "/v1/bookings/{id}/cancel": {
       "post": {
         "operationId": "post_v1_bookings_by_id_cancel",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "title": "Id",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CancelBookingRequest"
+              }
+            }
+          },
+          "required": true
+        },
         "responses": {
           "200": {
             "content": {
               "application/json": {
-                "schema": {}
+                "schema": {
+                  "$ref": "#/components/schemas/BookingDto"
+                }
               }
             },
             "description": "Successful Response"
           },
-          "501": {
+          "422": {
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/ProblemDetails"
+                  "$ref": "#/components/schemas/HTTPValidationError"
                 }
               }
             },
-            "description": "Contract stub not implemented yet"
+            "description": "Validation Error"
           }
         },
-        "summary": "Cancel booking",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "summary": "Cancel Booking",
         "tags": [
+          "marketplace",
           "bookings"
         ]
       }
@@ -986,28 +1650,58 @@
     "/v1/bookings/{id}/check-in": {
       "post": {
         "operationId": "post_v1_bookings_by_id_check_in",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "title": "Id",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CheckInRequest"
+              }
+            }
+          },
+          "required": true
+        },
         "responses": {
           "200": {
             "content": {
               "application/json": {
-                "schema": {}
+                "schema": {
+                  "$ref": "#/components/schemas/BookingDto"
+                }
               }
             },
             "description": "Successful Response"
           },
-          "501": {
+          "422": {
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/ProblemDetails"
+                  "$ref": "#/components/schemas/HTTPValidationError"
                 }
               }
             },
-            "description": "Contract stub not implemented yet"
+            "description": "Validation Error"
           }
         },
-        "summary": "Merchant checks in booking",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "summary": "Check In Booking",
         "tags": [
+          "marketplace",
           "merchant"
         ]
       }
@@ -1015,28 +1709,48 @@
     "/v1/bookings/{id}/complete-service": {
       "post": {
         "operationId": "post_v1_bookings_by_id_complete_service",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "title": "Id",
+              "type": "string"
+            }
+          }
+        ],
         "responses": {
           "200": {
             "content": {
               "application/json": {
-                "schema": {}
+                "schema": {
+                  "$ref": "#/components/schemas/BookingDto"
+                }
               }
             },
             "description": "Successful Response"
           },
-          "501": {
+          "422": {
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/ProblemDetails"
+                  "$ref": "#/components/schemas/HTTPValidationError"
                 }
               }
             },
-            "description": "Contract stub not implemented yet"
+            "description": "Validation Error"
           }
         },
-        "summary": "Complete service",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "summary": "Complete Booking Service",
         "tags": [
+          "marketplace",
           "merchant"
         ]
       }
@@ -1073,28 +1787,48 @@
     "/v1/bookings/{id}/start-service": {
       "post": {
         "operationId": "post_v1_bookings_by_id_start_service",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "title": "Id",
+              "type": "string"
+            }
+          }
+        ],
         "responses": {
           "200": {
             "content": {
               "application/json": {
-                "schema": {}
+                "schema": {
+                  "$ref": "#/components/schemas/BookingDto"
+                }
               }
             },
             "description": "Successful Response"
           },
-          "501": {
+          "422": {
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/ProblemDetails"
+                  "$ref": "#/components/schemas/HTTPValidationError"
                 }
               }
             },
-            "description": "Contract stub not implemented yet"
+            "description": "Validation Error"
           }
         },
-        "summary": "Start service",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "summary": "Start Booking Service",
         "tags": [
+          "marketplace",
           "merchant"
         ]
       }
@@ -1900,28 +2634,97 @@
     "/v1/merchants/nearby": {
       "get": {
         "operationId": "get_v1_merchants_nearby",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "lat",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "maximum": 90,
+                  "minimum": -90,
+                  "type": "number"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Lat"
+            }
+          },
+          {
+            "in": "query",
+            "name": "lng",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "maximum": 180,
+                  "minimum": -180,
+                  "type": "number"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Lng"
+            }
+          },
+          {
+            "in": "query",
+            "name": "radius",
+            "required": false,
+            "schema": {
+              "default": 5000,
+              "maximum": 20000,
+              "minimum": 1,
+              "title": "Radius",
+              "type": "integer"
+            }
+          },
+          {
+            "in": "query",
+            "name": "page",
+            "required": false,
+            "schema": {
+              "default": 0,
+              "minimum": 0,
+              "title": "Page",
+              "type": "integer"
+            }
+          }
+        ],
         "responses": {
           "200": {
             "content": {
               "application/json": {
-                "schema": {}
+                "schema": {
+                  "$ref": "#/components/schemas/MerchantsNearbyResponse"
+                }
               }
             },
             "description": "Successful Response"
           },
-          "501": {
+          "422": {
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/ProblemDetails"
+                  "$ref": "#/components/schemas/HTTPValidationError"
                 }
               }
             },
-            "description": "Contract stub not implemented yet"
+            "description": "Validation Error"
           }
         },
-        "summary": "List nearby merchants",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "summary": "Nearby Merchants",
         "tags": [
+          "marketplace",
           "merchants"
         ]
       }
@@ -1929,28 +2732,48 @@
     "/v1/merchants/{id}": {
       "get": {
         "operationId": "get_v1_merchants_by_id",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "title": "Id",
+              "type": "string"
+            }
+          }
+        ],
         "responses": {
           "200": {
             "content": {
               "application/json": {
-                "schema": {}
+                "schema": {
+                  "$ref": "#/components/schemas/MerchantNearbyDto"
+                }
               }
             },
             "description": "Successful Response"
           },
-          "501": {
+          "422": {
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/ProblemDetails"
+                  "$ref": "#/components/schemas/HTTPValidationError"
                 }
               }
             },
-            "description": "Contract stub not implemented yet"
+            "description": "Validation Error"
           }
         },
-        "summary": "Get merchant",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "summary": "Merchant Detail",
         "tags": [
+          "marketplace",
           "merchants"
         ]
       }
@@ -1958,28 +2781,48 @@
     "/v1/merchants/{id}/bays": {
       "get": {
         "operationId": "get_v1_merchants_by_id_bays",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "title": "Id",
+              "type": "string"
+            }
+          }
+        ],
         "responses": {
           "200": {
             "content": {
               "application/json": {
-                "schema": {}
+                "schema": {
+                  "$ref": "#/components/schemas/MerchantBaysResponse"
+                }
               }
             },
             "description": "Successful Response"
           },
-          "501": {
+          "422": {
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/ProblemDetails"
+                  "$ref": "#/components/schemas/HTTPValidationError"
                 }
               }
             },
-            "description": "Contract stub not implemented yet"
+            "description": "Validation Error"
           }
         },
-        "summary": "List merchant bays",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "summary": "Merchant Bays",
         "tags": [
+          "marketplace",
           "merchants"
         ]
       }
@@ -2333,28 +3176,48 @@
     "/v1/merchants/{id}/queue": {
       "get": {
         "operationId": "get_v1_merchants_by_id_queue",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "title": "Id",
+              "type": "string"
+            }
+          }
+        ],
         "responses": {
           "200": {
             "content": {
               "application/json": {
-                "schema": {}
+                "schema": {
+                  "$ref": "#/components/schemas/MerchantQueueResponse"
+                }
               }
             },
             "description": "Successful Response"
           },
-          "501": {
+          "422": {
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/ProblemDetails"
+                  "$ref": "#/components/schemas/HTTPValidationError"
                 }
               }
             },
-            "description": "Contract stub not implemented yet"
+            "description": "Validation Error"
           }
         },
-        "summary": "Get merchant queue",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "summary": "Merchant Queue",
         "tags": [
+          "marketplace",
           "merchant"
         ]
       }
@@ -2362,28 +3225,48 @@
     "/v1/merchants/{id}/services": {
       "get": {
         "operationId": "get_v1_merchants_by_id_services",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "title": "Id",
+              "type": "string"
+            }
+          }
+        ],
         "responses": {
           "200": {
             "content": {
               "application/json": {
-                "schema": {}
+                "schema": {
+                  "$ref": "#/components/schemas/MerchantServicesResponse"
+                }
               }
             },
             "description": "Successful Response"
           },
-          "501": {
+          "422": {
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/ProblemDetails"
+                  "$ref": "#/components/schemas/HTTPValidationError"
                 }
               }
             },
-            "description": "Contract stub not implemented yet"
+            "description": "Validation Error"
           }
         },
-        "summary": "List merchant services",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "summary": "Merchant Services",
         "tags": [
+          "marketplace",
           "merchants"
         ]
       }
@@ -3549,28 +4432,102 @@
     "/v1/search": {
       "get": {
         "operationId": "get_v1_search",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "q",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "maxLength": 120,
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Q"
+            }
+          },
+          {
+            "in": "query",
+            "name": "lat",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "maximum": 90,
+                  "minimum": -90,
+                  "type": "number"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Lat"
+            }
+          },
+          {
+            "in": "query",
+            "name": "lng",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "maximum": 180,
+                  "minimum": -180,
+                  "type": "number"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Lng"
+            }
+          },
+          {
+            "in": "query",
+            "name": "type",
+            "required": false,
+            "schema": {
+              "default": "merchant",
+              "pattern": "^(merchant|place)$",
+              "title": "Type",
+              "type": "string"
+            }
+          }
+        ],
         "responses": {
           "200": {
             "content": {
               "application/json": {
-                "schema": {}
+                "schema": {
+                  "$ref": "#/components/schemas/MerchantsNearbyResponse"
+                }
               }
             },
             "description": "Successful Response"
           },
-          "501": {
+          "422": {
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/ProblemDetails"
+                  "$ref": "#/components/schemas/HTTPValidationError"
                 }
               }
             },
-            "description": "Contract stub not implemented yet"
+            "description": "Validation Error"
           }
         },
-        "summary": "Search merchants",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "summary": "Search",
         "tags": [
+          "marketplace",
           "search"
         ]
       }
@@ -3582,24 +4539,17 @@
           "200": {
             "content": {
               "application/json": {
-                "schema": {}
-              }
-            },
-            "description": "Successful Response"
-          },
-          "501": {
-            "content": {
-              "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/ProblemDetails"
+                  "$ref": "#/components/schemas/ServiceTemplatesResponse"
                 }
               }
             },
-            "description": "Contract stub not implemented yet"
+            "description": "Successful Response"
           }
         },
-        "summary": "List service templates",
+        "summary": "List Service Templates",
         "tags": [
+          "marketplace",
           "search"
         ]
       }

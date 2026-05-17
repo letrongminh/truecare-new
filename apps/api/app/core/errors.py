@@ -17,6 +17,15 @@ class ErrorCode(StrEnum):
     idempotency_mismatch = "IDEMPOTENCY_MISMATCH"
     tenant_context_missing = "TENANT_CONTEXT_MISSING"
     duplicate_identity = "DUPLICATE_IDENTITY"
+    merchant_not_found = "MERCHANT_NOT_FOUND"
+    merchant_service_not_found = "MERCHANT_SERVICE_NOT_FOUND"
+    booking_not_found = "BOOKING_NOT_FOUND"
+    slot_full = "SLOT_FULL"
+    hold_limit_exceeded = "HOLD_LIMIT_EXCEEDED"
+    invalid_booking_hold = "INVALID_BOOKING_HOLD"
+    invalid_booking_state = "INVALID_BOOKING_STATE"
+    invalid_check_in_code = "INVALID_CHECK_IN_CODE"
+    hold_expired = "HOLD_EXPIRED"
 
 
 class ErrorDefinition(BaseModel):
@@ -108,6 +117,78 @@ ERROR_REGISTRY: dict[ErrorCode, ErrorDefinition] = {
         detail_key="errors.duplicate_identity.detail",
         retryable=False,
         client_action="log_in_or_use_different_identifier",
+    ),
+    ErrorCode.merchant_not_found: ErrorDefinition(
+        status=404,
+        type="https://truecare.vn/problems/merchant-not-found",
+        title_key="errors.merchant_not_found.title",
+        detail_key="errors.merchant_not_found.detail",
+        retryable=False,
+        client_action="choose_another_merchant",
+    ),
+    ErrorCode.merchant_service_not_found: ErrorDefinition(
+        status=404,
+        type="https://truecare.vn/problems/merchant-service-not-found",
+        title_key="errors.merchant_service_not_found.title",
+        detail_key="errors.merchant_service_not_found.detail",
+        retryable=False,
+        client_action="refresh_merchant_services",
+    ),
+    ErrorCode.booking_not_found: ErrorDefinition(
+        status=404,
+        type="https://truecare.vn/problems/booking-not-found",
+        title_key="errors.booking_not_found.title",
+        detail_key="errors.booking_not_found.detail",
+        retryable=False,
+        client_action="refresh_bookings",
+    ),
+    ErrorCode.slot_full: ErrorDefinition(
+        status=409,
+        type="https://truecare.vn/problems/slot-full",
+        title_key="errors.slot_full.title",
+        detail_key="errors.slot_full.detail",
+        retryable=True,
+        client_action="choose_another_slot",
+    ),
+    ErrorCode.hold_limit_exceeded: ErrorDefinition(
+        status=429,
+        type="https://truecare.vn/problems/hold-limit-exceeded",
+        title_key="errors.hold_limit_exceeded.title",
+        detail_key="errors.hold_limit_exceeded.detail",
+        retryable=False,
+        client_action="release_existing_hold",
+    ),
+    ErrorCode.invalid_booking_hold: ErrorDefinition(
+        status=409,
+        type="https://truecare.vn/problems/invalid-booking-hold",
+        title_key="errors.invalid_booking_hold.title",
+        detail_key="errors.invalid_booking_hold.detail",
+        retryable=False,
+        client_action="change_booking_request",
+    ),
+    ErrorCode.invalid_booking_state: ErrorDefinition(
+        status=409,
+        type="https://truecare.vn/problems/invalid-booking-state",
+        title_key="errors.invalid_booking_state.title",
+        detail_key="errors.invalid_booking_state.detail",
+        retryable=False,
+        client_action="refresh_booking",
+    ),
+    ErrorCode.invalid_check_in_code: ErrorDefinition(
+        status=403,
+        type="https://truecare.vn/problems/invalid-check-in-code",
+        title_key="errors.invalid_check_in_code.title",
+        detail_key="errors.invalid_check_in_code.detail",
+        retryable=False,
+        client_action="scan_or_enter_code_again",
+    ),
+    ErrorCode.hold_expired: ErrorDefinition(
+        status=410,
+        type="https://truecare.vn/problems/hold-expired",
+        title_key="errors.hold_expired.title",
+        detail_key="errors.hold_expired.detail",
+        retryable=False,
+        client_action="create_new_booking_hold",
     ),
 }
 
