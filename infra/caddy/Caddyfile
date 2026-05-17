@@ -1,0 +1,23 @@
+:8080 {
+	encode gzip zstd
+
+	handle_path /ops* {
+		reverse_proxy ops-web:8080
+	}
+
+	handle /healthz {
+		reverse_proxy api:8000
+	}
+
+	handle /readyz {
+		reverse_proxy api:8000
+	}
+
+	handle /metrics {
+		reverse_proxy api:8000
+	}
+
+	handle {
+		reverse_proxy api:8000
+	}
+}

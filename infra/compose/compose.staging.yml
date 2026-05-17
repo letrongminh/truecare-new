@@ -1,0 +1,62 @@
+name: truecare-new
+
+services:
+  caddy:
+    image: caddy:2-alpine
+    restart: unless-stopped
+    depends_on:
+      - api
+      - ops-web
+    volumes:
+      - ./Caddyfile:/etc/caddy/Caddyfile:ro
+    expose:
+      - "8080"
+
+  cloudflared:
+    image: cloudflare/cloudflared:latest
+    restart: unless-stopped
+    command: tunnel --no-autoupdate run --token ${CLOUDFLARE_TUNNEL_TOKEN}
+    depends_on:
+      - caddy
+
+  api:
+    image: ${TRUECARE_API_IMAGE}
+    restart: unless-stopped
+    environment:
+      PORT: "8000"
+      PUBLIC_API_BASE_URL: ${PUBLIC_API_BASE_URL}
+      DATABASE_URL_POOLER: ${DATABASE_URL_POOLER}
+      SUPABASE_URL: ${SUPABASE_URL}
+      SUPABASE_SERVICE_ROLE_KEY: ${SUPABASE_SERVICE_ROLE_KEY}
+      SUPABASE_JWT_SECRET: ${SUPABASE_JWT_SECRET}
+      JWT_SIGNING_PRIVATE_JWK: ${JWT_SIGNING_PRIVATE_JWK}
+      JWT_SIGNING_PUBLIC_JWKS: ${JWT_SIGNING_PUBLIC_JWKS}
+      SENTRY_DSN: ${SENTRY_DSN}
+      SENTRY_ENVIRONMENT: ${SENTRY_ENVIRONMENT}
+      LOG_LEVEL: ${LOG_LEVEL}
+    expose:
+      - "8000"
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://127.0.0.1:8000/healthz', timeout=2).read()"]
+      interval: 10s
+      timeout: 3s
+      retries: 6
+
+  worker:
+    image: ${TRUECARE_WORKER_IMAGE}
+    restart: unless-stopped
+    command: ["python", "/app/server.py", "--worker"]
+    environment:
+      DATABASE_URL_POOLER: ${DATABASE_URL_POOLER}
+      SUPABASE_URL: ${SUPABASE_URL}
+      SUPABASE_SERVICE_ROLE_KEY: ${SUPABASE_SERVICE_ROLE_KEY}
+      JWT_SIGNING_PUBLIC_JWKS: ${JWT_SIGNING_PUBLIC_JWKS}
+      SENTRY_DSN: ${SENTRY_DSN}
+      SENTRY_ENVIRONMENT: ${SENTRY_ENVIRONMENT}
+      LOG_LEVEL: ${LOG_LEVEL}
+
+  ops-web:
+    image: ${TRUECARE_OPS_WEB_IMAGE}
+    restart: unless-stopped
+    expose:
+      - "8080"

@@ -1,0 +1,26 @@
+name: infra-readiness
+
+on:
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  static:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: shell syntax
+        run: bash -n scripts/infra/*.sh
+      - name: secret leak check
+        run: make secret-leak.check
+      - name: docs inventory
+        run: |
+          test -f docs/infra/deployment-prereqs-v1.md
+          test -f docs/infra/env-contract-v1.md
+          test -f docs/infra/ec2-runbook-v1.md
+          test -f docs/infra/supabase-readiness-v1.md
+          test -f infra/compose/compose.staging.yml
+          test -f infra/caddy/Caddyfile
