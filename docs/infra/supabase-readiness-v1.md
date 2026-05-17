@@ -1,6 +1,6 @@
 # Supabase Readiness v1
 
-Supabase Singapore is the P0 data platform for Postgres, Realtime, and Storage.
+Supabase Singapore is the P0 data platform for Postgres, Realtime, and object storage. Do not introduce AWS S3 in P0.
 
 ## Project Requirements
 
@@ -8,7 +8,7 @@ Supabase Singapore is the P0 data platform for Postgres, Realtime, and Storage.
 - Products enabled:
   - Postgres
   - Realtime
-  - Storage
+- Storage
 - Required database extensions:
   - `postgis`
   - `pg_trgm`
@@ -71,6 +71,7 @@ Storage gate passes only when:
 - server can confirm object metadata;
 - unauthorized clients cannot list private buckets;
 - evidence download URLs are short-lived.
+- no application code path requires AWS S3, MinIO, or another object store for P0.
 
 ## Readiness Check
 

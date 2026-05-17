@@ -2,7 +2,7 @@
 set -euo pipefail
 
 missing=()
-for bin in docker node pnpm uv aws gh psql eas supabase jq curl git; do
+for bin in docker node pnpm uv psql supabase jq curl git ssh; do
   if ! command -v "$bin" >/dev/null 2>&1; then
     missing+=("$bin")
   fi
@@ -33,9 +33,12 @@ case "$remote" in
     ;;
 esac
 
+if [[ -n "${EC2_SSH_KEY_PATH:-}" && ! -f "$EC2_SSH_KEY_PATH" ]]; then
+  printf 'EC2_SSH_KEY_PATH does not exist: %s\n' "$EC2_SSH_KEY_PATH" >&2
+  exit 1
+fi
+
 if [[ "${CHECK_MODE:-local}" != "ci" ]]; then
-  aws sts get-caller-identity >/dev/null
-  gh auth status >/dev/null
   supabase projects list >/dev/null
 fi
 

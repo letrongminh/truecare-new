@@ -6,7 +6,7 @@ SHELL := /bin/bash
 help:
 	@grep -hE '^## [a-zA-Z0-9_.-]+\s—' $(MAKEFILE_LIST) | sed 's/^## //' | column -t -s'—'
 
-## infra-prereqs.check — verify local tooling, Docker daemon, git remote, and optional cloud auth
+## infra-prereqs.check — verify local tooling, Docker daemon, git remote, and SSH deploy prerequisites
 infra-prereqs.check:
 	@scripts/infra/infra-prereqs-check.sh
 
@@ -14,11 +14,11 @@ infra-prereqs.check:
 supabase-readiness.check:
 	@scripts/infra/supabase-readiness-check.sh
 
-## ec2-readiness.check — verify AWS EC2, SSM, ECR, security group, and optional Cloudflare tunnel state
+## ec2-readiness.check — verify EC2 SSH, Docker Compose, app directory, and optional Cloudflare tunnel state
 ec2-readiness.check:
 	@scripts/infra/ec2-readiness-check.sh
 
-## deploy-smoke — build placeholder images, push to ECR, deploy via SSM, and verify public health
+## deploy-smoke — deploy placeholder services by SSH and build directly on EC2
 deploy-smoke:
 	@scripts/infra/deploy-smoke.sh
 

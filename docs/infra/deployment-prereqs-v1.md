@@ -1,26 +1,44 @@
 # Deployment Prerequisites v1
 
-This document locks the infrastructure baseline required before port implementation starts.
+This document locks the minimum infrastructure baseline required before port implementation starts.
 
 ## Decisions
 
 | Area | Decision |
 | --- | --- |
-| App runtime | AWS EC2 single instance running Docker Compose |
+| AWS services | EC2 only for P0 runtime |
+| App runtime | Single EC2 instance running Docker Compose |
 | AWS region | `ap-southeast-1` |
-| EC2 size | Amazon Linux 2023 ARM64, `t4g.medium`, 30 GB encrypted gp3 |
-| Public ingress | Cloudflare Tunnel, no inbound EC2 security group rules |
+| EC2 size | Amazon Linux 2023 ARM64, `t4g.medium`, 30 GB encrypted root volume |
+| Public ingress | Cloudflare Tunnel to Caddy on EC2 |
+| Admin/deploy access | SSH to EC2, preferably through Cloudflare Access SSH or a fixed operator IP allowlist |
 | Database | Supabase Postgres in Singapore |
 | Realtime | Supabase Realtime private Broadcast |
 | Object storage | Supabase Storage private buckets |
-| CI/CD | GitHub Actions OIDC to AWS, ECR image push, SSM deploy |
+| CI/CD | GitHub Actions static checks; deploy is SSH-based and builds directly on EC2 |
 | Repo | `letrongminh/truecare-new` |
 
 The legacy TrueCare repository remains a source reference only. Do not pull the old EKS/k3s/Argo/Helm topology into P0.
 
+## Explicitly Out Of P0
+
+Do not introduce these AWS services for P0 unless a later review explicitly approves the added operational cost:
+
+- ECR
+- SSM Session Manager / SSM SendCommand
+- SSM Parameter Store
+- CloudWatch Logs
+- ALB / ACM
+- RDS
+- S3
+- EKS / ECS
+- IAM OIDC deploy role for GitHub Actions
+
+EC2 security groups, key pairs, Elastic IP, and the EC2 root volume are considered part of the EC2 baseline, not separate application services.
+
 ## Required Operator Accounts
 
-- AWS account with permission to manage EC2, ECR, IAM OIDC roles, SSM, CloudWatch Logs, and SSM Parameter Store.
+- AWS account with permission to create and manage one EC2 instance and its security group.
 - Cloudflare account for `truecare-new.noboil.dev` or another approved hostname.
 - Supabase project in Singapore.
 - GitHub repository with Actions enabled.
@@ -41,34 +59,28 @@ Required CLIs:
 - `node`
 - `pnpm`
 - `uv`
-- `aws`
-- `gh`
 - `psql`
-- `eas`
 - `supabase`
 - `jq`
 - `curl`
+- `git`
+- `ssh`
 
-Node must be an active even-numbered LTS/current major supported by the chosen Expo SDK. Pin the final version in the app workspace with `.nvmrc` or Volta before frontend implementation begins.
+Optional but expected soon:
 
-## AWS Setup Gates
+- `aws` for EC2 provisioning and security group audit
+- `gh` for GitHub repo/admin work
+- `eas` for mobile release setup
+
+## EC2 Setup Gates
 
 - EC2 instance is in `ap-southeast-1`.
-- Instance profile includes `AmazonSSMManagedInstanceCore`.
-- Security group has no inbound rules.
-- ECR repositories exist:
-  - `truecare-new-api`
-  - `truecare-new-ops-web`
-- GitHub Actions role trusts only `repo:letrongminh/truecare-new:*`.
-- Runtime secrets live under `/truecare-new/staging/*` in SSM Parameter Store SecureString.
-- EC2 can pull ECR images and read required SSM parameters.
-
-## Cloudflare Setup Gates
-
-- Public hostname defaults to `truecare-new.noboil.dev`.
-- Tunnel token is stored server-side only.
-- Tunnel routes public HTTPS traffic to Caddy on the EC2 Compose network.
-- Cloudflare WAF must not block `/healthz`, `/readyz`, `/metrics`, `/v1/*`, or Realtime fallback polling routes.
+- Docker Engine and Docker Compose plugin are installed.
+- Repo is cloned at `/opt/truecare-new`.
+- EC2-local `/opt/truecare-new/.env` exists and is never committed.
+- Public app traffic reaches the instance through Cloudflare Tunnel.
+- No public inbound `80` or `443` rules are open on EC2.
+- SSH is limited to Cloudflare Access SSH or a fixed operator IP allowlist.
 
 ## Supabase Setup Gates
 
@@ -76,11 +88,17 @@ See `docs/infra/supabase-readiness-v1.md`.
 
 ## CI/CD Setup Gates
 
-- `make secret-leak.check` runs on every pull request.
-- `deploy-staging` workflow uses GitHub OIDC, not static AWS keys.
-- Images are tagged with immutable git SHA tags.
-- Deploy uses SSM SendCommand to run `docker compose pull && docker compose up -d` on EC2.
-- Rollback command accepts a previous git SHA image tag.
+- Pull requests run static checks and `make secret-leak.check`.
+- Deploy is deliberately not AWS-managed in P0.
+- Deploy command SSHes to EC2, pulls `origin/main`, and runs:
+  ```bash
+  docker compose --env-file .env -f infra/compose/compose.staging.yml up -d --build
+  ```
+- Rollback uses git history on EC2:
+  ```bash
+  git checkout <previous-good-sha>
+  docker compose --env-file .env -f infra/compose/compose.staging.yml up -d --build
+  ```
 
 ## Ready-To-Implement Definition
 
