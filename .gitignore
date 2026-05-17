@@ -10,3 +10,5 @@ dist/
 .expo/
 .turbo/
 coverage/
+.local-e2e.json
+.local-jwt-signing-private.jwk.json

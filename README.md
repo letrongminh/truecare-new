@@ -14,6 +14,7 @@ Start here:
 - `apps/ops-web` contains the Vite React Ops shell with admissions mutation wiring and read surfaces for commission, complaints, network health, growth/eKYC, and audit.
 - `packages/api-client` contains the generated TypeScript API client.
 - `docs/migration-map-v1.md` maps the 37 legacy schema tables into the Python port.
+- `docs/local-e2e-runbook.md` describes local-only API/Ops/Mobile verification.
 - `Makefile` exposes readiness gates and local scaffold commands.
 
 All retained source documents were copied, not moved.
@@ -39,5 +40,9 @@ make api.integration
 make api.openapi
 make client.generate
 make worker.once
+make local.qa.fixtures
+make local.qa.smoke
 pnpm -r typecheck
 ```
+
+Run local apps with `make local.api`, `make local.ops`, and `make local.mobile`.

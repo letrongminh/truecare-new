@@ -1494,7 +1494,7 @@ Distribution rules:
 
 ## 21. Implementation Phases
 
-Status last updated: 2026-05-17.
+Status last updated: 2026-05-18.
 
 Completed slices:
 - [x] Foundation scaffold: FastAPI API, Expo shell, Ops web shell, OpenAPI export, generated TypeScript client, migration map, route-test-matrix gate, and local Makefile gates.
@@ -1510,6 +1510,7 @@ Completed slices:
 - [x] P0-02 merchant admission backend/API slice: merchant application, owner merchant membership upgrade, photo confirmation, local object-key payment setup and eKYC CMND/selfie/bank submissions, ops pending list, payment-recipient verification, approve/reject/suspend guards, transactional audit rows, cross-tenant admission RLS coverage, mobile onboarding basic data wiring, Ops admissions mutation wiring, and regenerated OpenAPI client.
 - [x] P0 local route-closure backend/API slice: `/v1/me/bookings`, consumer arrived ping, merchant calendar/maintenance, Golden Hour table/API, ops data-room/export jobs, fallback booking/check-in/evidence/payment confirmation, ops reward voucher minting, transactional audit rows, integration coverage, and regenerated OpenAPI client.
 - [x] P0 next local E2E closure slice: `/v1/auth/me` merchant context, stale-hold no-show/deposit worker path, replay-safe payment denial/switch/cash transitions, processed-domain-event/dead-letter worker coverage, local native capability adapters/file queue, consumer/merchant primary-action wiring, Ops fallback/export/complaint/audit action wiring, route matrix completed-row enforcement, and regenerated OpenAPI client.
+- [x] Local E2E verification slice: stable local JWT signing key, deterministic consumer/merchant/ops QA fixtures, local API/Ops/Mobile Make targets, local-only runbook, and `make local.qa.smoke` covering auth exists/signup/login/me, discovery, hold/arrived/check-in, evidence, payment denial/switch/cash, rating, voucher redeem, referral share, complaint resolution, merchant queue/service transition, Ops fallback/export/audit actions, then restoring the fixture baseline.
 
 Current contract route status:
 - [x] 103/103 contract routes have real handlers in the local FastAPI port.
@@ -1527,10 +1528,12 @@ Current verification:
 - [x] `make shadow-read.check`
 - [x] `make db.up`
 - [x] `make db.migrate`
+- [x] `make local.qa.fixtures`
 - [x] `make api.test`
 - [x] `make api.integration`
 - [x] `make client.generate`
 - [x] `make worker.once`
+- [x] `make local.qa.smoke`
 - [x] `pnpm -r typecheck`
 - [x] P0-02 targeted integration: merchant admission go-live guard, payment recipient verification, approve/reject/suspend audit, and cross-tenant admission reads blocked through app-role RLS.
 - [x] Route-closure targeted integration: remaining 14 contract routes execute against local DB and ops mutations write audit rows.
@@ -1714,8 +1717,8 @@ These slices are the remaining decision-complete backlog from the current port s
 |---|---|---|---|
 | P0-01 Auth/profile/device/support completion | Invite-code signup gate, auth exists, logout-all, profile/vehicles, sessions, password change, forgot-password support request, notification preferences, max 3 accounts per device, ops user reset/manual support flow | Phase 1 auth foundation | API tests pass; mobile O1/O2/C9 screens are data-wired; ops user reset writes audit; fraud/device tests cover allow, deny, and manual reset |
 | P0-02 Merchant onboarding/admission/eKYC go-live | Backend/API and basic mobile/Ops wiring are complete for merchant application, photo confirmation, eKYC CMND/selfie/bank object keys, payment setup/verification, approve/reject/suspend, go-live guard, audit, and admission RLS. Remaining: admission scoring, real storage policy, offline/native uploads, and Playwright journey. | Storage policy spike; Ops auth | Merchant cannot go live until checklist passes; Ops admissions Playwright flow passes; audit rows written for every state change |
-| P0-03 Booking/payment/evidence end-to-end | Backend and local mobile/Ops route closure now covers active booking list, arrived ping, no-show/deposit after repeated no-shows, replay-safe payment denial/switch/cash, evidence presign/confirm with local file queue fallback, and ops fallback booking/check-in/evidence/payment confirmation. Remaining: Maestro booking/payment/evidence smoke and physical camera/QR/GPS checks. | Core booking/payment/evidence APIs | API integration covers state machine; Maestro booking/payment/evidence smoke passes; physical camera/QR/GPS tests pass on iOS and Android |
-| P0-04 Promo/reward/referral completion | Golden Hour table/API, ops voucher mint, voucher reserve/redeem action wiring, and referral share action wiring are implemented locally. Remaining: mobile Golden Hour surface, promo stacking rules, reward C10/C11/C12 Maestro flow, and referral reward issuance from invite first-touch attribution. | Promo/reward/referral backend | Promo 5 stacking cases pass; reward/referral integration tests pass; C10/C11/C12 Maestro flow passes |
+| P0-03 Booking/payment/evidence end-to-end | Backend and local mobile/Ops route closure now covers active booking list, arrived ping, no-show/deposit after repeated no-shows, replay-safe payment denial/switch/cash, evidence presign/confirm with local file queue fallback, ops fallback booking/check-in/evidence/payment confirmation, and local API smoke execution. Remaining: Maestro booking/payment/evidence smoke and physical camera/QR/GPS checks. | Core booking/payment/evidence APIs | API integration covers state machine; Maestro booking/payment/evidence smoke passes; physical camera/QR/GPS tests pass on iOS and Android |
+| P0-04 Promo/reward/referral completion | Golden Hour table/API, ops voucher mint, voucher reserve/redeem action wiring, referral share action wiring, and local API smoke coverage are implemented locally. Remaining: mobile Golden Hour surface, promo stacking rules, reward C10/C11/C12 Maestro flow, and referral reward issuance from invite first-touch attribution. | Promo/reward/referral backend | Promo 5 stacking cases pass; reward/referral integration tests pass; C10/C11/C12 Maestro flow passes |
 | P0-05 Mobile parity completion | Generated-client primary actions, `/v1/auth/me` merchant context, local native adapters, and completed-row route coverage references are wired. Remaining: full Vietnamese UX polish, deep-link/maps resume validation, Maestro iOS/Android smoke, and physical-device native checks. | P0-01 through P0-04 APIs | Route matrix has no P0 mobile gaps; `mobile.route-files.check`, typecheck, Maestro iOS/Android smoke, and physical-device native checks pass |
 | P0-06 Ops web completion | Ops UI wiring now covers fallback actions, export creation/status, complaint resolution/voucher minting, commission export, and audit search. Remaining: audit detail, richer reconciliation UI, and Playwright journeys. | P0-02 through P0-04 backend | Route matrix has no P0 Ops gaps; Playwright Ops journeys pass; CSV/data-room totals reconcile; all mutations write audit rows |
 | P0-07 Realtime/storage/worker completion | Local worker ledger, scheduled stale-hold expiry, processed-domain-event records, bounded retry exhaustion, and visible dead-letter rows are implemented and tested. Remaining: Supabase private Broadcast policies, storage bucket policies, realtime token refresh, polling fallback, advisory-lock hardening, and crash/redeploy catch-up rehearsal. | Supabase credentials and schema freeze | Supabase readiness passes; realtime authorization negative tests pass; worker recovery tests prove no duplicate effects and visible dead letters |
@@ -1801,6 +1804,7 @@ Realtime, storage, and native reliability:
 Data, migration, and cutover:
 - [x] Table migration map exists for the legacy 37-table schema.
 - [x] Seed manifest/checker exists.
+- [x] Local QA fixture seed, gitignored token artifact, and local E2E runbook exist for Docker Postgres/FastAPI/Ops/Mobile verification.
 - [x] Shadow-read dry-run harness exists.
 - [x] Migration dry-run planner exists.
 - [ ] Production migration dry-run passes against staging data with checksums.

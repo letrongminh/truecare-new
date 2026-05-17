@@ -7,6 +7,13 @@ VENV_PY := $(VENV)/bin/python
 VENV_MARKER := $(VENV)/.installed
 LOCAL_DATABASE_URL := postgresql+asyncpg://truecare:truecare@127.0.0.1:55432/truecare
 LOCAL_DATABASE_URL_SYNC := postgresql://truecare:truecare@127.0.0.1:55432/truecare
+LOCAL_JWT_PRIVATE_JWK := $(CURDIR)/.local-jwt-signing-private.jwk.json
+LOCAL_QA_ARTIFACT := $(CURDIR)/.local-e2e.json
+LOCAL_API_BASE_URL ?= http://127.0.0.1:8000
+LOCAL_API_HOST ?= 127.0.0.1
+LOCAL_API_PORT ?= 8000
+LOCAL_OPS_HOST ?= 127.0.0.1
+LOCAL_OPS_PORT ?= 5173
 
 ## help — list available targets
 help:
@@ -94,3 +101,27 @@ api.integration: venv
 ## worker.once — run the worker skeleton once
 worker.once: venv
 	@cd apps/api && DATABASE_URL_DIRECT="$${DATABASE_URL_DIRECT:-$(LOCAL_DATABASE_URL)}" ../../$(VENV_PY) -m app.jobs.worker --once
+
+## local.jwt — create a stable local-only JWT signing key for API, fixtures, and smoke
+local.jwt: venv
+	@$(VENV_PY) scripts/local/ensure_jwt_key.py --out "$(LOCAL_JWT_PRIVATE_JWK)"
+
+## local.qa.fixtures — seed deterministic local personas and QA rows into Docker Postgres
+local.qa.fixtures: db.up db.migrate local.jwt
+	@DATABASE_URL_DIRECT="$${DATABASE_URL_DIRECT:-$(LOCAL_DATABASE_URL)}" JWT_SIGNING_PRIVATE_JWK="$(LOCAL_JWT_PRIVATE_JWK)" $(VENV_PY) scripts/local/qa_fixtures.py --out "$(LOCAL_QA_ARTIFACT)"
+
+## local.qa.smoke — run local in-process API smoke against deterministic QA fixtures
+local.qa.smoke: local.qa.fixtures
+	@DATABASE_URL_DIRECT="$${DATABASE_URL_DIRECT:-$(LOCAL_DATABASE_URL)}" JWT_SIGNING_PRIVATE_JWK="$(LOCAL_JWT_PRIVATE_JWK)" $(VENV_PY) scripts/local/qa_smoke.py --artifact "$(LOCAL_QA_ARTIFACT)"
+
+## local.api — run FastAPI locally with the same JWT key and Postgres as local QA
+local.api: db.up db.migrate local.jwt
+	@cd apps/api && DATABASE_URL_DIRECT="$${DATABASE_URL_DIRECT:-$(LOCAL_DATABASE_URL)}" JWT_SIGNING_PRIVATE_JWK="$(LOCAL_JWT_PRIVATE_JWK)" PUBLIC_API_BASE_URL="$(LOCAL_API_BASE_URL)" ../../$(VENV_PY) -m uvicorn app.main:app --reload --host "$(LOCAL_API_HOST)" --port "$(LOCAL_API_PORT)"
+
+## local.ops — run Ops web locally against local.api
+local.ops:
+	@VITE_API_BASE_URL="$(LOCAL_API_BASE_URL)" pnpm --filter @truecare/ops-web dev --host "$(LOCAL_OPS_HOST)" --port "$(LOCAL_OPS_PORT)"
+
+## local.mobile — run Expo mobile locally against local.api
+local.mobile:
+	@EXPO_PUBLIC_API_BASE_URL="$(LOCAL_API_BASE_URL)" pnpm --filter @truecare/mobile dev
