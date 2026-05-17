@@ -6,6 +6,11 @@ trap 'rm -f "$tmp"' EXIT
 
 find . -type f \
   -not -path './.git/*' \
+  -not -path './.venv/*' \
+  -not -path './node_modules/*' \
+  -not -path './.pytest_cache/*' \
+  -not -path '*/.pytest_cache/*' \
+  -not -path '*/__pycache__/*' \
   -not -name '*.swp' \
   -not -name '*.swo' \
   -print0 \

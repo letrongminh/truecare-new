@@ -1,0 +1,12 @@
+{
+  "name": "truecare-new",
+  "private": true,
+  "packageManager": "pnpm@10.14.0",
+  "scripts": {
+    "client:generate": "node scripts/codegen/generate-api-client.mjs packages/api-client/openapi.json packages/api-client/src/index.ts",
+    "typecheck": "pnpm -r typecheck"
+  },
+  "devDependencies": {
+    "typescript": "latest"
+  }
+}

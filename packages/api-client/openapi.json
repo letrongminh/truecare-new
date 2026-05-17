@@ -1,0 +1,3608 @@
+{
+  "components": {
+    "schemas": {
+      "AuthExistsRequest": {
+        "properties": {
+          "identifier": {
+            "maxLength": 320,
+            "minLength": 3,
+            "title": "Identifier",
+            "type": "string"
+          }
+        },
+        "required": [
+          "identifier"
+        ],
+        "title": "AuthExistsRequest",
+        "type": "object"
+      },
+      "AuthExistsResponse": {
+        "properties": {
+          "exists": {
+            "title": "Exists",
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "exists"
+        ],
+        "title": "AuthExistsResponse",
+        "type": "object"
+      },
+      "AuthMeResponse": {
+        "properties": {
+          "locale": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Locale"
+          },
+          "roles": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Roles",
+            "type": "array"
+          },
+          "tenant_id": {
+            "format": "uuid",
+            "title": "Tenant Id",
+            "type": "string"
+          },
+          "user_id": {
+            "format": "uuid",
+            "title": "User Id",
+            "type": "string"
+          }
+        },
+        "required": [
+          "user_id",
+          "tenant_id",
+          "roles"
+        ],
+        "title": "AuthMeResponse",
+        "type": "object"
+      },
+      "ErrorCode": {
+        "enum": [
+          "NOT_IMPLEMENTED",
+          "INTERNAL_ERROR",
+          "INVALID_CREDENTIALS",
+          "UNAUTHORIZED",
+          "FORBIDDEN",
+          "TOKEN_EXPIRED",
+          "TOKEN_REUSED",
+          "IDEMPOTENCY_MISMATCH",
+          "TENANT_CONTEXT_MISSING",
+          "DUPLICATE_IDENTITY"
+        ],
+        "title": "ErrorCode",
+        "type": "string"
+      },
+      "FlagsResponse": {
+        "properties": {
+          "flags": {
+            "additionalProperties": {
+              "type": "boolean"
+            },
+            "title": "Flags",
+            "type": "object"
+          }
+        },
+        "required": [
+          "flags"
+        ],
+        "title": "FlagsResponse",
+        "type": "object"
+      },
+      "HTTPValidationError": {
+        "properties": {
+          "detail": {
+            "items": {
+              "$ref": "#/components/schemas/ValidationError"
+            },
+            "title": "Detail",
+            "type": "array"
+          }
+        },
+        "title": "HTTPValidationError",
+        "type": "object"
+      },
+      "HealthResponse": {
+        "properties": {
+          "status": {
+            "title": "Status",
+            "type": "string"
+          }
+        },
+        "required": [
+          "status"
+        ],
+        "title": "HealthResponse",
+        "type": "object"
+      },
+      "LoginRequest": {
+        "properties": {
+          "identifier": {
+            "maxLength": 320,
+            "minLength": 3,
+            "title": "Identifier",
+            "type": "string"
+          },
+          "password": {
+            "maxLength": 256,
+            "minLength": 1,
+            "title": "Password",
+            "type": "string"
+          }
+        },
+        "required": [
+          "identifier",
+          "password"
+        ],
+        "title": "LoginRequest",
+        "type": "object"
+      },
+      "LogoutRequest": {
+        "properties": {
+          "refresh_token": {
+            "maxLength": 512,
+            "minLength": 24,
+            "title": "Refresh Token",
+            "type": "string"
+          }
+        },
+        "required": [
+          "refresh_token"
+        ],
+        "title": "LogoutRequest",
+        "type": "object"
+      },
+      "LogoutResponse": {
+        "properties": {
+          "revoked": {
+            "title": "Revoked",
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "revoked"
+        ],
+        "title": "LogoutResponse",
+        "type": "object"
+      },
+      "ProblemDetails": {
+        "properties": {
+          "clientAction": {
+            "title": "Clientaction",
+            "type": "string"
+          },
+          "code": {
+            "$ref": "#/components/schemas/ErrorCode"
+          },
+          "detail": {
+            "title": "Detail",
+            "type": "string"
+          },
+          "extra": {
+            "additionalProperties": true,
+            "title": "Extra",
+            "type": "object"
+          },
+          "requestId": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Requestid"
+          },
+          "retryable": {
+            "title": "Retryable",
+            "type": "boolean"
+          },
+          "status": {
+            "title": "Status",
+            "type": "integer"
+          },
+          "title": {
+            "title": "Title",
+            "type": "string"
+          },
+          "type": {
+            "title": "Type",
+            "type": "string"
+          }
+        },
+        "required": [
+          "type",
+          "title",
+          "status",
+          "detail",
+          "code",
+          "retryable",
+          "clientAction"
+        ],
+        "title": "ProblemDetails",
+        "type": "object"
+      },
+      "ReadyResponse": {
+        "properties": {
+          "checks": {
+            "additionalProperties": {
+              "type": "string"
+            },
+            "title": "Checks",
+            "type": "object"
+          },
+          "status": {
+            "title": "Status",
+            "type": "string"
+          }
+        },
+        "required": [
+          "status",
+          "checks"
+        ],
+        "title": "ReadyResponse",
+        "type": "object"
+      },
+      "RefreshRequest": {
+        "properties": {
+          "refresh_token": {
+            "maxLength": 512,
+            "minLength": 24,
+            "title": "Refresh Token",
+            "type": "string"
+          }
+        },
+        "required": [
+          "refresh_token"
+        ],
+        "title": "RefreshRequest",
+        "type": "object"
+      },
+      "SignupRequest": {
+        "properties": {
+          "display_name": {
+            "anyOf": [
+              {
+                "maxLength": 200,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Display Name"
+          },
+          "identifier": {
+            "maxLength": 320,
+            "minLength": 3,
+            "title": "Identifier",
+            "type": "string"
+          },
+          "invite_code": {
+            "anyOf": [
+              {
+                "maxLength": 64,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Invite Code"
+          },
+          "locale": {
+            "default": "vi",
+            "maxLength": 16,
+            "title": "Locale",
+            "type": "string"
+          },
+          "password": {
+            "maxLength": 256,
+            "minLength": 8,
+            "title": "Password",
+            "type": "string"
+          },
+          "referral_code": {
+            "anyOf": [
+              {
+                "maxLength": 64,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Referral Code"
+          }
+        },
+        "required": [
+          "identifier",
+          "password"
+        ],
+        "title": "SignupRequest",
+        "type": "object"
+      },
+      "TokenPair": {
+        "properties": {
+          "access_token": {
+            "title": "Access Token",
+            "type": "string"
+          },
+          "expires_in": {
+            "default": 900,
+            "title": "Expires In",
+            "type": "integer"
+          },
+          "refresh_token": {
+            "title": "Refresh Token",
+            "type": "string"
+          },
+          "token_type": {
+            "default": "bearer",
+            "title": "Token Type",
+            "type": "string"
+          }
+        },
+        "required": [
+          "access_token",
+          "refresh_token"
+        ],
+        "title": "TokenPair",
+        "type": "object"
+      },
+      "ValidationError": {
+        "properties": {
+          "ctx": {
+            "title": "Context",
+            "type": "object"
+          },
+          "input": {
+            "title": "Input"
+          },
+          "loc": {
+            "items": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "integer"
+                }
+              ]
+            },
+            "title": "Location",
+            "type": "array"
+          },
+          "msg": {
+            "title": "Message",
+            "type": "string"
+          },
+          "type": {
+            "title": "Error Type",
+            "type": "string"
+          }
+        },
+        "required": [
+          "loc",
+          "msg",
+          "type"
+        ],
+        "title": "ValidationError",
+        "type": "object"
+      },
+      "VersionCheckResponse": {
+        "properties": {
+          "app_store_url": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "App Store Url"
+          },
+          "latest_supported_build": {
+            "title": "Latest Supported Build",
+            "type": "integer"
+          },
+          "messages": {
+            "additionalProperties": {
+              "type": "string"
+            },
+            "title": "Messages",
+            "type": "object"
+          },
+          "minimum_supported_build": {
+            "title": "Minimum Supported Build",
+            "type": "integer"
+          },
+          "play_store_url": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Play Store Url"
+          },
+          "update_class": {
+            "title": "Update Class",
+            "type": "string"
+          }
+        },
+        "required": [
+          "minimum_supported_build",
+          "latest_supported_build",
+          "update_class",
+          "messages"
+        ],
+        "title": "VersionCheckResponse",
+        "type": "object"
+      }
+    },
+    "securitySchemes": {
+      "HTTPBearer": {
+        "scheme": "bearer",
+        "type": "http"
+      }
+    }
+  },
+  "info": {
+    "description": "Foundation OpenAPI contract for the TrueCare Python port.",
+    "title": "TrueCare API",
+    "version": "0.1.0"
+  },
+  "openapi": "3.1.0",
+  "paths": {
+    "/healthz": {
+      "get": {
+        "operationId": "getHealthz",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HealthResponse"
+                }
+              }
+            },
+            "description": "Successful Response"
+          }
+        },
+        "summary": "Healthz",
+        "tags": [
+          "platform"
+        ]
+      }
+    },
+    "/metrics": {
+      "get": {
+        "operationId": "getMetrics",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            },
+            "description": "Successful Response"
+          }
+        },
+        "summary": "Metrics",
+        "tags": [
+          "platform"
+        ]
+      }
+    },
+    "/readyz": {
+      "get": {
+        "operationId": "getReadyz",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ReadyResponse"
+                }
+              }
+            },
+            "description": "Successful Response"
+          }
+        },
+        "summary": "Readyz",
+        "tags": [
+          "platform"
+        ]
+      }
+    },
+    "/v1/app/version-check": {
+      "get": {
+        "operationId": "getVersionCheck",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/VersionCheckResponse"
+                }
+              }
+            },
+            "description": "Successful Response"
+          }
+        },
+        "summary": "Version Check",
+        "tags": [
+          "platform"
+        ]
+      }
+    },
+    "/v1/auth/exists": {
+      "post": {
+        "operationId": "post_v1_auth_exists",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AuthExistsRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AuthExistsResponse"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Exists",
+        "tags": [
+          "auth"
+        ]
+      }
+    },
+    "/v1/auth/forgot-password": {
+      "post": {
+        "operationId": "post_v1_auth_forgot_password",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            },
+            "description": "Successful Response"
+          },
+          "501": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            },
+            "description": "Contract stub not implemented yet"
+          }
+        },
+        "summary": "Create manual password reset request",
+        "tags": [
+          "auth"
+        ]
+      }
+    },
+    "/v1/auth/login": {
+      "post": {
+        "operationId": "post_v1_auth_login",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/LoginRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TokenPair"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Login",
+        "tags": [
+          "auth"
+        ]
+      }
+    },
+    "/v1/auth/logout": {
+      "post": {
+        "operationId": "post_v1_auth_logout",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/LogoutRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/LogoutResponse"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Logout",
+        "tags": [
+          "auth"
+        ]
+      }
+    },
+    "/v1/auth/logout-all": {
+      "post": {
+        "operationId": "post_v1_auth_logout_all",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/LogoutResponse"
+                }
+              }
+            },
+            "description": "Successful Response"
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "summary": "Logout All",
+        "tags": [
+          "auth"
+        ]
+      }
+    },
+    "/v1/auth/me": {
+      "get": {
+        "operationId": "get_v1_auth_me",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AuthMeResponse"
+                }
+              }
+            },
+            "description": "Successful Response"
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "summary": "Me",
+        "tags": [
+          "auth"
+        ]
+      }
+    },
+    "/v1/auth/refresh": {
+      "post": {
+        "operationId": "post_v1_auth_refresh",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RefreshRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TokenPair"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Refresh",
+        "tags": [
+          "auth"
+        ]
+      }
+    },
+    "/v1/auth/signup": {
+      "post": {
+        "operationId": "post_v1_auth_signup",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SignupRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TokenPair"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Signup",
+        "tags": [
+          "auth"
+        ]
+      }
+    },
+    "/v1/bookings": {
+      "get": {
+        "operationId": "get_v1_bookings",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            },
+            "description": "Successful Response"
+          },
+          "501": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            },
+            "description": "Contract stub not implemented yet"
+          }
+        },
+        "summary": "List bookings",
+        "tags": [
+          "bookings"
+        ]
+      }
+    },
+    "/v1/bookings/holds": {
+      "post": {
+        "operationId": "post_v1_bookings_holds",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            },
+            "description": "Successful Response"
+          },
+          "501": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            },
+            "description": "Contract stub not implemented yet"
+          }
+        },
+        "summary": "Create booking hold",
+        "tags": [
+          "bookings"
+        ]
+      }
+    },
+    "/v1/bookings/{id}": {
+      "get": {
+        "operationId": "get_v1_bookings_by_id",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            },
+            "description": "Successful Response"
+          },
+          "501": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            },
+            "description": "Contract stub not implemented yet"
+          }
+        },
+        "summary": "Get booking",
+        "tags": [
+          "bookings"
+        ]
+      }
+    },
+    "/v1/bookings/{id}/arrived": {
+      "post": {
+        "operationId": "post_v1_bookings_by_id_arrived",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            },
+            "description": "Successful Response"
+          },
+          "501": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            },
+            "description": "Contract stub not implemented yet"
+          }
+        },
+        "summary": "Mark booking arrived",
+        "tags": [
+          "bookings"
+        ]
+      }
+    },
+    "/v1/bookings/{id}/cancel": {
+      "post": {
+        "operationId": "post_v1_bookings_by_id_cancel",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            },
+            "description": "Successful Response"
+          },
+          "501": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            },
+            "description": "Contract stub not implemented yet"
+          }
+        },
+        "summary": "Cancel booking",
+        "tags": [
+          "bookings"
+        ]
+      }
+    },
+    "/v1/bookings/{id}/check-in": {
+      "post": {
+        "operationId": "post_v1_bookings_by_id_check_in",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            },
+            "description": "Successful Response"
+          },
+          "501": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            },
+            "description": "Contract stub not implemented yet"
+          }
+        },
+        "summary": "Merchant checks in booking",
+        "tags": [
+          "merchant"
+        ]
+      }
+    },
+    "/v1/bookings/{id}/complete-service": {
+      "post": {
+        "operationId": "post_v1_bookings_by_id_complete_service",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            },
+            "description": "Successful Response"
+          },
+          "501": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            },
+            "description": "Contract stub not implemented yet"
+          }
+        },
+        "summary": "Complete service",
+        "tags": [
+          "merchant"
+        ]
+      }
+    },
+    "/v1/bookings/{id}/rate": {
+      "post": {
+        "operationId": "post_v1_bookings_by_id_rate",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            },
+            "description": "Successful Response"
+          },
+          "501": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            },
+            "description": "Contract stub not implemented yet"
+          }
+        },
+        "summary": "Rate booking",
+        "tags": [
+          "bookings"
+        ]
+      }
+    },
+    "/v1/bookings/{id}/start-service": {
+      "post": {
+        "operationId": "post_v1_bookings_by_id_start_service",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            },
+            "description": "Successful Response"
+          },
+          "501": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            },
+            "description": "Contract stub not implemented yet"
+          }
+        },
+        "summary": "Start service",
+        "tags": [
+          "merchant"
+        ]
+      }
+    },
+    "/v1/complaints": {
+      "post": {
+        "operationId": "post_v1_complaints",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            },
+            "description": "Successful Response"
+          },
+          "501": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            },
+            "description": "Contract stub not implemented yet"
+          }
+        },
+        "summary": "Create complaint",
+        "tags": [
+          "complaints"
+        ]
+      }
+    },
+    "/v1/complaints/{id}": {
+      "get": {
+        "operationId": "get_v1_complaints_by_id",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            },
+            "description": "Successful Response"
+          },
+          "501": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            },
+            "description": "Contract stub not implemented yet"
+          }
+        },
+        "summary": "Get complaint",
+        "tags": [
+          "complaints"
+        ]
+      }
+    },
+    "/v1/evidence/{booking_id}": {
+      "get": {
+        "operationId": "get_v1_evidence_by_booking_id",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            },
+            "description": "Successful Response"
+          },
+          "501": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            },
+            "description": "Contract stub not implemented yet"
+          }
+        },
+        "summary": "List booking evidence",
+        "tags": [
+          "evidence"
+        ]
+      }
+    },
+    "/v1/evidence/{booking_id}/presign": {
+      "post": {
+        "operationId": "post_v1_evidence_by_booking_id_presign",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            },
+            "description": "Successful Response"
+          },
+          "501": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            },
+            "description": "Contract stub not implemented yet"
+          }
+        },
+        "summary": "Presign evidence upload",
+        "tags": [
+          "evidence"
+        ]
+      }
+    },
+    "/v1/evidence/{evidence_id}/confirm": {
+      "post": {
+        "operationId": "post_v1_evidence_by_evidence_id_confirm",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            },
+            "description": "Successful Response"
+          },
+          "501": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            },
+            "description": "Contract stub not implemented yet"
+          }
+        },
+        "summary": "Confirm evidence upload",
+        "tags": [
+          "evidence"
+        ]
+      }
+    },
+    "/v1/flags": {
+      "get": {
+        "operationId": "getFlags",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/FlagsResponse"
+                }
+              }
+            },
+            "description": "Successful Response"
+          }
+        },
+        "summary": "Flags",
+        "tags": [
+          "platform"
+        ]
+      }
+    },
+    "/v1/me/account": {
+      "delete": {
+        "operationId": "delete_v1_me_account",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            },
+            "description": "Successful Response"
+          },
+          "501": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            },
+            "description": "Contract stub not implemented yet"
+          }
+        },
+        "summary": "Request account deletion",
+        "tags": [
+          "me"
+        ]
+      }
+    },
+    "/v1/me/bookings": {
+      "get": {
+        "operationId": "get_v1_me_bookings",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            },
+            "description": "Successful Response"
+          },
+          "501": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            },
+            "description": "Contract stub not implemented yet"
+          }
+        },
+        "summary": "List my bookings",
+        "tags": [
+          "me"
+        ]
+      }
+    },
+    "/v1/me/cancel-delete": {
+      "post": {
+        "operationId": "post_v1_me_cancel_delete",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            },
+            "description": "Successful Response"
+          },
+          "501": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            },
+            "description": "Contract stub not implemented yet"
+          }
+        },
+        "summary": "Cancel account deletion",
+        "tags": [
+          "me"
+        ]
+      }
+    },
+    "/v1/me/data-export": {
+      "post": {
+        "operationId": "post_v1_me_data_export",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            },
+            "description": "Successful Response"
+          },
+          "501": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            },
+            "description": "Contract stub not implemented yet"
+          }
+        },
+        "summary": "Request my data export",
+        "tags": [
+          "me"
+        ]
+      }
+    },
+    "/v1/me/data-export/{job_id}": {
+      "get": {
+        "operationId": "get_v1_me_data_export_by_job_id",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            },
+            "description": "Successful Response"
+          },
+          "501": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            },
+            "description": "Contract stub not implemented yet"
+          }
+        },
+        "summary": "Get my data export status",
+        "tags": [
+          "me"
+        ]
+      }
+    },
+    "/v1/me/notifications/preferences": {
+      "get": {
+        "operationId": "get_v1_me_notifications_preferences",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            },
+            "description": "Successful Response"
+          },
+          "501": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            },
+            "description": "Contract stub not implemented yet"
+          }
+        },
+        "summary": "Get notification preferences",
+        "tags": [
+          "me"
+        ]
+      },
+      "patch": {
+        "operationId": "patch_v1_me_notifications_preferences",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            },
+            "description": "Successful Response"
+          },
+          "501": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            },
+            "description": "Contract stub not implemented yet"
+          }
+        },
+        "summary": "Update notification preferences",
+        "tags": [
+          "me"
+        ]
+      }
+    },
+    "/v1/me/notifications/register": {
+      "post": {
+        "operationId": "post_v1_me_notifications_register",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            },
+            "description": "Successful Response"
+          },
+          "501": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            },
+            "description": "Contract stub not implemented yet"
+          }
+        },
+        "summary": "Register notification token",
+        "tags": [
+          "me"
+        ]
+      }
+    },
+    "/v1/me/password": {
+      "post": {
+        "operationId": "post_v1_me_password",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            },
+            "description": "Successful Response"
+          },
+          "501": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            },
+            "description": "Contract stub not implemented yet"
+          }
+        },
+        "summary": "Change password",
+        "tags": [
+          "me"
+        ]
+      }
+    },
+    "/v1/me/profile": {
+      "get": {
+        "operationId": "get_v1_me_profile",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            },
+            "description": "Successful Response"
+          },
+          "501": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            },
+            "description": "Contract stub not implemented yet"
+          }
+        },
+        "summary": "Get my profile",
+        "tags": [
+          "me"
+        ]
+      },
+      "patch": {
+        "operationId": "patch_v1_me_profile",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            },
+            "description": "Successful Response"
+          },
+          "501": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            },
+            "description": "Contract stub not implemented yet"
+          }
+        },
+        "summary": "Update my profile",
+        "tags": [
+          "me"
+        ]
+      }
+    },
+    "/v1/me/sessions": {
+      "get": {
+        "operationId": "get_v1_me_sessions",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            },
+            "description": "Successful Response"
+          },
+          "501": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            },
+            "description": "Contract stub not implemented yet"
+          }
+        },
+        "summary": "List sessions",
+        "tags": [
+          "me"
+        ]
+      }
+    },
+    "/v1/me/sessions/{id}": {
+      "delete": {
+        "operationId": "delete_v1_me_sessions_by_id",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            },
+            "description": "Successful Response"
+          },
+          "501": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            },
+            "description": "Contract stub not implemented yet"
+          }
+        },
+        "summary": "Revoke session",
+        "tags": [
+          "me"
+        ]
+      }
+    },
+    "/v1/me/vehicles": {
+      "get": {
+        "operationId": "get_v1_me_vehicles",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            },
+            "description": "Successful Response"
+          },
+          "501": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            },
+            "description": "Contract stub not implemented yet"
+          }
+        },
+        "summary": "List my vehicles",
+        "tags": [
+          "me"
+        ]
+      },
+      "post": {
+        "operationId": "post_v1_me_vehicles",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            },
+            "description": "Successful Response"
+          },
+          "501": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            },
+            "description": "Contract stub not implemented yet"
+          }
+        },
+        "summary": "Create my vehicle",
+        "tags": [
+          "me"
+        ]
+      }
+    },
+    "/v1/me/vehicles/{id}": {
+      "patch": {
+        "operationId": "patch_v1_me_vehicles_by_id",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            },
+            "description": "Successful Response"
+          },
+          "501": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            },
+            "description": "Contract stub not implemented yet"
+          }
+        },
+        "summary": "Update my vehicle",
+        "tags": [
+          "me"
+        ]
+      }
+    },
+    "/v1/merchant-services": {
+      "post": {
+        "operationId": "post_v1_merchant_services",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            },
+            "description": "Successful Response"
+          },
+          "501": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            },
+            "description": "Contract stub not implemented yet"
+          }
+        },
+        "summary": "Create merchant service",
+        "tags": [
+          "merchant-services"
+        ]
+      }
+    },
+    "/v1/merchant-services/custom": {
+      "post": {
+        "operationId": "post_v1_merchant_services_custom",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            },
+            "description": "Successful Response"
+          },
+          "501": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            },
+            "description": "Contract stub not implemented yet"
+          }
+        },
+        "summary": "Create custom merchant service",
+        "tags": [
+          "merchant-services"
+        ]
+      }
+    },
+    "/v1/merchant-services/{id}": {
+      "patch": {
+        "operationId": "patch_v1_merchant_services_by_id",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            },
+            "description": "Successful Response"
+          },
+          "501": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            },
+            "description": "Contract stub not implemented yet"
+          }
+        },
+        "summary": "Update merchant service",
+        "tags": [
+          "merchant-services"
+        ]
+      }
+    },
+    "/v1/merchant-services/{id}/price-history": {
+      "get": {
+        "operationId": "get_v1_merchant_services_by_id_price_history",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            },
+            "description": "Successful Response"
+          },
+          "501": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            },
+            "description": "Contract stub not implemented yet"
+          }
+        },
+        "summary": "Get merchant service price history",
+        "tags": [
+          "merchant-services"
+        ]
+      }
+    },
+    "/v1/merchant-services/{id}/resubmit": {
+      "post": {
+        "operationId": "post_v1_merchant_services_by_id_resubmit",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            },
+            "description": "Successful Response"
+          },
+          "501": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            },
+            "description": "Contract stub not implemented yet"
+          }
+        },
+        "summary": "Resubmit merchant service",
+        "tags": [
+          "merchant-services"
+        ]
+      }
+    },
+    "/v1/merchants/applications": {
+      "post": {
+        "operationId": "post_v1_merchants_applications",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            },
+            "description": "Successful Response"
+          },
+          "501": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            },
+            "description": "Contract stub not implemented yet"
+          }
+        },
+        "summary": "Create merchant application",
+        "tags": [
+          "merchant"
+        ]
+      }
+    },
+    "/v1/merchants/nearby": {
+      "get": {
+        "operationId": "get_v1_merchants_nearby",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            },
+            "description": "Successful Response"
+          },
+          "501": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            },
+            "description": "Contract stub not implemented yet"
+          }
+        },
+        "summary": "List nearby merchants",
+        "tags": [
+          "merchants"
+        ]
+      }
+    },
+    "/v1/merchants/{id}": {
+      "get": {
+        "operationId": "get_v1_merchants_by_id",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            },
+            "description": "Successful Response"
+          },
+          "501": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            },
+            "description": "Contract stub not implemented yet"
+          }
+        },
+        "summary": "Get merchant",
+        "tags": [
+          "merchants"
+        ]
+      }
+    },
+    "/v1/merchants/{id}/bays": {
+      "get": {
+        "operationId": "get_v1_merchants_by_id_bays",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            },
+            "description": "Successful Response"
+          },
+          "501": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            },
+            "description": "Contract stub not implemented yet"
+          }
+        },
+        "summary": "List merchant bays",
+        "tags": [
+          "merchants"
+        ]
+      }
+    },
+    "/v1/merchants/{id}/calendar": {
+      "get": {
+        "operationId": "get_v1_merchants_by_id_calendar",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            },
+            "description": "Successful Response"
+          },
+          "501": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            },
+            "description": "Contract stub not implemented yet"
+          }
+        },
+        "summary": "Get merchant calendar",
+        "tags": [
+          "merchant"
+        ]
+      }
+    },
+    "/v1/merchants/{id}/calendar/maintenance": {
+      "post": {
+        "operationId": "post_v1_merchants_by_id_calendar_maintenance",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            },
+            "description": "Successful Response"
+          },
+          "501": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            },
+            "description": "Contract stub not implemented yet"
+          }
+        },
+        "summary": "Create merchant maintenance window",
+        "tags": [
+          "merchant"
+        ]
+      }
+    },
+    "/v1/merchants/{id}/confirm-photo": {
+      "post": {
+        "operationId": "post_v1_merchants_by_id_confirm_photo",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            },
+            "description": "Successful Response"
+          },
+          "501": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            },
+            "description": "Contract stub not implemented yet"
+          }
+        },
+        "summary": "Confirm merchant photo",
+        "tags": [
+          "merchant"
+        ]
+      }
+    },
+    "/v1/merchants/{id}/daily-summary": {
+      "get": {
+        "operationId": "get_v1_merchants_by_id_daily_summary",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            },
+            "description": "Successful Response"
+          },
+          "501": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            },
+            "description": "Contract stub not implemented yet"
+          }
+        },
+        "summary": "Get merchant daily summary",
+        "tags": [
+          "merchant"
+        ]
+      }
+    },
+    "/v1/merchants/{id}/daily-summary.csv": {
+      "get": {
+        "operationId": "get_v1_merchants_by_id_daily_summary_csv",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            },
+            "description": "Successful Response"
+          },
+          "501": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            },
+            "description": "Contract stub not implemented yet"
+          }
+        },
+        "summary": "Export merchant daily summary CSV",
+        "tags": [
+          "merchant"
+        ]
+      }
+    },
+    "/v1/merchants/{id}/ekyc/bank": {
+      "post": {
+        "operationId": "post_v1_merchants_by_id_ekyc_bank",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            },
+            "description": "Successful Response"
+          },
+          "501": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            },
+            "description": "Contract stub not implemented yet"
+          }
+        },
+        "summary": "Upload merchant bank evidence",
+        "tags": [
+          "merchant-ekyc"
+        ]
+      }
+    },
+    "/v1/merchants/{id}/ekyc/cmnd": {
+      "post": {
+        "operationId": "post_v1_merchants_by_id_ekyc_cmnd",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            },
+            "description": "Successful Response"
+          },
+          "501": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            },
+            "description": "Contract stub not implemented yet"
+          }
+        },
+        "summary": "Upload merchant CMND",
+        "tags": [
+          "merchant-ekyc"
+        ]
+      }
+    },
+    "/v1/merchants/{id}/ekyc/selfie": {
+      "post": {
+        "operationId": "post_v1_merchants_by_id_ekyc_selfie",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            },
+            "description": "Successful Response"
+          },
+          "501": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            },
+            "description": "Contract stub not implemented yet"
+          }
+        },
+        "summary": "Upload merchant selfie",
+        "tags": [
+          "merchant-ekyc"
+        ]
+      }
+    },
+    "/v1/merchants/{id}/ekyc/status": {
+      "get": {
+        "operationId": "get_v1_merchants_by_id_ekyc_status",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            },
+            "description": "Successful Response"
+          },
+          "501": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            },
+            "description": "Contract stub not implemented yet"
+          }
+        },
+        "summary": "Get merchant eKYC status",
+        "tags": [
+          "merchant-ekyc"
+        ]
+      }
+    },
+    "/v1/merchants/{id}/golden-hour": {
+      "get": {
+        "operationId": "get_v1_merchants_by_id_golden_hour",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            },
+            "description": "Successful Response"
+          },
+          "501": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            },
+            "description": "Contract stub not implemented yet"
+          }
+        },
+        "summary": "Get merchant golden hour",
+        "tags": [
+          "merchant"
+        ]
+      },
+      "put": {
+        "operationId": "put_v1_merchants_by_id_golden_hour",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            },
+            "description": "Successful Response"
+          },
+          "501": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            },
+            "description": "Contract stub not implemented yet"
+          }
+        },
+        "summary": "Update merchant golden hour",
+        "tags": [
+          "merchant"
+        ]
+      }
+    },
+    "/v1/merchants/{id}/payment-setup": {
+      "post": {
+        "operationId": "post_v1_merchants_by_id_payment_setup",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            },
+            "description": "Successful Response"
+          },
+          "501": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            },
+            "description": "Contract stub not implemented yet"
+          }
+        },
+        "summary": "Submit merchant payment setup",
+        "tags": [
+          "merchant"
+        ]
+      }
+    },
+    "/v1/merchants/{id}/queue": {
+      "get": {
+        "operationId": "get_v1_merchants_by_id_queue",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            },
+            "description": "Successful Response"
+          },
+          "501": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            },
+            "description": "Contract stub not implemented yet"
+          }
+        },
+        "summary": "Get merchant queue",
+        "tags": [
+          "merchant"
+        ]
+      }
+    },
+    "/v1/merchants/{id}/services": {
+      "get": {
+        "operationId": "get_v1_merchants_by_id_services",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            },
+            "description": "Successful Response"
+          },
+          "501": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            },
+            "description": "Contract stub not implemented yet"
+          }
+        },
+        "summary": "List merchant services",
+        "tags": [
+          "merchants"
+        ]
+      }
+    },
+    "/v1/ops/audit-log": {
+      "get": {
+        "operationId": "get_v1_ops_audit_log",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            },
+            "description": "Successful Response"
+          },
+          "501": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            },
+            "description": "Contract stub not implemented yet"
+          }
+        },
+        "summary": "List audit log",
+        "tags": [
+          "ops"
+        ]
+      }
+    },
+    "/v1/ops/bookings": {
+      "post": {
+        "operationId": "post_v1_ops_bookings",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            },
+            "description": "Successful Response"
+          },
+          "501": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            },
+            "description": "Contract stub not implemented yet"
+          }
+        },
+        "summary": "Create ops booking",
+        "tags": [
+          "ops"
+        ]
+      }
+    },
+    "/v1/ops/bookings/{id}/check-in": {
+      "post": {
+        "operationId": "post_v1_ops_bookings_by_id_check_in",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            },
+            "description": "Successful Response"
+          },
+          "501": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            },
+            "description": "Contract stub not implemented yet"
+          }
+        },
+        "summary": "Ops checks in booking",
+        "tags": [
+          "ops"
+        ]
+      }
+    },
+    "/v1/ops/commission-receivables": {
+      "get": {
+        "operationId": "get_v1_ops_commission_receivables",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            },
+            "description": "Successful Response"
+          },
+          "501": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            },
+            "description": "Contract stub not implemented yet"
+          }
+        },
+        "summary": "List commission receivables",
+        "tags": [
+          "ops"
+        ]
+      }
+    },
+    "/v1/ops/complaints": {
+      "get": {
+        "operationId": "get_v1_ops_complaints",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            },
+            "description": "Successful Response"
+          },
+          "501": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            },
+            "description": "Contract stub not implemented yet"
+          }
+        },
+        "summary": "List ops complaints",
+        "tags": [
+          "ops"
+        ]
+      }
+    },
+    "/v1/ops/complaints/{id}": {
+      "patch": {
+        "operationId": "patch_v1_ops_complaints_by_id",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            },
+            "description": "Successful Response"
+          },
+          "501": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            },
+            "description": "Contract stub not implemented yet"
+          }
+        },
+        "summary": "Update ops complaint",
+        "tags": [
+          "ops"
+        ]
+      }
+    },
+    "/v1/ops/data-room/{section}": {
+      "get": {
+        "operationId": "get_v1_ops_data_room_by_section",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            },
+            "description": "Successful Response"
+          },
+          "501": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            },
+            "description": "Contract stub not implemented yet"
+          }
+        },
+        "summary": "Get ops data room section",
+        "tags": [
+          "ops"
+        ]
+      }
+    },
+    "/v1/ops/evidence/upload": {
+      "post": {
+        "operationId": "post_v1_ops_evidence_upload",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            },
+            "description": "Successful Response"
+          },
+          "501": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            },
+            "description": "Contract stub not implemented yet"
+          }
+        },
+        "summary": "Ops uploads evidence",
+        "tags": [
+          "ops"
+        ]
+      }
+    },
+    "/v1/ops/exports": {
+      "post": {
+        "operationId": "post_v1_ops_exports",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            },
+            "description": "Successful Response"
+          },
+          "501": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            },
+            "description": "Contract stub not implemented yet"
+          }
+        },
+        "summary": "Create ops export",
+        "tags": [
+          "ops"
+        ]
+      }
+    },
+    "/v1/ops/exports/{job_id}": {
+      "get": {
+        "operationId": "get_v1_ops_exports_by_job_id",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            },
+            "description": "Successful Response"
+          },
+          "501": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            },
+            "description": "Contract stub not implemented yet"
+          }
+        },
+        "summary": "Get ops export",
+        "tags": [
+          "ops"
+        ]
+      }
+    },
+    "/v1/ops/merchant-services/{id}/approve": {
+      "post": {
+        "operationId": "post_v1_ops_merchant_services_by_id_approve",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            },
+            "description": "Successful Response"
+          },
+          "501": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            },
+            "description": "Contract stub not implemented yet"
+          }
+        },
+        "summary": "Approve merchant service",
+        "tags": [
+          "ops"
+        ]
+      }
+    },
+    "/v1/ops/merchant-services/{id}/reject": {
+      "post": {
+        "operationId": "post_v1_ops_merchant_services_by_id_reject",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            },
+            "description": "Successful Response"
+          },
+          "501": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            },
+            "description": "Contract stub not implemented yet"
+          }
+        },
+        "summary": "Reject merchant service",
+        "tags": [
+          "ops"
+        ]
+      }
+    },
+    "/v1/ops/merchants/pending": {
+      "get": {
+        "operationId": "get_v1_ops_merchants_pending",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            },
+            "description": "Successful Response"
+          },
+          "501": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            },
+            "description": "Contract stub not implemented yet"
+          }
+        },
+        "summary": "List pending merchants",
+        "tags": [
+          "ops"
+        ]
+      }
+    },
+    "/v1/ops/merchants/{id}/approve": {
+      "post": {
+        "operationId": "post_v1_ops_merchants_by_id_approve",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            },
+            "description": "Successful Response"
+          },
+          "501": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            },
+            "description": "Contract stub not implemented yet"
+          }
+        },
+        "summary": "Approve merchant",
+        "tags": [
+          "ops"
+        ]
+      }
+    },
+    "/v1/ops/merchants/{id}/reject": {
+      "post": {
+        "operationId": "post_v1_ops_merchants_by_id_reject",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            },
+            "description": "Successful Response"
+          },
+          "501": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            },
+            "description": "Contract stub not implemented yet"
+          }
+        },
+        "summary": "Reject merchant",
+        "tags": [
+          "ops"
+        ]
+      }
+    },
+    "/v1/ops/merchants/{id}/suspend": {
+      "post": {
+        "operationId": "post_v1_ops_merchants_by_id_suspend",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            },
+            "description": "Successful Response"
+          },
+          "501": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            },
+            "description": "Contract stub not implemented yet"
+          }
+        },
+        "summary": "Suspend merchant",
+        "tags": [
+          "ops"
+        ]
+      }
+    },
+    "/v1/ops/merchants/{id}/verify-payment-recipient": {
+      "post": {
+        "operationId": "post_v1_ops_merchants_by_id_verify_payment_recipient",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            },
+            "description": "Successful Response"
+          },
+          "501": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            },
+            "description": "Contract stub not implemented yet"
+          }
+        },
+        "summary": "Verify merchant payment recipient",
+        "tags": [
+          "ops"
+        ]
+      }
+    },
+    "/v1/ops/payments/{id}/confirm": {
+      "post": {
+        "operationId": "post_v1_ops_payments_by_id_confirm",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            },
+            "description": "Successful Response"
+          },
+          "501": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            },
+            "description": "Contract stub not implemented yet"
+          }
+        },
+        "summary": "Ops confirms payment",
+        "tags": [
+          "ops"
+        ]
+      }
+    },
+    "/v1/ops/promo-codes": {
+      "post": {
+        "operationId": "post_v1_ops_promo_codes",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            },
+            "description": "Successful Response"
+          },
+          "501": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            },
+            "description": "Contract stub not implemented yet"
+          }
+        },
+        "summary": "Create ops promo code",
+        "tags": [
+          "ops"
+        ]
+      }
+    },
+    "/v1/ops/reward/voucher": {
+      "post": {
+        "operationId": "post_v1_ops_reward_voucher",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            },
+            "description": "Successful Response"
+          },
+          "501": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            },
+            "description": "Contract stub not implemented yet"
+          }
+        },
+        "summary": "Mint reward voucher",
+        "tags": [
+          "ops"
+        ]
+      }
+    },
+    "/v1/ops/users": {
+      "get": {
+        "operationId": "get_v1_ops_users",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            },
+            "description": "Successful Response"
+          },
+          "501": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            },
+            "description": "Contract stub not implemented yet"
+          }
+        },
+        "summary": "List ops users",
+        "tags": [
+          "ops"
+        ]
+      },
+      "post": {
+        "operationId": "post_v1_ops_users",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            },
+            "description": "Successful Response"
+          },
+          "501": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            },
+            "description": "Contract stub not implemented yet"
+          }
+        },
+        "summary": "Create ops user",
+        "tags": [
+          "ops"
+        ]
+      }
+    },
+    "/v1/ops/users/{id}/reset-password": {
+      "post": {
+        "operationId": "post_v1_ops_users_by_id_reset_password",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            },
+            "description": "Successful Response"
+          },
+          "501": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            },
+            "description": "Contract stub not implemented yet"
+          }
+        },
+        "summary": "Reset user password",
+        "tags": [
+          "ops"
+        ]
+      }
+    },
+    "/v1/payments/initiate": {
+      "post": {
+        "operationId": "post_v1_payments_initiate",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            },
+            "description": "Successful Response"
+          },
+          "501": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            },
+            "description": "Contract stub not implemented yet"
+          }
+        },
+        "summary": "Initiate payment",
+        "tags": [
+          "payments"
+        ]
+      }
+    },
+    "/v1/payments/{id}": {
+      "get": {
+        "operationId": "get_v1_payments_by_id",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            },
+            "description": "Successful Response"
+          },
+          "501": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            },
+            "description": "Contract stub not implemented yet"
+          }
+        },
+        "summary": "Get payment",
+        "tags": [
+          "payments"
+        ]
+      }
+    },
+    "/v1/payments/{id}/cash-record": {
+      "post": {
+        "operationId": "post_v1_payments_by_id_cash_record",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            },
+            "description": "Successful Response"
+          },
+          "501": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            },
+            "description": "Contract stub not implemented yet"
+          }
+        },
+        "summary": "Record cash payment",
+        "tags": [
+          "payments"
+        ]
+      }
+    },
+    "/v1/payments/{id}/merchant-confirmed": {
+      "post": {
+        "operationId": "post_v1_payments_by_id_merchant_confirmed",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            },
+            "description": "Successful Response"
+          },
+          "501": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            },
+            "description": "Contract stub not implemented yet"
+          }
+        },
+        "summary": "Merchant confirms payment",
+        "tags": [
+          "payments"
+        ]
+      }
+    },
+    "/v1/payments/{id}/merchant-denied": {
+      "post": {
+        "operationId": "post_v1_payments_by_id_merchant_denied",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            },
+            "description": "Successful Response"
+          },
+          "501": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            },
+            "description": "Contract stub not implemented yet"
+          }
+        },
+        "summary": "Merchant denies payment",
+        "tags": [
+          "payments"
+        ]
+      }
+    },
+    "/v1/payments/{id}/switch-method": {
+      "post": {
+        "operationId": "post_v1_payments_by_id_switch_method",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            },
+            "description": "Successful Response"
+          },
+          "501": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            },
+            "description": "Contract stub not implemented yet"
+          }
+        },
+        "summary": "Switch payment method",
+        "tags": [
+          "payments"
+        ]
+      }
+    },
+    "/v1/payments/{id}/user-claimed": {
+      "post": {
+        "operationId": "post_v1_payments_by_id_user_claimed",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            },
+            "description": "Successful Response"
+          },
+          "501": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            },
+            "description": "Contract stub not implemented yet"
+          }
+        },
+        "summary": "Mark payment user claimed",
+        "tags": [
+          "payments"
+        ]
+      }
+    },
+    "/v1/promo-codes/user": {
+      "get": {
+        "operationId": "get_v1_promo_codes_user",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            },
+            "description": "Successful Response"
+          },
+          "501": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            },
+            "description": "Contract stub not implemented yet"
+          }
+        },
+        "summary": "List user promo codes",
+        "tags": [
+          "promo"
+        ]
+      }
+    },
+    "/v1/promo-codes/validate": {
+      "post": {
+        "operationId": "post_v1_promo_codes_validate",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            },
+            "description": "Successful Response"
+          },
+          "501": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            },
+            "description": "Contract stub not implemented yet"
+          }
+        },
+        "summary": "Validate promo code",
+        "tags": [
+          "promo"
+        ]
+      }
+    },
+    "/v1/realtime/token": {
+      "post": {
+        "operationId": "post_v1_realtime_token",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            },
+            "description": "Successful Response"
+          },
+          "501": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            },
+            "description": "Contract stub not implemented yet"
+          }
+        },
+        "summary": "Create realtime token",
+        "tags": [
+          "realtime"
+        ]
+      }
+    },
+    "/v1/referrals/me": {
+      "get": {
+        "operationId": "get_v1_referrals_me",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            },
+            "description": "Successful Response"
+          },
+          "501": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            },
+            "description": "Contract stub not implemented yet"
+          }
+        },
+        "summary": "Get referral state",
+        "tags": [
+          "referrals"
+        ]
+      }
+    },
+    "/v1/referrals/share-event": {
+      "post": {
+        "operationId": "post_v1_referrals_share_event",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            },
+            "description": "Successful Response"
+          },
+          "501": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            },
+            "description": "Contract stub not implemented yet"
+          }
+        },
+        "summary": "Record referral share event",
+        "tags": [
+          "referrals"
+        ]
+      }
+    },
+    "/v1/rewards/progress": {
+      "get": {
+        "operationId": "get_v1_rewards_progress",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            },
+            "description": "Successful Response"
+          },
+          "501": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            },
+            "description": "Contract stub not implemented yet"
+          }
+        },
+        "summary": "Get reward progress",
+        "tags": [
+          "rewards"
+        ]
+      }
+    },
+    "/v1/rewards/vouchers": {
+      "get": {
+        "operationId": "get_v1_rewards_vouchers",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            },
+            "description": "Successful Response"
+          },
+          "501": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            },
+            "description": "Contract stub not implemented yet"
+          }
+        },
+        "summary": "List reward vouchers",
+        "tags": [
+          "rewards"
+        ]
+      }
+    },
+    "/v1/rewards/vouchers/{id}/redeem": {
+      "post": {
+        "operationId": "post_v1_rewards_vouchers_by_id_redeem",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            },
+            "description": "Successful Response"
+          },
+          "501": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            },
+            "description": "Contract stub not implemented yet"
+          }
+        },
+        "summary": "Redeem voucher",
+        "tags": [
+          "rewards"
+        ]
+      }
+    },
+    "/v1/rewards/vouchers/{id}/release": {
+      "post": {
+        "operationId": "post_v1_rewards_vouchers_by_id_release",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            },
+            "description": "Successful Response"
+          },
+          "501": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            },
+            "description": "Contract stub not implemented yet"
+          }
+        },
+        "summary": "Release voucher",
+        "tags": [
+          "rewards"
+        ]
+      }
+    },
+    "/v1/rewards/vouchers/{id}/reserve": {
+      "post": {
+        "operationId": "post_v1_rewards_vouchers_by_id_reserve",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            },
+            "description": "Successful Response"
+          },
+          "501": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            },
+            "description": "Contract stub not implemented yet"
+          }
+        },
+        "summary": "Reserve voucher",
+        "tags": [
+          "rewards"
+        ]
+      }
+    },
+    "/v1/search": {
+      "get": {
+        "operationId": "get_v1_search",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            },
+            "description": "Successful Response"
+          },
+          "501": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            },
+            "description": "Contract stub not implemented yet"
+          }
+        },
+        "summary": "Search merchants",
+        "tags": [
+          "search"
+        ]
+      }
+    },
+    "/v1/service-templates": {
+      "get": {
+        "operationId": "get_v1_service_templates",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            },
+            "description": "Successful Response"
+          },
+          "501": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            },
+            "description": "Contract stub not implemented yet"
+          }
+        },
+        "summary": "List service templates",
+        "tags": [
+          "search"
+        ]
+      }
+    }
+  }
+}

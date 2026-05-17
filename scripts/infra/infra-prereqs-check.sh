@@ -2,7 +2,7 @@
 set -euo pipefail
 
 missing=()
-for bin in node pnpm uv psql supabase jq curl git; do
+for bin in node python3 corepack supabase curl git; do
   if ! command -v "$bin" >/dev/null 2>&1; then
     missing+=("$bin")
   fi
@@ -29,7 +29,11 @@ case "$remote" in
 esac
 
 warnings=()
-for optional in docker aws ssh gh eas; do
+if ! command -v pnpm >/dev/null 2>&1; then
+  warnings+=("pnpm shim not enabled; corepack is available")
+fi
+
+for optional in psql jq uv docker aws ssh gh eas; do
   if ! command -v "$optional" >/dev/null 2>&1; then
     warnings+=("$optional")
   fi

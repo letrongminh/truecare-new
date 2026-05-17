@@ -53,13 +53,16 @@ Required accounts:
 Required local CLIs:
 
 - `node`
-- `pnpm`
-- `uv`
-- `psql`
+- `corepack` for `pnpm`
+- `python3` with local `.venv` package installs
 - `supabase`
-- `jq`
 - `curl`
 - `git`
+
+Required for Supabase readiness checks:
+
+- `psql`
+- `jq`
 
 Optional local tools for later:
 
@@ -68,6 +71,7 @@ Optional local tools for later:
 - `ssh` for future EC2 deploy.
 - `gh` for GitHub admin work.
 - `eas` for mobile release setup.
+- `uv` if the team later wants faster Python package installs than venv/pip.
 
 Run:
 

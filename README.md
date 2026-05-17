@@ -9,6 +9,26 @@ Start here:
 - `knowledge/02-business/` contains the retained business proposal context.
 - `knowledge/INDEX.md` records every copied artifact, original source path, destination path, and purpose.
 - `INFRA.md` is the single minimal infrastructure plan for local porting with Supabase.
-- `Makefile` exposes readiness gates: `infra-prereqs.check`, `supabase-readiness.check`, and `secret-leak.check`.
+- `apps/api` contains the FastAPI foundation scaffold and OpenAPI contract stubs.
+- `apps/mobile` contains the Expo Router shell.
+- `apps/ops-web` contains the Vite React Ops shell.
+- `packages/api-client` contains the generated TypeScript API client.
+- `docs/migration-map-v1.md` maps the 37 legacy schema tables into the Python port.
+- `Makefile` exposes readiness gates and local scaffold commands.
 
 All retained source documents were copied, not moved.
+
+Useful commands:
+
+```bash
+make infra-prereqs.check
+make secret-leak.check
+make route-test-matrix.check
+make db.up
+make db.migrate
+make api.test
+make api.integration
+make api.openapi
+make client.generate
+make worker.once
+```

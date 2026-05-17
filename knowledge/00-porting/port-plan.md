@@ -1475,142 +1475,178 @@ Distribution rules:
 
 ## 21. Implementation Phases
 
+Status last updated: 2026-05-17.
+
+Completed slices:
+- [x] Foundation scaffold: FastAPI API, Expo shell, Ops web shell, OpenAPI export, generated TypeScript client, migration map, route-test-matrix gate, and local Makefile gates.
+- [x] Backend foundation POC: SQLAlchemy async session, Alembic baseline, auth signup/login/refresh/logout/me, RBAC dependencies, tenant context, RLS proof table, idempotency service, domain events repository, worker drain skeleton, and local Docker Postgres commands.
+
+Current verification:
+- [x] `make infra-prereqs.check`
+- [x] `make secret-leak.check`
+- [x] `make route-test-matrix.check`
+- [x] `make db.up`
+- [x] `make db.migrate`
+- [x] `make api.test`
+- [x] `make api.integration`
+- [x] `make client.generate`
+- [x] `make worker.once`
+- [ ] `make supabase-readiness.check` after real Supabase credentials, `psql`, and `jq` are available.
+- [ ] JavaScript workspace install/typecheck after `pnpm` is enabled.
+
 ### Phase 0 - Production Design Freeze
 
 Duration: 5-7 days.
 
 Deliverables:
-- OpenAPI v1 contract and generated clients.
-- Route manifest and testID convention.
-- UI system decision and shell primitives.
-- Auth/RBAC/RLS/rate-limit spec.
-- Booking concurrency spike.
-- Offline/evidence queue spike.
-- Realtime private channel policy spike.
-- Migration map and seed plan.
-- Test infrastructure skeleton.
+- [x] OpenAPI v1 contract skeleton and generated clients.
+- [x] Route manifest and testID convention via `knowledge/00-porting/route-test-matrix-v1.md`.
+- [x] UI system decision and shell primitives for Expo and Ops web shells.
+- [x] Auth/RBAC/RLS spec and proof-of-concept implementation.
+- [ ] Rate-limit spec implementation.
+- [ ] Booking concurrency spike.
+- [ ] Offline/evidence queue spike.
+- [ ] Realtime private channel policy spike.
+- [x] Migration map for legacy 37-table schema.
+- [ ] Seed plan.
+- [x] Test infrastructure skeleton for API unit/integration gates.
 
 Exit gate:
-- No unresolved TODO remains for runner choice, UI library, RLS stance, or route manifest.
+- [x] Runner choice, UI library, RLS stance, and route manifest are no longer blocked for the first scaffold.
+- [ ] Booking, evidence, realtime, seed, and production rate-limit spikes remain before Phase 0 is fully closed.
 
 ### Phase 1 - Backend Foundation
 
 Duration: 1.5-2 weeks.
 
 Build:
-- FastAPI skeleton.
-- Alembic baseline.
-- SQLAlchemy async engine/session.
-- Request ID, error envelope, logging.
-- Auth with refresh rotation.
-- RBAC dependencies.
-- RLS tenant context.
-- Rate limiter.
-- Idempotency service.
-- Domain events table and worker skeleton.
-- Health/readiness/metrics endpoints.
+- [x] FastAPI skeleton.
+- [x] Alembic baseline.
+- [x] SQLAlchemy async engine/session.
+- [x] Request ID middleware.
+- [x] RFC 9457 error envelope and registered typed errors.
+- [ ] Structured JSON logging.
+- [x] Auth with refresh rotation.
+- [x] Refresh-token reuse detection.
+- [x] RBAC dependencies: `require_user`, `require_role`, `require_tenant`.
+- [x] RLS tenant context through `SET LOCAL`.
+- [ ] Production rate limiter.
+- [x] Idempotency service keyed by tenant, subject, and key with body-hash mismatch handling.
+- [x] Domain events table and repository.
+- [x] Worker skeleton with domain-event claim/drain no-op.
+- [x] Health/readiness/metrics endpoints.
+- [x] Local Docker Postgres commands: `db.up`, `db.down`, `db.migrate`.
 
 Exit gate:
-- Auth/security integration suite passes.
-- DB RLS tests pass for critical tables.
-- Generated client compiles.
+- [x] Auth/security integration suite passes.
+- [x] DB RLS proof test passes for the first RLS table.
+- [x] Generated client is regenerated from OpenAPI.
+- [ ] Rate-limit tests pass.
+- [ ] Structured logging checks pass.
+- [ ] RLS coverage expands from proof table to production tenant tables.
 
 ### Phase 2 - Core Marketplace Loop
 
 Duration: 2-3 weeks.
 
 Build:
-- Merchant discovery and detail.
-- Service templates and merchant services.
-- Slot capacity and booking hold lifecycle.
-- Merchant queue APIs.
-- Check-in QR/manual code.
-- Evidence presign/confirm/process.
-- Payment QR/cash/user-claimed/merchant-confirmed.
-- Rating.
-- Realtime events and polling fallback.
+- [ ] Merchant discovery and detail.
+- [ ] Service templates and merchant services.
+- [ ] Slot capacity and booking hold lifecycle.
+- [ ] Merchant queue APIs.
+- [ ] Check-in QR/manual code.
+- [ ] Evidence presign/confirm/process.
+- [ ] Payment QR/cash/user-claimed/merchant-confirmed.
+- [ ] Rating.
+- [ ] Realtime events and polling fallback.
 
 Exit gate:
-- Full core loop passes API integration and Maestro smoke.
-- Concurrent hold tests pass.
-- Payment idempotency tests pass.
-- Evidence retry tests pass.
+- [ ] Full core loop passes API integration and Maestro smoke.
+- [ ] Concurrent hold tests pass.
+- [ ] Payment idempotency tests pass.
+- [ ] Evidence retry tests pass.
 
 ### Phase 3 - Retention, Promo, Complaints, Ops Support
 
 Duration: 2-3 weeks.
 
 Build:
-- Promo code validation with 8 cases and stacking rules.
-- Reward stamp/voucher lifecycle with budget cap.
-- Referral tracking and sharing links.
-- Complaint submission, SLA, ops resolution, refund/voucher decision.
-- Merchant custom service review/resubmit.
-- Merchant price history.
-- Daily summary CSV.
-- Commission receivable export.
+- [ ] Promo code validation with 8 cases and stacking rules.
+- [ ] Reward stamp/voucher lifecycle with budget cap.
+- [ ] Referral tracking and sharing links.
+- [ ] Complaint submission, SLA, ops resolution, refund/voucher decision.
+- [ ] Merchant custom service review/resubmit.
+- [ ] Merchant price history.
+- [ ] Daily summary CSV.
+- [ ] Commission receivable export.
 
 Exit gate:
-- Reward C10/C11/C12 flows pass.
-- Referral attribution tests pass.
-- Complaint ops workflow passes.
-- Promo stacking tests pass.
+- [ ] Reward C10/C11/C12 flows pass.
+- [ ] Referral attribution tests pass.
+- [ ] Complaint ops workflow passes.
+- [ ] Promo stacking tests pass.
 
 ### Phase 4 - Expo Mobile Parity
 
 Duration: 4-6 weeks, parallelizable after Phase 0 and backend contract freeze.
 
 Build lanes:
-- Mobile shell: Expo Router, Tamagui, auth store, generated client, query client, offline queue.
-- Consumer lane: O1/O2/C1/C3/C4/C5/C6/C7/C9/C10/C11/C12.
-- Merchant lane: MO1-MO4/M1/M2/M4/M-Service.
-- Native capability lane: camera, QR, GPS, SecureStore, push, deep links, file queue.
+- [x] Mobile shell scaffold: Expo Router app shell.
+- [ ] Tamagui primitives.
+- [ ] Auth store.
+- [ ] Generated client integration in app runtime.
+- [ ] Query client.
+- [ ] Offline queue.
+- [ ] Consumer lane: O1/O2/C1/C3/C4/C5/C6/C7/C9/C10/C11/C12.
+- [ ] Merchant lane: MO1-MO4/M1/M2/M4/M-Service.
+- [ ] Native capability lane: camera, QR, GPS, SecureStore, push, deep links, file queue.
 
 Exit gate:
-- All mandatory route manifest rows have loading/error/offline/forbidden states.
-- Maestro smoke passes on iOS and Android.
-- Physical-device camera/push/GPS tests pass.
+- [ ] All mandatory route manifest rows have loading/error/offline/forbidden states.
+- [ ] Maestro smoke passes on iOS and Android.
+- [ ] Physical-device camera/push/GPS tests pass.
 
 ### Phase 5 - Ops Web
 
 Duration: 1-2 weeks.
 
 Build:
-- Ops auth/RBAC.
-- Admissions queue and detail.
-- Payment recipient verification.
-- Commission export.
-- Complaint triage/refund/voucher decision.
-- Network health/fallback actions.
-- Growth/eKYC review and merchant pipeline.
-- Audit log views.
+- [x] Ops web scaffold: Vite React shell.
+- [ ] Ops auth/RBAC.
+- [ ] Admissions queue and detail.
+- [ ] Payment recipient verification.
+- [ ] Commission export.
+- [ ] Complaint triage/refund/voucher decision.
+- [ ] Network health/fallback actions.
+- [ ] Growth/eKYC review and merchant pipeline.
+- [ ] Audit log views.
 
 Exit gate:
-- Playwright ops journeys pass.
-- Exports return correct CSV headers and totals.
-- Ops actions write audit log.
+- [ ] Playwright ops journeys pass.
+- [ ] Exports return correct CSV headers and totals.
+- [ ] Ops actions write audit log.
 
 ### Phase 6 - Migration, Soak, Cutover
 
 Duration: 1-2 weeks.
 
 Build:
-- Migration script with dry-run mode.
-- Seed scripts.
-- Shadow-read compare harness.
-- Production deploy pipeline.
-- Backup/restore rehearsal.
-- Feature-flagged API origin switch.
-- Launch dashboards and alerts.
+- [ ] Migration script with dry-run mode.
+- [ ] Seed scripts.
+- [ ] Shadow-read compare harness.
+- [ ] Production deploy pipeline.
+- [ ] Backup/restore rehearsal.
+- [ ] Feature-flagged API origin switch.
+- [ ] Launch dashboards and alerts.
 
 Cutover gate:
-- 48h staging soak.
-- 20+ synthetic bookings with no state divergence.
-- Migration dry-run and restore rehearsal pass.
-- Security suite pass.
-- Load smoke pass.
-- Mobile release candidate installed on target devices.
-- Rollback runbook executed once in staging.
+- [ ] 48h staging soak.
+- [ ] 20+ synthetic bookings with no state divergence.
+- [ ] Migration dry-run and restore rehearsal pass.
+- [ ] Security suite pass.
+- [ ] Load smoke pass.
+- [ ] Mobile release candidate installed on target devices.
+- [ ] Rollback runbook executed once in staging.
 
 ## 22. Workstream Parallelization
 
