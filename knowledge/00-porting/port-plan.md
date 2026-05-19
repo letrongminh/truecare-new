@@ -1511,6 +1511,7 @@ Completed slices:
 - [x] P0 local route-closure backend/API slice: `/v1/me/bookings`, consumer arrived ping, merchant calendar/maintenance, Golden Hour table/API, ops data-room/export jobs, fallback booking/check-in/evidence/payment confirmation, ops reward voucher minting, transactional audit rows, integration coverage, and regenerated OpenAPI client.
 - [x] P0 next local E2E closure slice: `/v1/auth/me` merchant context, stale-hold no-show/deposit worker path, replay-safe payment denial/switch/cash transitions, processed-domain-event/dead-letter worker coverage, local native capability adapters/file queue, consumer/merchant primary-action wiring, Ops fallback/export/complaint/audit action wiring, route matrix completed-row enforcement, and regenerated OpenAPI client.
 - [x] Local E2E verification slice: stable local JWT signing key, deterministic consumer/merchant/ops QA fixtures, local API/Ops/Mobile Make targets, local-only runbook, and `make local.qa.smoke` covering auth exists/signup/login/me, discovery, hold/arrived/check-in, evidence, payment denial/switch/cash, rating, voucher redeem, referral share, complaint resolution, merchant queue/service transition, Ops fallback/export/audit actions, then restoring the fixture baseline.
+- [x] Local E2E prerequisites and app-health slice: required CLI/Docker prerequisite checker, aggregate `make local.e2e.gates` target that restores fixture baseline at the end, API/Ops app health checker using seeded tokens, runner fail-fast targets for Maestro/Playwright prerequisites, and detailed E2E prerequisites documentation.
 
 Current contract route status:
 - [x] 103/103 contract routes have real handlers in the local FastAPI port.
@@ -1528,12 +1529,15 @@ Current verification:
 - [x] `make shadow-read.check`
 - [x] `make db.up`
 - [x] `make db.migrate`
+- [x] `make local.e2e.prereqs`
+- [x] `make local.e2e.gates`
 - [x] `make local.qa.fixtures`
 - [x] `make api.test`
 - [x] `make api.integration`
 - [x] `make client.generate`
 - [x] `make worker.once`
 - [x] `make local.qa.smoke`
+- [x] `make local.app.check` against running local API and Ops web; mobile runtime status remains optional/manual until Expo/physical-device checks run.
 - [x] `pnpm -r typecheck`
 - [x] P0-02 targeted integration: merchant admission go-live guard, payment recipient verification, approve/reject/suspend audit, and cross-tenant admission reads blocked through app-role RLS.
 - [x] Route-closure targeted integration: remaining 14 contract routes execute against local DB and ops mutations write audit rows.

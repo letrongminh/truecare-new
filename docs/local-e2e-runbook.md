@@ -1,6 +1,7 @@
 # Local E2E Runbook
 
 This runbook verifies the local-only TrueCare port without Supabase credentials or physical-device certification.
+See `docs/e2e-verification-prerequisites.md` for the complete local, runner, and production-like prerequisite matrix.
 
 ## Scope
 
@@ -13,12 +14,21 @@ This runbook verifies the local-only TrueCare port without Supabase credentials 
 
 ```bash
 make venv
+make local.e2e.prereqs
 make infra-prereqs.check secret-leak.check route-test-matrix.check mobile.route-files.check ops.route-files.check
 make db.up db.migrate
 make api.test api.integration worker.once
 make client.generate
 pnpm -r typecheck
 ```
+
+The same local gate set can be run with:
+
+```bash
+make local.e2e.gates
+```
+
+This aggregate target reseeds `local.qa.fixtures` at the end so `.local-e2e.json` and the local DB are ready for app testing after integration tests run.
 
 ## Seed And Smoke
 
@@ -54,6 +64,12 @@ make local.ops
 
 Open `http://127.0.0.1:5173`, paste the Ops access token from `.local-e2e.json`, and verify admissions, complaints, commission/export, network fallback, and audit search.
 
+Verify the running API and Ops web:
+
+```bash
+make local.app.check
+```
+
 Start mobile in another terminal:
 
 ```bash
@@ -61,6 +77,19 @@ make local.mobile
 ```
 
 For physical devices, run API with a LAN-reachable host and override `LOCAL_API_BASE_URL`; keep those checks manual until the physical-device gate is explicitly run.
+
+If the Expo/Metro status endpoint is reachable, include it in the local app check:
+
+```bash
+LOCAL_MOBILE_STATUS_URL=http://127.0.0.1:8081/status make local.app.check
+```
+
+Runner gates stay open until the required tools are installed and the commands pass:
+
+```bash
+make local.mobile.maestro
+make local.ops.playwright
+```
 
 ## Manual QA Checklist
 

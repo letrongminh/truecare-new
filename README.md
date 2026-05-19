@@ -15,6 +15,7 @@ Start here:
 - `packages/api-client` contains the generated TypeScript API client.
 - `docs/migration-map-v1.md` maps the 37 legacy schema tables into the Python port.
 - `docs/local-e2e-runbook.md` describes local-only API/Ops/Mobile verification.
+- `docs/e2e-verification-prerequisites.md` lists local, runner, Supabase, and production-like E2E prerequisites.
 - `Makefile` exposes readiness gates and local scaffold commands.
 
 All retained source documents were copied, not moved.
@@ -40,9 +41,10 @@ make api.integration
 make api.openapi
 make client.generate
 make worker.once
+make local.e2e.prereqs
 make local.qa.fixtures
 make local.qa.smoke
 pnpm -r typecheck
 ```
 
-Run local apps with `make local.api`, `make local.ops`, and `make local.mobile`.
+Run local apps with `make local.api`, `make local.ops`, and `make local.mobile`; verify running API/Ops endpoints with `make local.app.check`.

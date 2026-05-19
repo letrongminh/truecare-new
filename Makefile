@@ -14,6 +14,8 @@ LOCAL_API_HOST ?= 127.0.0.1
 LOCAL_API_PORT ?= 8000
 LOCAL_OPS_HOST ?= 127.0.0.1
 LOCAL_OPS_PORT ?= 5173
+LOCAL_OPS_URL ?= http://$(LOCAL_OPS_HOST):$(LOCAL_OPS_PORT)
+LOCAL_MOBILE_STATUS_URL ?=
 
 ## help — list available targets
 help:
@@ -125,3 +127,36 @@ local.ops:
 ## local.mobile — run Expo mobile locally against local.api
 local.mobile:
 	@EXPO_PUBLIC_API_BASE_URL="$(LOCAL_API_BASE_URL)" pnpm --filter @truecare/mobile dev
+
+## local.e2e.prereqs — verify required and optional local E2E tooling
+local.e2e.prereqs:
+	@$(PYTHON) scripts/local/e2e_prereqs_check.py
+
+## local.e2e.gates — run the required local API/static/typecheck verification gates
+local.e2e.gates:
+	@$(MAKE) infra-prereqs.check
+	@$(MAKE) secret-leak.check
+	@$(MAKE) route-test-matrix.check mobile.route-files.check ops.route-files.check
+	@$(MAKE) db.up db.migrate
+	@$(MAKE) local.qa.fixtures
+	@$(MAKE) local.qa.smoke
+	@$(MAKE) api.test
+	@$(MAKE) api.integration
+	@$(MAKE) worker.once
+	@$(MAKE) client.generate
+	@pnpm -r typecheck
+	@$(MAKE) local.qa.fixtures
+
+## local.app.check — verify running local API and Ops web with seeded QA tokens
+local.app.check:
+	@$(PYTHON) scripts/local/app_health_check.py --artifact "$(LOCAL_QA_ARTIFACT)" --api-base-url "$(LOCAL_API_BASE_URL)" --ops-url "$(LOCAL_OPS_URL)" $(if $(LOCAL_MOBILE_STATUS_URL),--mobile-status-url "$(LOCAL_MOBILE_STATUS_URL)",)
+
+## local.mobile.maestro — run the local mobile Maestro smoke when Maestro and a device are ready
+local.mobile.maestro:
+	@command -v maestro >/dev/null 2>&1 || { printf 'maestro CLI is required for this gate; install it before marking mobile E2E done\n' >&2; exit 1; }
+	@maestro test tools/maestro/flows/p0-mobile-smoke.yaml
+
+## local.ops.playwright — run Ops Playwright smoke against a running local Ops web
+local.ops.playwright:
+	@test -d node_modules/@playwright/test || { printf 'project-local @playwright/test is required; install it before marking Ops Playwright done\n' >&2; exit 1; }
+	@pnpm exec playwright test apps/ops-web/tests/p0-ops.spec.ts
